@@ -20,4 +20,4 @@ ENV FLASK_APP=app.py
 EXPOSE 5000
 
 # Comando por defecto
-CMD ["flask", "run", "--host=0.0.0.0", "--reload"]
+CMD ["flask", "run", "--host=0.0.0.0", "--reload", "python", "run.py"]
