@@ -10,6 +10,7 @@ Aplicación para reconocer distintas especies de anfibios de la región(Río Cua
 
 ## 🔊 Enlaces de interés
 - [Link a Miró del proyecto](https://miro.com/app/board/uXjVJP2cDz8=/)
+- [Link a Figma del proyecto](https://www.figma.com/design/qQEoRQuefrvVby2dB6fPVy/Phibia-views?node-id=0-1&t=4Uc8m4m6WApkZdQH-0)
 
 ## 👥 Integrantes
 
