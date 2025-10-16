@@ -20,4 +20,24 @@ Aplicación para reconocer distintas especies de anfibios de la región(Río Cua
    5. Lucas Martín Lillo - [@lucaslillo03](https://github.com/lucaslillo03)
 
 
+## PhibIA app
+
+Proyecto con Flask (backend), React (frontend) y MySQL, dockerizado para facilitar la instalación y despliegue.
+
+Para levantar la aplicación con Docker:
+
+-Para construir imágenes y levantar los servicios:
+   
+   ```docker compose up --build```
+
+
+   - **db**: levanta MySQL con la base de datos inicial `anfibios`.  
+   - **backend**: levanta Flask en [http://localhost:5000](http://localhost:5000).  
+   - **frontend**: levanta React (Nginx) en [http://localhost:3000](http://localhost:3000).
+
+
+-Una vez construido, solo para iniciar:
+
+   ```sudo docker compose up```
+
 

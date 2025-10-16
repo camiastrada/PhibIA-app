@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: mysql:8.0
@@ -30,13 +28,21 @@ services:
       timeout: 2s
       retries: 10
 
-  web:
-    build: .
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend 
+
+  backend:
+    build: ./backend
     container_name: flask_app
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
+      - ./backend:/app
     environment:
       - FLASK_ENV=development
       - MYSQL_HOST=db
@@ -48,3 +54,4 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        
