@@ -49,7 +49,7 @@ export default function LoginForm() {
   }, [formData]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between bg-white/80 rounded-2xl shadow-2xl">
+    <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between rounded-2xl shadow-2xl">
 
         <div className="absolute md:relative z-0 w-full md:w-1/2 h-full md:rounded-l-xl flex flex-col items-center justify-center p-8" style={{ backgroundImage: `url(${LoginImage})`, backgroundSize: 'cover', backgroundPosition: 'top' }}>
           <div className="absolute inset-0 bg-black opacity-40 md:rounded-l-xl"></div>
@@ -66,7 +66,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 h-2/5 md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 md:bg-none z-10 md:rounded-r-xl rounded-t-4xl md:rounded-t-none">
+        <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 h-2/5 md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 z-10 md:rounded-r-xl rounded-t-4xl md:rounded-t-none">
           <div className="flex flex-col items-center w-full">
             <h2 className="text-2xl font-bold mb-4 text-center text-[var(--color-text-main)] font-sans ">Iniciar Sesión</h2>
 

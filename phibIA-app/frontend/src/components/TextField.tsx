@@ -1,4 +1,4 @@
-import React from "react";
+import {useState} from "react";
 
 interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   type: string;
@@ -8,7 +8,7 @@ interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default function TextField({ type, placeholder, color, icon, ...props }: TextFieldProps) {
-  const[showPassword, setShowPassword] = React.useState(false);
+  const[showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="flex items-center border-b mb-3 p-3" style={{ borderBottomColor: color }}>

@@ -1,5 +1,4 @@
-import React from "react";
-import "../App.css"; 
+import "../styles/App.css";
 import LoginForm from "../components/LoginForm.tsx";
 
 function Login() {

@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+body:has(#homeIcon:hover) #homeLabel,body:has(#capturesIcon:hover) #capturesLabel,body:has(#encyclopediaIcon:hover) #encyclopediaLabel, .sidebarLabel:hover {
+  background-color: #152C2880; /* el último "80" es la opacidad en hexadecimal */
+}
+
+body:has(#homeLabel:hover) #homeIcon, body:has(#capturesLabel:hover) #capturesIcon, body:has(#encyclopediaLabel:hover) #encyclopediaIcon, .sidebarIcon:hover {
+    padding-left: 0;
+    border-left-width: 6px;
+    border-left-color: #43A047; 
+}

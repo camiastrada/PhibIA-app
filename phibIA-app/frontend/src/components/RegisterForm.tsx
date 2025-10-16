@@ -58,7 +58,7 @@ export default function RegisterForm() {
   }, [formData]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between bg-white/80 rounded-2xl shadow-2xl">
+    <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between rounded-2xl shadow-2xl">
 
         <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 h-1/2 md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 md:bg-none z-10 md:rounded-l-xl rounded-t-4xl md:rounded-t-none">
           <div className="flex flex-col items-center w-full">
