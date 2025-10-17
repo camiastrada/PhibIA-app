@@ -3,6 +3,7 @@
 body:has(#homeIcon:hover) #homeLabel,
 body:has(#capturesIcon:hover) #capturesLabel,
 body:has(#encyclopediaIcon:hover) #encyclopediaLabel,
+body:has(#profileIcon:hover) #profileLabel,
 .sidebarLabel:hover {
   background-color: #152c2880; /* el último "80" es la opacidad en hexadecimal */
 }
@@ -14,6 +15,10 @@ body:has(#encyclopediaLabel:hover) #encyclopediaIcon,
   padding-left: 0;
   border-left-width: 6px;
   border-left-color: #43a047;
+}
+
+body:has(#profileLabel:hover) #profileSection {
+  border: 3px solid #43a047;
 }
 
 .actived-nav {
