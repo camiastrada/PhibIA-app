@@ -1,7 +1,57 @@
-version: "3.9"
-
 services:
-  web:
-    build: .
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: anfibios
+      MYSQL_USER: phibia_user
+      MYSQL_PASSWORD: user123
+    volumes:
+      - ./db/anfibios.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-proot123",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend 
+
+  backend:
+    build: ./backend
+    container_name: flask_app
     ports:
       - "5000:5000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - FLASK_ENV=development
+      - MYSQL_HOST=db
+      - MYSQL_USER=phibia_user
+      - MYSQL_PASSWORD=user123
+      - MYSQL_DATABASE=anfibios
+      - MYSQL_PORT=3306
+    command: python run.py
+    depends_on:
+      db:
+        condition: service_healthy
+        
