@@ -12,7 +12,7 @@ import ShowBar from "../assets/sidebarIcons/showBar.tsx";
 import ProfileIcon from "../assets/sidebarIcons/profileIcon1.png";
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   //const { pathname } = useLocation();
   return (
     <>
