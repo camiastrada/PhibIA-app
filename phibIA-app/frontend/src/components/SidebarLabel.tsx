@@ -12,7 +12,7 @@ export default function SidebarLabel({ to, id, label, isOpen }: SidebarLabelProp
     <Link
       to={to}
       id={id}
-      className="sidebarLabel p-2 flex flex-row items-center h-1/3 whitespace-nowrap"
+      className="sidebarLabel p-2 flex flex-row items-center h-15 whitespace-nowrap"
     >
       <label
         className={`text-lg ml-3 cursor-pointer transition-all duration-300 ${

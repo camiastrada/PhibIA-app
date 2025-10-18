@@ -14,7 +14,7 @@ export default function SidebarIcon({ to, icon: Icon, id }: SidebarIconProps) {
     <Link
       to={to}
       id={id}
-      className={`sidebarIcon p-2 ${
+      className={`sidebarIcon p-2 h-15 ${
         pathname === to ? "actived-nav" : ""
       }`}
     >

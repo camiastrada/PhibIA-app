@@ -5,9 +5,9 @@ import Background from '/images/bgMainImage.jpg'
 
 export default function DashboardLayout() {
   return (
-    <div className="flex h-screen w-screen"style={{ backgroundImage: `url(${Background})`, backgroundSize: 'cover', backgroundPosition: 'top' }} >
+    <div className="flex h-screen w-screen items-center"style={{ backgroundImage: `url(${Background})`, backgroundSize: 'cover', backgroundPosition: 'top' }} >
       <Sidebar />
-      <div className="flex-1 p-6 overflow-y-auto" >
+      <div className="flex justify-center items-center w-full h-full overflow-y-clip overflow-x-hidden" >
         <Outlet />
       </div>
     </div>
