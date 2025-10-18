@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Logo from "/images/whiteLogo.png";
 import "../styles/sidebar.css";
 import SidebarIcon from "./SidebarIcon.tsx";
@@ -13,7 +13,7 @@ import ProfileIcon from "../assets/sidebarIcons/profileIcon1.png";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { pathname } = useLocation();
+  //const { pathname } = useLocation();
   return (
     <>
       <div className="fixed h-screen w-20 bg-[#004D40] text-white flex flex-col p-2 rounded-r-2xl left-0 top-0 shadow-lg z-10 items-center justify-between">
