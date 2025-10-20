@@ -25,6 +25,7 @@ def init_routes(app):
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         file_path = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(file_path)
+        print(f"Archivo recibido y guardado en: {file_path}") 
 
         try:
             especie_predicha = predict_species(file_path)
