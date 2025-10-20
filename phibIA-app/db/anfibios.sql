@@ -10,8 +10,8 @@ create table usuarios(
     usuario_id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(20) NOT NULL,
-    fecha_registro DATE NOT NULL
+    password VARCHAR(100) NOT NULL,
+    fecha_registro DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
 create table especies(
