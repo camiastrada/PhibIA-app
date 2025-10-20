@@ -10,6 +10,10 @@ COPY requirements.txt .
 # Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Instala FFmpeg y otras dependencias del sistema
+RUN apt-get update && apt-get install -y ffmpeg && apt-get clean
+
+
 # Copiar código
 COPY . .
 

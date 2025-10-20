@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import librosa
 import os
+import subprocess
 
 # CARGAR MODELO
 MODEL_PATH = "app/model/anfibios_model_mejorado.pkl"
@@ -20,6 +21,14 @@ HOP_LENGTH = model_data["hop_length"]
 # FUNCIÓN PARA EXTRAER FEATURES 
 def extract_features(file_path):
     try:
+        # Verificar si el archivo es .webm
+        if file_path.endswith('.webm'):
+            wav_path = file_path.replace('.webm', '.wav')
+            file_path = convert_webm_to_wav(file_path, wav_path)
+            if not file_path:
+                print("Error en la conversión de .webm a .wav")
+                return None
+            
         audio, sr = librosa.load(file_path, sr=None)
 
         # 1. MFCC
@@ -83,3 +92,13 @@ def predict_species(file_path):
     # Decodificar nombre de especie
     especie = label_encoder.inverse_transform([pred_encoded])[0]
     return especie
+
+def convert_webm_to_wav(input_path, output_path):
+    try:
+        # Comando FFmpeg para convertir .webm a .wav
+        command = ['ffmpeg', '-i', input_path, output_path, '-y']
+        subprocess.run(command, check=True)
+        return output_path
+    except Exception as e:
+        print(f"Error al convertir {input_path} a .wav: {e}")
+        return None
