@@ -15,7 +15,7 @@ export default function SidebarIcon({ to, icon: Icon, id }: SidebarIconProps) {
       to={to}
       id={id}
       className={`sidebarIcon p-2 h-15 ${
-        pathname === to ? "actived-nav" : ""
+        pathname === to ? "md:actived-nav" : ""
       }`}
     >
       <Icon className="size-10 inline-block" />

@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import "../styles/App.css";
 import logo from "../assets/singleLogo.png";
 import specie1 from"../assets/speciesShadow/RhinellaArenarumShadow1.png";
-import specie3 from"../assets/speciesShadow/BoanaPulchellaShadow3.png";
 import specie2 from"../assets/speciesShadow/OdontophrynusAsperShadow2.png";
+import specie3 from"../assets/speciesShadow/BoanaPulchellaShadow3.png";
+import specie4 from"../assets/speciesShadow/CeratophrysCranwelliShadow4.png";
 
 function Home() {
   const [listening, setListenig] = useState(false);
   const [actualShadow, setActualShadow] = useState(specie1);
-  const shadowsList = [specie1, specie2, specie3];
+  const shadowsList = [specie1, specie2, specie3, specie4];
 
   const changeShadow = () => {
     setActualShadow((prev) => {
