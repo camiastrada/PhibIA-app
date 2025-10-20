@@ -6,3 +6,4 @@ numpy
 librosa
 scikit-learn
 soundfile
+flask-cors
