@@ -30,3 +30,27 @@ def init_routes(app):
             return jsonify({"prediccion": especie_predicha})
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+
+    @app.route("/register", methods=["POST"])
+    def register():
+        data = request.get_json()
+        name = data.get("nombre_usuario")
+        email = data.get("email")
+        password = data.get("password")
+
+        if not name or not email or not password:
+            return jsonify({"error": "Missing data"}), 400
+
+        if Usuario.query.filter((Usuario.email == email)
+        ).first():
+            return jsonify({"error": "This email is taken"}), 400
+
+        new_user = Usuario(nombre_usuario=name, email=email)
+        new_user.set_password(password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({"message": "Registration completed"}), 201
+    
