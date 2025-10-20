@@ -6,4 +6,6 @@ numpy
 librosa
 scikit-learn
 soundfile
+flask-bcrypt==1.0.1 
+Flask-JWT-Extended
 flask-cors

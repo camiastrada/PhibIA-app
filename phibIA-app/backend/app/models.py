@@ -1,23 +1,36 @@
-from datetime import datetime
+from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from . import db
-
+import bcrypt;
 
 class Usuario(db.Model):
     __tablename__ = 'usuarios'
 
     usuario_id = db.Column(db.Integer, primary_key=True)
-    nombre_usuario = db.Column(db.String(20), nullable=False, unique=True)
+    name = db.Column(db.String(20), nullable=False, unique=True)
     email = db.Column(db.String(50), nullable=False, unique=True)
-    password = db.Column(db.String(20), nullable=False)
-    fecha_registro = db.Column(db.Date, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    register_date = db.Column(db.Date, nullable=False, default=date.today)
 
     # Relaciones
     audios = db.relationship('Audio', back_populates='usuario')
     especies = db.relationship('UsuarioEspecie', back_populates='usuario')
 
     def __repr__(self):
-        return f'<Usuario {self.nombre_usuario}>'
+        return f'<Usuario {self.name}>'
+    
+    def set_password(self, password_plain):
+        self.password = bcrypt.hashpw(
+            password_plain.encode('utf-8'), 
+            bcrypt.gensalt()
+        ).decode('utf-8')
+
+    def check_password(self, password_plain):
+        return bcrypt.checkpw(
+            password_plain.encode('utf-8'), 
+            self.password.encode('utf-8')
+        )    
+   
 
 class Especie(db.Model):
     __tablename__ = 'especies'
