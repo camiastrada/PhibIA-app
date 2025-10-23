@@ -12,7 +12,7 @@ export default function Topbar(){
                     id="capturesIcon"
                     icon={CapturesIcon} />
                 <SidebarIcon
-                    to="/home"
+                    to="/"
                     id="homeIcon"
                     icon={HomeIcon} />
                 <SidebarIcon

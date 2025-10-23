@@ -30,7 +30,7 @@ export default function Sidebar() {
         </button>
         <nav className="relative flex flex-col bottom-30 gap-6 w-full justify-center">
           <SidebarIcon
-            to="/home"
+            to="/"
             id="homeIcon"
             icon={HomeIcon} />
           <SidebarIcon
@@ -75,7 +75,7 @@ export default function Sidebar() {
             } relative flex flex-col gap-6 bottom-30 transition-all ease-in-out `}
             >
             <SidebarLabel
-              to="/home"
+              to="/"
               id="homeLabel"
               label="Inicio"
               isOpen={isOpen}
