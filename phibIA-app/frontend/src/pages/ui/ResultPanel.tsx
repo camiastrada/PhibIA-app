@@ -6,10 +6,16 @@ import specie3 from "../../assets/speciesShadow/BoanaPulchellaShadow3.png";
 import specie4 from "../../assets/speciesShadow/CeratophrysCranwelliShadow4.png";
 import specie5 from "../../assets/speciesShadow/LeptodactylusGracilisShadow5.png";
 
-
-export default function ResultPanel({listening} : {listening:boolean}){
+interface Params{
+  listening: boolean;
+  prediction: boolean;
+  specie?: string; 
+}
+export default function ResultPanel({listening, prediction , specie} : Params){
     const [actualShadow, setActualShadow] = useState(specie1);
     const shadowsList = [specie1, specie2, specie3, specie4, specie5];
+
+    console.log(specie)
 
     const changeShadow = () => {
         setActualShadow((prev) => {
@@ -20,12 +26,20 @@ export default function ResultPanel({listening} : {listening:boolean}){
     };
 
     useEffect(() => {
-        if (!listening) return;
+      if (!listening) return;
 
-        const id = setInterval(changeShadow, 500);
+      if (prediction && specie) {
+        const index = parseInt(specie) - 1;
+        if (index >= 0 && index < shadowsList.length) {
+          setActualShadow(shadowsList[index]);
+        }
+        return; // 👈 Esto corta el efecto antes de crear el intervalo
+      }
 
-        return () => { clearInterval(id) };
-    }, [listening]);
+      const id = setInterval(changeShadow, 500);
+      return () => clearInterval(id);
+    }, [listening, prediction, specie]);
+
 
 
     return(
@@ -37,7 +51,7 @@ export default function ResultPanel({listening} : {listening:boolean}){
             id="panel"
             className="bg-[#004D40] rounded-full size-40 md:size-60 flex justify-center items-center"
           >
-            {listening ? (
+            {listening || prediction ? (
               <img
                 src={actualShadow}
                 alt="Species Shadow"

@@ -17,9 +17,16 @@ function Home() {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
+  const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const specieNumber = predictedSpecies?.split("-")[0];
+  const specieName = predictedSpecies?.split("-")[1];
+  
+  const hasPrediction = Boolean(
+    !listening && !isProcessing && !error && predictedSpecies && predictedSpecies !== "No detectada"
+  );
 
   useEffect(() => {
     if (listening) {
@@ -57,6 +64,7 @@ function Home() {
 
       recorder.onstop = async () => {
         try {
+          setIsProcessing(true);
           const mime = chunksRef.current[0]?.type || "audio/webm";
           const ext = mime.includes("webm") ? "webm" : mime.includes("wav") ? "wav" : "audio";
           const blob = new Blob(chunksRef.current, { type: mime });
@@ -81,6 +89,7 @@ function Home() {
         } catch (err: any) {
           setError(err?.message || String(err));
         } finally {
+          setIsProcessing(false);
           // limpiar y detener stream
           if (streamRef.current) {
             streamRef.current.getTracks().forEach((t) => t.stop());
@@ -134,7 +143,7 @@ function Home() {
         subtitle="Acercate al anfibio y graba su canto para detectar su especie"
         />
         
-        <ResultPanel listening={listening}/>
+        <ResultPanel listening={listening} prediction={hasPrediction} specie={specieNumber}/>
         <div
           id="buttonsSection"
           className="flex flex-col justify-around items-center"
@@ -170,7 +179,7 @@ function Home() {
                 setIsImport(true);
                 setListening(false);
               }}
-              className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 ${
+              className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
                 listening ? "hidden" : "flex"
               }`}
             >
@@ -181,7 +190,7 @@ function Home() {
         </div>
         {/* mostrar predicción o error */}
         <div className="mt-4 text-center">
-          {predictedSpecies && <p className="text-lg font-semibold text-[#004D40]">Predicción: {predictedSpecies}</p>}
+          {predictedSpecies && <p className="text-lg font-semibold text-[#004D40]">Predicción: {specieName}</p>}
           {error && <p className="text-red-600">Error: {error}</p>}
         </div>
       </div>
