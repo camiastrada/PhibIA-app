@@ -19,34 +19,57 @@ export default function LoginForm() {
 
   const navigate = useNavigate();
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement>
-  ): void => {
+  const [loading, setLoading] = useState(false);
+
+    const BACKEND = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent): void => {
+   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      setError("Por favor, completa todos los campos");
+      setError("Incomplete credentials");
       return;
     }
     setError("");
-    console.log("Datos del formulario:", formData);
-    // Aquí puedes agregar la lógica para enviar los datos a tu backend
-    navigate('/home');
-    setFormData({ email: "", password: "" });
-  };
+    setLoading(true);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("loginForm");
-    if (saved) setFormData(JSON.parse(saved));
-  }, []);
+    try {
+      const response = await fetch(`${BACKEND}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-  useEffect(() => {
-    localStorage.setItem("loginForm", JSON.stringify(formData));
-  }, [formData]);
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("user_info", JSON.stringify(data.user_info));
+      
+        
+        setFormData({ email: "", password: "" });
+        
+        
+        navigate('/');
+      } else {
+        setError(data.message || "Login error");
+      }
+    } catch (err) {
+      console.error("Server conection error:", err);
+      setError("No se pudo conectar con el servidor. Verifica tu conexión.");
+    } finally {
+      setLoading(false);
+    }
+    };
 
   return (
     <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between rounded-2xl shadow-2xl">
