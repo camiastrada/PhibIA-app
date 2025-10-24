@@ -53,7 +53,7 @@ export default function ResultPanel({listening, prediction , specie} : Params){
 
           const timeout = setTimeout(() => {
             setShowSpecie(true);
-          }, 2000);
+          }, 1500);
 
           return () => clearTimeout(timeout);
         }

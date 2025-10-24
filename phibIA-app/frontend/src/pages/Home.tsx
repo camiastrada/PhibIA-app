@@ -158,7 +158,7 @@ function Home() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center md:min-h-4/5 md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs md:rounded-3xl md:p-4 ">
+    <div className="flex flex-col justify-center items-center md:min-h-4/5 w-screen md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs md:rounded-3xl md:p-4 ">
       <div id="content" >
         
         <TitleWithSubtitle
