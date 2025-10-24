@@ -7,6 +7,8 @@ import TitleWithSubtitle from "./ui/TitleWithSubtitle"
 import StopRecordIcon from "../assets/uiIcons/stopRecordIcon"
 import MicrophoneIcon from "../assets/uiIcons/microphoneIcon"
 import UploadIcon from "../assets/uiIcons/uploadIcon"
+import InfoIcon from "../assets/uiIcons/infoIcon"
+import BackIcon from "../assets/uiIcons/backIcon"
 
 
 function Home() {
@@ -23,10 +25,31 @@ function Home() {
 
   const specieNumber = predictedSpecies?.split("-")[0];
   const specieName = predictedSpecies?.split("-")[1];
-  
+
   const hasPrediction = Boolean(
     !listening && !isProcessing && !error && predictedSpecies && predictedSpecies !== "No detectada"
   );
+
+  const resetState = () => {
+  // Detener grabación si está activa
+  stopRecording();
+
+  // Limpiar todos los estados
+  setListening(false);
+  setIsImport(false);
+  setIsProcessing(false);
+  setPredictedSpecies(null);
+  setError(null);
+
+  // Asegurar que el stream se detenga
+  if (streamRef.current) {
+    streamRef.current.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+  }
+
+  mediaRecorderRef.current = null;
+  chunksRef.current = [];
+};
 
   useEffect(() => {
     if (listening) {
@@ -135,18 +158,46 @@ function Home() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center md:min-h-4/5 md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs md:rounded-3xl md:p-4">
+    <div className="flex flex-col justify-center items-center md:min-h-4/5 md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs md:rounded-3xl md:p-4 ">
       <div id="content" >
         
         <TitleWithSubtitle
-        title="¡Comienza a grabar!"
-        subtitle="Acercate al anfibio y graba su canto para detectar su especie"
+        title={hasPrediction ? specieName: "¡Comienza a grabar!"}
+        subtitle={hasPrediction ? "*resumen de la especie*" : "Acercate al anfibio y graba su canto para detectar su especie"}
         />
         
         <ResultPanel listening={listening} prediction={hasPrediction} specie={specieNumber}/>
+        
+        {!hasPrediction && (
+          listening ? (
+            <p className="text-md mb-6">Escuchando...</p>
+          ) : (
+            <p className="text-md mb-6">Comienza a grabar para obtener resultados</p>
+          )
+        )}
+        {hasPrediction &&
+        <>
+        <div className="flex flex-col items-center gap-6">
+          <Link 
+          to={"/encyclopedia/" + specieNumber}
+          className="text-[#004D40] hover:text-[#02372E] flex gap-1">
+          <InfoIcon/>
+          ver informacion detallada
+          </Link>
+          <button 
+          type="button"
+          onClick={resetState}
+          className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1">
+            Volver 
+            <BackIcon className="size-5"/>
+          </button>
+        </div>
+        </>
+        }
+
         <div
           id="buttonsSection"
-          className="flex flex-col justify-around items-center"
+          className={`${hasPrediction ? "hidden" : "flex"} flex-col justify-around items-center`}
         >
           <button
             type="button"
@@ -188,9 +239,8 @@ function Home() {
             </button>
           </Link>
         </div>
-        {/* mostrar predicción o error */}
+        {/* mostrar error */}
         <div className="mt-4 text-center">
-          {predictedSpecies && <p className="text-lg font-semibold text-[#004D40]">Predicción: {specieName}</p>}
           {error && <p className="text-red-600">Error: {error}</p>}
         </div>
       </div>
