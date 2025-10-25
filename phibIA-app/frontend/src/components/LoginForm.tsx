@@ -1,4 +1,4 @@
-import { useState,  type ChangeEvent, type FormEvent, useEffect } from "react";
+import { useState,  type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginImage from '/images/loginImage.jpg';
 import TextField from "./TextField.tsx";
@@ -119,8 +119,8 @@ export default function LoginForm() {
                 </>
               )}
 
-              <button type="submit" className="w-full bg-[#43a047] text-white py-2 rounded-lg hover:bg-[#388e3c] active:bg-[#388e3c] transition cursor-pointer">
-                Entrar
+              <button type="submit" disabled={loading} className="w-full bg-[#43a047] text-white py-2 rounded-lg hover:bg-[#388e3c] active:bg-[#388e3c] transition cursor-pointer">
+                  {loading ? 'Entrar' : 'Cargando...'}
               </button>
 
               <div className="flex justify-between md:justify-end mb-4">
