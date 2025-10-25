@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import "../styles/App.css";
-import ResultPanel from "./ui/ResultPanel"
-import TitleWithSubtitle from "./ui/TitleWithSubtitle"
+import ResultPanel from "../components/ui/ResultPanel"
+import Upload from "../components/Upload"
+import TitleWithSubtitle from "../components/ui/TitleWithSubtitle"
 import StopRecordIcon from "../assets/uiIcons/stopRecordIcon"
 import MicrophoneIcon from "../assets/uiIcons/microphoneIcon"
 import UploadIcon from "../assets/uiIcons/uploadIcon"
@@ -13,7 +14,7 @@ import BackIcon from "../assets/uiIcons/backIcon"
 
 function Home() {
   const [listening, setListening] = useState(false);
-  const [_isImport, setIsImport] = useState(false);
+  const [isImport, setIsImport] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -22,6 +23,8 @@ function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [file, setFile] = useState<File | null>(null);
 
   const specieNumber = predictedSpecies?.split("-")[0];
   const specieName = predictedSpecies?.split("-")[1];
@@ -51,17 +54,6 @@ function Home() {
   chunksRef.current = [];
 };
 
-  useEffect(() => {
-    if (listening) {
-      startRecording();
-
-      return () => {
-        stopRecording(); 
-      };
-    } else {
-      stopRecording();
-    }
-  }, [listening]);
 
 
   // Iniciar grabación
@@ -74,8 +66,10 @@ function Home() {
       streamRef.current = stream;
       chunksRef.current = [];
 
+      setListening(true)
+
       const options: any = {};
-      // Si necesitas forzar mimeType puedes usar: options.mimeType = 'audio/webm';
+
       const recorder = new MediaRecorder(stream as MediaStream, options);
       mediaRecorderRef.current = recorder;
 
@@ -87,6 +81,7 @@ function Home() {
 
       recorder.onstop = async () => {
         try {
+          setListening(false)
           setIsProcessing(true);
           const mime = chunksRef.current[0]?.type || "audio/webm";
           const ext = mime.includes("webm") ? "webm" : mime.includes("wav") ? "wav" : "audio";
@@ -157,10 +152,55 @@ function Home() {
     }
   };
 
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setError(null);
+      setPredictedSpecies(null);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsImport(false);
+
+    if (!file) {
+      setError("Por favor selecciona un archivo de audio");
+      return;
+    }
+
+    setListening(true);
+    const formData = new FormData();
+    formData.append("audio", file);
+
+    try {
+      const response = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPredictedSpecies(data.prediccion);
+        setError(null);
+      } else {
+        setError(data.error || "Error en la predicción");
+      }
+    } catch (err) {
+      setError("Error al conectar con el servidor");
+    } finally {
+      setListening(false);
+      
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center md:min-h-4/5 w-screen md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs md:rounded-3xl md:p-4 ">
-      <div id="content" >
-        
+      <div className={isImport ? "absolute flex w-full h-full justify-center items-center z-10" : "hidden"}><Upload handleFileChange={handleFileChange} handleSubmit={handleSubmit} file={file}/></div>
+      <div id="content" className={isImport ? "blur-xl" : ""}>
         <TitleWithSubtitle
         title={hasPrediction ? specieName: "¡Comienza a grabar!"}
         subtitle={hasPrediction ? "*resumen de la especie*" : "Acercate al anfibio y graba su canto para detectar su especie"}
@@ -202,7 +242,7 @@ function Home() {
           <button
             type="button"
             onClick={() => {
-              setListening(!listening);
+              listening ? stopRecording() : startRecording();
               setIsImport(false);
             }}
             className={`flex flex-row justify-center cursor-pointer ${
@@ -223,21 +263,21 @@ function Home() {
             )}
           </button>
 
-          <Link to="/upload">
-            <button
-              type="button"
-              onClick={() => {
-                setIsImport(true);
-                setListening(false);
-              }}
-              className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
-                listening ? "hidden" : "flex"
-              }`}
-            >
-              Importar grabación
-              <UploadIcon className="size-4 inline-block" />
-            </button>
-          </Link>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsImport(true);
+              setListening(false);
+            }}
+            className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
+              listening ? "hidden" : "flex"
+            }`}
+          >
+            Importar grabación
+            <UploadIcon className="size-4 inline-block" />
+          </button>
+
         </div>
         {/* mostrar error */}
         <div className="mt-4 text-center">
