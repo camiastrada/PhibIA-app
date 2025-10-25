@@ -3,7 +3,7 @@ from .models import Usuario
 from .ml_model import predict_species
 from . import db
 import os
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
 
 UPLOAD_FOLDER = "app/uploads"
 
@@ -14,6 +14,7 @@ def init_routes(app):
 
 
     @app.route("/predict", methods=["POST"])
+    @jwt_required()
     def predict():
         if "audio" not in request.files:
             return jsonify({"error": "No se envió archivo"}), 400
