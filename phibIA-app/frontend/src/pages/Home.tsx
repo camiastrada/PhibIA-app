@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import "../styles/App.css";
@@ -193,17 +193,19 @@ function Home() {
       setError("Error al conectar con el servidor");
     } finally {
       setListening(false);
-      
+      setFile(null);
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center md:min-h-4/5 w-screen md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs md:rounded-3xl md:p-4 ">
-      <div className={isImport ? "absolute flex w-full h-full justify-center items-center z-10" : "hidden"}><Upload handleFileChange={handleFileChange} handleSubmit={handleSubmit} file={file}/></div>
+    <div className="flex flex-col justify-center items-center md:min-h-4/5 md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
+      <div className={isImport ? "absolute flex w-full h-full justify-center items-center z-10" : "hidden"}>
+        <Upload handleFileChange={handleFileChange} handleSubmit={handleSubmit} setIsImport={setIsImport}/>
+      </div>
       <div id="content" className={isImport ? "blur-xl" : ""}>
         <TitleWithSubtitle
         title={hasPrediction ? specieName: "¡Comienza a grabar!"}
-        subtitle={hasPrediction ? "*resumen de la especie*" : "Acercate al anfibio y graba su canto para detectar su especie"}
+        subtitle={hasPrediction ? "*nombre comun*" : "Acercate al anfibio y graba su canto para detectar su especie"}
         />
         
         <ResultPanel listening={listening} prediction={hasPrediction} specie={specieNumber}/>
