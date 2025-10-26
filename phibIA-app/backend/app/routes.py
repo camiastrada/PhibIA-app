@@ -28,8 +28,11 @@ def init_routes(app):
         print(f"Archivo recibido y guardado en: {file_path}") 
 
         try:
-            especie_predicha = predict_species(file_path)
-            return jsonify({"prediccion": especie_predicha})
+            especie_predicha, confianza = predict_species(file_path)
+            return jsonify({
+                "prediccion": especie_predicha,
+                "confianza": round(confianza, 2)  
+            })
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
