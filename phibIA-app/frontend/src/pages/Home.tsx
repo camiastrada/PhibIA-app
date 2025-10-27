@@ -22,6 +22,7 @@ function Home() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
+  const [confidence, setConfidence] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -42,6 +43,7 @@ function Home() {
   setIsImport(false);
   setIsProcessing(false);
   setPredictedSpecies(null);
+  setConfidence(null);
   setError(null);
 
   // Asegurar que el stream se detenga
@@ -60,6 +62,7 @@ function Home() {
   const startRecording = async () => {
     setError(null);
     setPredictedSpecies(null);
+    setConfidence(null);
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -103,6 +106,7 @@ function Home() {
           } else {
             // backend devuelve { prediccion: 'Nombre' }
             setPredictedSpecies(data?.prediccion ?? data?.prediction ?? data?.species ?? "No detectada");
+            setConfidence(data?.confianza ?? null);
           }
         } catch (err: any) {
           setError(err?.message || String(err));
@@ -159,6 +163,7 @@ function Home() {
       setFile(selectedFile);
       setError(null);
       setPredictedSpecies(null);
+      setConfidence(null);
     }
   };
 
@@ -185,6 +190,7 @@ function Home() {
 
       if (response.ok) {
         setPredictedSpecies(data.prediccion);
+        setConfidence(data.confianza ?? null);
         setError(null);
       } else {
         setError(data.error || "Error en la predicción");
