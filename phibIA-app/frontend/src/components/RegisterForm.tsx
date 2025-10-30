@@ -5,7 +5,7 @@ import TextField from "./TextField.tsx";
 import { Link } from "react-router-dom";
 
 interface RegisterFormData {
-  user: string;
+  name: string;
   email: string;
   password: string;
 }
@@ -13,12 +13,14 @@ interface RegisterFormData {
 export default function RegisterForm() {
 
   const [formData, setFormData] = useState<RegisterFormData>({
-    user: "",
+    name: "",
     email: "",
     password: "",
   });
 
   const[confirmPassword, setConfirmPassword] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const[error, setError] = useState("");
 
@@ -31,21 +33,46 @@ export default function RegisterForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent): void => {
+   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (formData.password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
       return;
     }
-    if (!formData.user || !formData.email || !formData.password || !confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password || !confirmPassword) {
       setError("Por favor, completa todos los campos");
       return;
     }
-    setError("");
-    console.log("Datos del formulario:", formData);
-    // Aquí puedes agregar la lógica para enviar los datos a tu backend
-    navigate('/login');
     
+    setError("");
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Error al registrar usuario');
+        return;
+      }
+
+      localStorage.setItem('token', data.token); //JWT
+      localStorage.removeItem("registerForm");
+      navigate('/login');
+      
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error de conexión con el servidor');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -72,7 +99,7 @@ export default function RegisterForm() {
                 </svg>
               }/>
 
-              <TextField type="text" placeholder="Nombre de usuario" color="#C0592B" name="user" onChange={handleChange} icon={
+              <TextField type="text" placeholder="Nombre de usuario" color="#C0592B" name="name" onChange={handleChange} icon={
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                 </svg>
@@ -102,8 +129,8 @@ export default function RegisterForm() {
                 </>
               )}
 
-              <button type="submit" className="w-full bg-[#C0592B] text-white py-2 rounded-lg hover:bg-[#b15327] active:bg-[#b15327] transition cursor-pointer">
-                Registrate
+              <button type="submit" disabled={isLoading} className="w-full bg-[#C0592B] text-white py-2 rounded-lg hover:bg-[#b15327] active:bg-[#b15327] transition cursor-pointer">
+                {isLoading ? 'Registrando...' : 'Registrate'}
               </button>
 
               <div className="flex justify-center mb-4">
