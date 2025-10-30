@@ -3,7 +3,6 @@ import DashboardLayout from "./layouts/DahboardLayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import Upload from "./pages/Upload";
 import "./styles/App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";

@@ -88,10 +88,17 @@ def predict_species(file_path):
 
     # Predicción del modelo
     pred_encoded = model.predict(X_scaled)[0]
+    
+    # Obtener probabilidades de todas las clases
+    probabilities = model.predict_proba(X_scaled)[0]
+    
+    # La confianza es la probabilidad máxima (de la clase predicha)
+    confidence = float(max(probabilities)) * 100  # Convertir a porcentaje
 
     # Decodificar nombre de especie
     especie = label_encoder.inverse_transform([pred_encoded])[0]
-    return especie
+    
+    return especie, confidence
 
 def convert_webm_to_wav(input_path, output_path):
     try:
