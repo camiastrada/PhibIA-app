@@ -11,6 +11,8 @@ class Usuario(db.Model):
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
     register_date = db.Column(db.Date, nullable=False, default=date.today)
+    avatar_id = db.Column(db.Integer, default=0)
+    background_color = db.Column(db.String(10), default="#FFFFFF")
 
     # Relaciones
     audios = db.relationship('Audio', back_populates='usuario')
