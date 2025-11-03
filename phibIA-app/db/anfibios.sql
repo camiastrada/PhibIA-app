@@ -11,7 +11,9 @@ create table usuarios(
     name VARCHAR(20) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    register_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    register_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    avatar_id INTEGER DEFAULT 0,
+    background_color VARCHAR(10) DEFAULT "#FFFFFF"
 
 );
 
