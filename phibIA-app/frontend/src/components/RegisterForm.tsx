@@ -1,6 +1,6 @@
-import { useState,  type ChangeEvent, type FormEvent, useEffect } from "react";
+import { useState,  type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import RegisterImage from '/images/registerImage.jpg';
+const RegisterImage = "/images/registerImage.jpg";
 import TextField from "./TextField.tsx";
 import { Link } from "react-router-dom";
 
@@ -23,6 +23,8 @@ export default function RegisterForm() {
   const[error, setError] = useState("");
 
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement>
@@ -31,7 +33,7 @@ export default function RegisterForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent): void => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (formData.password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -42,20 +44,33 @@ export default function RegisterForm() {
       return;
     }
     setError("");
-    console.log("Datos del formulario:", formData);
-    // Aquí puedes agregar la lógica para enviar los datos a tu backend
-    navigate('/login');
-    
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre_usuario: formData.user,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setError(data.error || data.message || 'Error en el registro');
+        return;
+      }
+
+      navigate('/login');
+    } catch (err) {
+      setError('Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
+    }
   };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("registerForm");
-    if (saved) setFormData(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("registerForm", JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between rounded-2xl shadow-2xl">
@@ -102,8 +117,8 @@ export default function RegisterForm() {
                 </>
               )}
 
-              <button type="submit" className="w-full bg-[#C0592B] text-white py-2 rounded-lg hover:bg-[#b15327] active:bg-[#b15327] transition cursor-pointer">
-                Registrate
+              <button type="submit" className="w-full bg-[#C0592B] text-white py-2 rounded-lg hover:bg-[#b15327] active:bg-[#b15327] transition cursor-pointer" disabled={loading}>
+                {loading ? 'Registrando...' : 'Registrate'}
               </button>
 
               <div className="flex justify-center mb-4">

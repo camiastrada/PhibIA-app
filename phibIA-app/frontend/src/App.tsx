@@ -3,6 +3,7 @@ import DashboardLayout from "./layouts/DahboardLayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import Logout from "./pages/Logout";
 import "./styles/App.css";
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Logout />} />
       </Routes>
     </Router>
   );

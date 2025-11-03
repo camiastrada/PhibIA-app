@@ -1,6 +1,7 @@
-import { useState,  type ChangeEvent, type FormEvent, useEffect } from "react";
+import { useState,  type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginImage from '/images/loginImage.jpg';
+import { useAuth } from "../context/AuthContext";
+const LoginImage = "/images/loginImage.jpg";
 import TextField from "./TextField.tsx";
 import { Link } from 'react-router-dom';
 
@@ -16,8 +17,11 @@ export default function LoginForm() {
   });
 
   const[error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const auth = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement>
@@ -26,28 +30,42 @@ export default function LoginForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent): void => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-    if (!formData.email || !formData.password) {
+    const email = formData.email?.trim() ?? '';
+    const password = formData.password?.trim() ?? '';
+    if (!email || !password) {
       setError("Por favor, completa todos los campos");
       return;
     }
     setError("");
-    console.log("Datos del formulario:", formData);
-    // Aquí puedes agregar la lógica para enviar los datos a tu backend
-    navigate('/home');
-    setFormData({ email: "", password: "" });
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.message || data.error || 'Error en el login');
+        return;
+      }
+      const token = data.access_token;
+      const user_info = data.user_info ?? null;
+      if (token) {
+        auth.login(token, user_info);
+        navigate('/');
+      } else {
+        setError('No se recibió token del servidor');
+      }
+    } catch (err) {
+      setError('Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
+      setFormData({ email: "", password: "" });
+    }
   };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("loginForm");
-    if (saved) setFormData(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("loginForm", JSON.stringify(formData));
-  }, [formData]);
-
   return (
     <div className="flex flex-col md:flex-row w-full md:w-4/5 h-full md:h-4/5 items-center justify-between rounded-2xl shadow-2xl">
 
@@ -72,13 +90,13 @@ export default function LoginForm() {
 
             <div className="w-full max-w-sm">
 
-              <TextField type="email" placeholder="Correo electrónico" color="var(--color-text-main)" name="email" onChange={handleChange} icon={
+              <TextField type="email" placeholder="Correo electrónico" color="var(--color-text-main)" name="email" value={formData.email} onChange={handleChange} icon={
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 text-slate-500 md:hidden lg:block">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                 </svg>
               }/>
 
-              <TextField type="password" placeholder="Contraseña" color="var(--color-text-main)" name="password" onChange={handleChange} icon={
+              <TextField type="password" placeholder="Contraseña" color="var(--color-text-main)" name="password" value={formData.password} onChange={handleChange} icon={
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 text-slate-500 md:hidden lg:block">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
@@ -96,8 +114,8 @@ export default function LoginForm() {
                 </>
               )}
 
-              <button type="submit" className="w-full bg-[#43a047] text-white py-2 rounded-lg hover:bg-[#388e3c] active:bg-[#388e3c] transition cursor-pointer">
-                Entrar
+              <button type="submit" className="w-full bg-[#43a047] text-white py-2 rounded-lg hover:bg-[#388e3c] active:bg-[#388e3c] transition cursor-pointer" disabled={loading}>
+                {loading ? 'Ingresando...' : 'Entrar'}
               </button>
 
               <div className="flex justify-between md:justify-end mb-4">
