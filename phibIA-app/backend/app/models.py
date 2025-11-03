@@ -69,7 +69,8 @@ class Audio(db.Model):
     
     # Claves foráneas
     especie_id = db.Column(db.Integer, db.ForeignKey('especies.especie_id'), nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
+    #usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=True)
     ubicacion_id = db.Column(db.Integer, db.ForeignKey('ubicaciones.ubicacion_id'), nullable=False)
 
     # Relaciones

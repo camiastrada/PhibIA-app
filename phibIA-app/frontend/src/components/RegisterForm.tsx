@@ -65,6 +65,7 @@ export default function RegisterForm() {
 
       localStorage.setItem('token', data.token); //JWT
       localStorage.removeItem("registerForm");
+
       navigate('/login');
       
     } catch (error) {

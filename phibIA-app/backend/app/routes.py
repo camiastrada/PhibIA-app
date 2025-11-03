@@ -1,8 +1,10 @@
 from flask import jsonify, request
 from .models import Usuario
+from .models import Audio
 from .ml_model import predict_species
 from . import db
 import os
+from datetime import datetime
 from flask_jwt_extended import create_access_token, jwt_required
 
 UPLOAD_FOLDER = "app/uploads"
@@ -14,7 +16,7 @@ def init_routes(app):
 
 
     @app.route("/predict", methods=["POST"])
-    @jwt_required()
+    #@jwt_required()
     def predict():
         if "audio" not in request.files:
             return jsonify({"error": "No se envió archivo"}), 400
@@ -30,6 +32,22 @@ def init_routes(app):
 
         try:
             especie_predicha, confianza = predict_species(file_path)
+
+            # Separar ID y nombre
+            especie_id_str, nombre_especie = especie_predicha.split('-', 1)
+            especie_id = int(especie_id_str)  # convertir a entero
+            # Crear el objeto Audio
+            nuevo_audio = Audio(
+                ruta=file_path,
+                fecha_grabacion=datetime.now(),
+                especie_id=especie_id,     
+                usuario_id=None,      # aca deberia ir el usuario actual
+                ubicacion_id=1    # aca iria la ubicacion real
+            )
+
+            # Guardarlo en la DB
+            db.session.add(nuevo_audio)
+            db.session.commit()
             return jsonify({
                 "prediccion": especie_predicha,
                 "confianza": round(confianza, 2)  
@@ -40,10 +58,12 @@ def init_routes(app):
 
     @app.route("/register", methods=["POST"])
     def register():
+        print("Endpoint /register llamado")  
         data = request.get_json()
-        name = data.get("nombre_usuario")
+        name = data.get("name")
         email = data.get("email")
         password = data.get("password")
+        print(data)
 
         if not name or not email or not password:
             return jsonify({"error": "Missing data"}), 400
@@ -60,6 +80,8 @@ def init_routes(app):
             db.session.commit()
             return jsonify({'message': 'Registration completed'}), 201
         except Exception as e:
+            db.session.rollback()  # evita que la sesión quede "sucia"
+            print("Error al guardar usuario:", e)  # log en consola
             return jsonify({'message': 'Error in database', 'error': str(e)}), 500
 
 

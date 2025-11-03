@@ -11,7 +11,7 @@ create table usuarios(
     name VARCHAR(20) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    register_date DATE NOT NULL DEFAULT CURRENT_DATE
+    register_date DATE NOT NULL DEFAULT (CURRENT_DATE)
 );
 
 create table especies(
@@ -42,9 +42,28 @@ create table audios(
     ruta VARCHAR(100) NOT NULL,
     fecha_grabacion DATETIME NOT NULL,
     especie_id INT NOT NULL,
-    usuario_id INT NOT NULL,
+    /*usuario_id INT NOT NULL*/
+    usuario_id INT NULL,
     ubicacion_id INT NOT NULL,
     CONSTRAINT fk_usuario_audio FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
     CONSTRAINT fk_especie_audio FOREIGN KEY (especie_id) REFERENCES especies(especie_id),
     CONSTRAINT fk_ubicacione_audio FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
 );
+
+INSERT INTO especies (nombre_cientifico, nombre_comun, descripcion, imagen)
+VALUES
+('Rhinella arenarum', NULL, NULL, 'photo/RhinellaArenarum.png'),
+('Odontophrynus asper', NULL, NULL, 'photo/OdontophrynusAsper.png'),
+('Boana pulchella', NULL, NULL, 'photo/BoanaPulchella.png'),
+('Ceratophrys cranwelli', NULL, NULL, 'photo/CeratophrysCranwelli.png'),
+('Leptodactylus gracilis', NULL, NULL, 'photo/LeptodactylusGracilis.png'),
+('Leptodactylus latinasus', NULL, NULL, 'photo/LeptodactylusLatinasus.png'),
+('Leptodactylus luctator', NULL, NULL, 'photo/LeptodactylusLuctator.png'),
+('Leptodactylus mystacinus', NULL, NULL, 'photo/LeptodactylusMystacinus.png'),
+('Pleurodema tucumanum', NULL, NULL, 'photo/PleurodemaTucumanum.png'),
+('Scinax nasicus', NULL, NULL, 'photo/ScinaxNasicus.png'),
+('Physalaemus biligonigerus', NULL, NULL, 'photo/PhysalaemusBiligonigerus.png')
+ON DUPLICATE KEY UPDATE imagen=VALUES(imagen);
+
+INSERT IGNORE INTO ubicaciones (ubicacion_id, descripcion)
+VALUES (1, 'Desconocida');

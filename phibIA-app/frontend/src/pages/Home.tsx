@@ -22,7 +22,7 @@ function Home() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
-  const [confidence, setConfidence] = useState<number | null>(null);
+  const [_confidence, setConfidence] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -95,8 +95,12 @@ function Home() {
           formData.append("audio", blob, `recording_${Date.now()}.${ext}`);
 
           // enviar al backend
+          const token = localStorage.getItem("access_token");
           const res = await fetch("http://localhost:5000/predict", {
             method: "POST",
+            headers: {
+              "Authorization": `Bearer ${token}`, // <--- token recibido al loguearse
+            },
             body: formData,
           });
 
