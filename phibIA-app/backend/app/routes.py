@@ -3,7 +3,8 @@ from .models import Usuario
 from .ml_model import predict_species
 from . import db
 import os
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+
 
 UPLOAD_FOLDER = "app/uploads"
 
@@ -93,3 +94,20 @@ def init_routes(app):
 
         else:
             return jsonify({'message': 'Wrong password or email'}), 401        
+        
+    @app.route("/api/user/profile", methods=["GET"])
+    @jwt_required()
+    def get_user_profile():
+        user_id = get_jwt_identity()  # viene del token JWT
+        user = Usuario.query.filter_by(usuario_id=user_id).first()
+
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        return jsonify({
+            "id": user.usuario_id,
+            "name": user.name,
+            "email": user.email,
+            "avatar_id": user.avatar_id,
+            "background_color": user.background_color
+        })

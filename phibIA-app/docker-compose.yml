@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: mysql:8.0
@@ -13,32 +15,15 @@ services:
     ports:
       - "3307:3306"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-proot123",
-        ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
       interval: 5s
-      timeout: 2s
+      timeout: 10s
       retries: 10
-
-  frontend:
-    build: ./frontend
-    container_name: frontend_app
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend 
 
   backend:
     build: ./backend
     container_name: flask_app
+    restart: always
     ports:
       - "5000:5000"
     volumes:
@@ -50,8 +35,15 @@ services:
       - MYSQL_PASSWORD=user123
       - MYSQL_DATABASE=anfibios
       - MYSQL_PORT=3306
-    command: python run.py
     depends_on:
       db:
         condition: service_healthy
-        
+    command: python run.py
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend

@@ -11,7 +11,8 @@ create table usuarios(
     name VARCHAR(20) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    register_date DATE NOT NULL DEFAULT CURRENT_DATE
+    register_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
 );
 
 create table especies(
