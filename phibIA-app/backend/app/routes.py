@@ -89,7 +89,7 @@ def init_routes(app):
             user_identity = str(user.usuario_id)
             access_token = create_access_token(identity=user_identity)
             response = jsonify({
-                'message': 'Succesful login',
+                'message': 'Successful login',
                 'user_info': { 
                     'id': user.usuario_id,
                     'name': user.name,
