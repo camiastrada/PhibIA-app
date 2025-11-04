@@ -135,7 +135,7 @@ def init_routes(app):
             
             return jsonify({'valid': False}), 422
 
-    #ejemplo para prueba
+    # Protected route example
     @app.route('/protected-example', methods=['GET'])
     @jwt_required()
     def protected_example():
