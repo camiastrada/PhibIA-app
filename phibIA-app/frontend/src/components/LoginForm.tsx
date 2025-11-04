@@ -52,6 +52,7 @@ export default function LoginForm() {
         return;
       }
       const token = data.access_token;
+      console.log("TOKEN RECIBIDO:", token);
       const user_info = data.user_info ?? null;
       if (token) {
         auth.login(token, user_info);

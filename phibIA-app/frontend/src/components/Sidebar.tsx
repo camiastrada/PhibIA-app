@@ -9,7 +9,7 @@ import CapturesIcon from "../assets/sidebarIcons/mydetections.tsx";
 import EncyclopediaIcon from "../assets/sidebarIcons/encyclopedia.tsx";
 import OcultBar from "../assets/sidebarIcons/ocultBar.tsx";
 import ShowBar from "../assets/sidebarIcons/showBar.tsx";
-import ProfileIcon from "../assets/sidebarIcons/profileIcon1.png";
+import ProfileIcon from "../assets/profileIcons/profileIcon1.png";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);

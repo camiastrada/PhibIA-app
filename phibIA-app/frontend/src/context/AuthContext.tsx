@@ -16,17 +16,26 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<UserInfo | null>(null);
+    const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('authToken');
+  });
+  const [user, setUser] = useState<UserInfo | null>(() => {
+    const userData = localStorage.getItem('authUser');
+    return userData ? JSON.parse(userData) : null;
+  });
 
   const login = (newToken: string, userInfo: UserInfo | null) => {
     setToken(newToken);
     setUser(userInfo);
+    localStorage.setItem('authToken', newToken);
+    localStorage.setItem('authUser', JSON.stringify(userInfo));
   };
-
+  
   const logout = () => {
     setToken(null);
     setUser(null);
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
   };
 
   return (

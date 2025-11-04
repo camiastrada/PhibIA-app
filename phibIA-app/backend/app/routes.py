@@ -81,7 +81,7 @@ def init_routes(app):
 
         if user.check_password(password):
             user_identity = user.usuario_id
-            access_token = create_access_token(identity=user_identity)
+            access_token = create_access_token(identity=str(user.usuario_id))
             return jsonify({
                 'message': 'Succesful login',
                 'access_token': access_token, 
@@ -98,7 +98,7 @@ def init_routes(app):
     @app.route("/api/user/profile", methods=["GET"])
     @jwt_required()
     def get_user_profile():
-        user_id = get_jwt_identity()  # viene del token JWT
+        user_id = get_jwt_identity() 
         user = Usuario.query.filter_by(usuario_id=user_id).first()
 
         if not user:

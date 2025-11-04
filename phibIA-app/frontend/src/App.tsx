@@ -3,7 +3,8 @@ import DashboardLayout from "./layouts/DahboardLayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import Logout from "./pages/Logout";
+import Profile from "./pages/Profile";
+import Logout from "./components/Logout";
 import "./styles/App.css";
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
 
         <Route path="/" element={<DashboardLayout />}>
           <Route path="" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
 
         <Route path="/login" element={<Login />} />

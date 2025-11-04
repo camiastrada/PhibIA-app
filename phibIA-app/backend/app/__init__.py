@@ -10,8 +10,10 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     CORS(app, 
-         resources={r"/*": {"origins": ["http://localhost:3000", "http://frontend_app:3000"]}},
-         supports_credentials=True)
+     resources={r"/*": {"origins": ["http://localhost:3000"]}},
+     supports_credentials=True,
+     expose_headers=["Authorization"],
+     allow_headers=["Content-Type", "Authorization"])
 
     app.config['SQLALCHEMY_DATABASE_URI'] = (
         f"mysql+pymysql://{os.getenv('MYSQL_USER')}:"
