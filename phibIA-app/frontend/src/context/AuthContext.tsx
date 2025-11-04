@@ -7,30 +7,26 @@ interface UserInfo {
 }
 
 interface AuthContextType {
-  token: string | null;
   user: UserInfo | null;
-  login: (token: string, user: UserInfo | null) => void;
+  login: (user: UserInfo | null) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserInfo | null>(null);
 
-  const login = (newToken: string, userInfo: UserInfo | null) => {
-    setToken(newToken);
+  const login = (userInfo: UserInfo | null) => {
     setUser(userInfo);
   };
 
   const logout = () => {
-    setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

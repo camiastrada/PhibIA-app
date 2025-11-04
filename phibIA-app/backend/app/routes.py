@@ -1,9 +1,15 @@
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 from .models import Usuario
 from .ml_model import predict_species
 from . import db
 import os
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (
+    create_access_token, 
+    jwt_required, 
+    get_jwt_identity,
+    unset_jwt_cookies,
+    set_access_cookies
+)
 
 UPLOAD_FOLDER = "app/uploads"
 
@@ -79,17 +85,71 @@ def init_routes(app):
             return jsonify({'message': 'Wrong password or email'}), 401
 
         if user.check_password(password):
-            user_identity = user.usuario_id
+            # Asegurar que el 'sub' (subject) sea string para PyJWT
+            user_identity = str(user.usuario_id)
             access_token = create_access_token(identity=user_identity)
-            return jsonify({
+            response = jsonify({
                 'message': 'Succesful login',
-                'access_token': access_token, 
                 'user_info': { 
                     'id': user.usuario_id,
                     'name': user.name,
                     'email': user.email
                 }
-            }), 200
-
+            })
+            set_access_cookies(response, access_token)
+            return response, 200
         else:
             return jsonify({'message': 'Wrong password or email'}), 401        
+
+    @app.route('/logout', methods=['POST'])
+    @jwt_required()
+    def logout():
+        """
+        Cierra la sesión eliminando la cookie del token
+        """
+        response = jsonify({'message': 'Logout successful'})
+        unset_jwt_cookies(response)  # Elimina la cookie
+        return response, 200
+
+
+    @app.route('/verify-token', methods=['GET'])
+    @jwt_required()
+    def verify_token():
+             
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'valid': False}), 401
+        user = Usuario.query.get(current_user_id)
+        
+        if user:
+            return jsonify({
+                'valid': True,
+                'user_info': {
+                    'id': user.usuario_id,
+                    'name': user.name,
+                    'email': user.email
+                }
+            }), 200
+        else:
+            return jsonify({'valid': False}), 401
+
+    #ejemplo para prueba
+    @app.route('/protected-example', methods=['GET'])
+    @jwt_required()
+    def protected_example():
+        """
+        Ejemplo de ruta protegida
+        """
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'message': 'Invalid token subject'}), 401
+
+        user = Usuario.query.get(current_user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 401
+
+        return jsonify({
+            'message': f'Hola {user.name}, estás autenticado!'
+        }), 200
