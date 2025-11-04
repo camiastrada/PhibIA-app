@@ -43,7 +43,7 @@ export default function LoginForm() {
       const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', //PARA COOKIES
+        credentials: 'include', // Include credentials for cookie support
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json().catch(() => ({}));
