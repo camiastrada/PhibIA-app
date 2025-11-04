@@ -31,8 +31,7 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend_app
-    ports:
-      - "3000:80"
+    # No exponer puerto directamente - solo accesible a través de nginx
     environment:
       - VITE_API_URL=/api # Las direcciones sin api son front
     depends_on:
@@ -41,6 +40,7 @@ services:
   backend:
     build: ./backend
     container_name: flask_app
+    # Puerto 5000 solo para debug directo - en producción comentar esta línea
     ports:
       - "5000:5000"
     volumes:

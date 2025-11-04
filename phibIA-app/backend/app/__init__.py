@@ -13,9 +13,15 @@ def create_app():
     app = Flask(__name__)
     
     # ========== CONFIGURACIÓN CORS ==========
+  
+    allowed_origins = [
+        'http://localhost:5173',  # Vite dev
+        'http://localhost',        # nginx
+        'http://localhost:80'      # nginx explícito
+    ]
     CORS(app, 
          supports_credentials=True,
-         origins=[os.getenv('FRONTEND_ORIGIN', 'http://localhost:5173')],
+         origins=allowed_origins,
          allow_headers=["Content-Type"],
          expose_headers=["Set-Cookie"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
