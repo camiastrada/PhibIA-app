@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import os 
@@ -45,6 +45,11 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
+
+    # Manejar tokens inválidos: devolver 422 (Unprocessable Entity)
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error_string):
+        return jsonify({"msg": error_string}), 422
 
     from .routes import init_routes
     init_routes(app)

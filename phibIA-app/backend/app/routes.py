@@ -120,7 +120,7 @@ def init_routes(app):
             current_user_id = int(get_jwt_identity())
         except (TypeError, ValueError):
             return jsonify({'valid': False}), 401
-        user = Usuario.query.get(current_user_id)
+        user = db.session.get(Usuario, current_user_id)
         
         if user:
             return jsonify({
@@ -146,7 +146,7 @@ def init_routes(app):
         except (TypeError, ValueError):
             return jsonify({'message': 'Invalid token subject'}), 401
 
-        user = Usuario.query.get(current_user_id)
+        user = db.session.get(Usuario, current_user_id)
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
