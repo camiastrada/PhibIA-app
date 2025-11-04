@@ -1,4 +1,4 @@
-from flask import jsonify, request, make_response
+from flask import jsonify, request
 from .models import Usuario
 from .ml_model import predict_species
 from . import db
