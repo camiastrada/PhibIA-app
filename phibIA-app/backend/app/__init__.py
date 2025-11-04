@@ -46,10 +46,25 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
-    # Manejar tokens inválidos: devolver 422 (Unprocessable Entity)
     @jwt.invalid_token_loader
     def invalid_token_callback(error_string):
+        # Token mal formado / inválido -> 422
         return jsonify({"msg": error_string}), 422
+
+    @jwt.unauthorized_loader
+    def unauthorized_callback(error_string):
+        # Falta autorización (no se envió token) -> 401
+        return jsonify({"msg": error_string}), 401
+
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        # Token expirado -> 401
+        return jsonify({"msg": "Token expired"}), 401
+
+    @jwt.revoked_token_loader
+    def revoked_token_callback(jwt_header, jwt_payload):
+        # Token revocado -> 401
+        return jsonify({"msg": "Token revoked"}), 401
 
     from .routes import init_routes
     init_routes(app)

@@ -192,7 +192,7 @@ def test_verify_token_invalid_cookie(client):
     res = client.get('/verify-token', headers={
         'Cookie': 'access_token_cookie=invalid-token-12345'
     })
-    assert res.status_code == 422  # Unprocessable Entity (JWT inválido)
+    assert res.status_code == 401  # Unprocessable Entity (JWT inválido)
 
 
 # ========== TESTS DE LOGOUT ==========

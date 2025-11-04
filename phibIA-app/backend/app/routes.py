@@ -115,11 +115,11 @@ def init_routes(app):
     @app.route('/verify-token', methods=['GET'])
     @jwt_required()
     def verify_token():
-             
         try:
             current_user_id = int(get_jwt_identity())
         except (TypeError, ValueError):
-            return jsonify({'valid': False}), 401
+            # El token está presente pero el 'sub' es malformado/incorrecto -> 422
+            return jsonify({'valid': False}), 422
         user = db.session.get(Usuario, current_user_id)
         
         if user:
@@ -132,7 +132,8 @@ def init_routes(app):
                 }
             }), 200
         else:
-            return jsonify({'valid': False}), 401
+            
+            return jsonify({'valid': False}), 422
 
     #ejemplo para prueba
     @app.route('/protected-example', methods=['GET'])
@@ -144,7 +145,8 @@ def init_routes(app):
         try:
             current_user_id = int(get_jwt_identity())
         except (TypeError, ValueError):
-            return jsonify({'message': 'Invalid token subject'}), 401
+            # Token presente pero subject malformado -> 422
+            return jsonify({'message': 'Invalid token subject'}), 422
 
         user = db.session.get(Usuario, current_user_id)
         if not user:
