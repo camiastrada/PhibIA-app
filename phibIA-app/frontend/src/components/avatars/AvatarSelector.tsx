@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle";
 import Background from "/images/bgMainImage.jpg";
 import AvatarList from "./AvatarList";
-import ProfilePanel from "../../components/ui/ProfilePanel";
+import ProfilePanel from "../ui/ProfilePanel";
 import { useAuth } from "../../context/AuthContext";
 
 
@@ -144,16 +144,31 @@ export default function AvatarSelector(
 
 
       <div  className="space-y-4 bg-white w-full flex-1 flex justify-center items-center rounded-b-3xl gap-4 px-8">
-        <div className="flex flex-col w-full gap-3 m-3">
+        <div className="flex flex-col w-full gap-3 m-3 items-center justify-center">
             <h2 className="text-xl font-bold mb-3 whitespace-nowrap text-center">Elegí tu anfibio preferido</h2>
             <AvatarList
                 selectedId={selectedAvatar}
                 onSelect={(id) => setSelectedAvatar(id)}
             />
+            <div className={`flex-col md:flex-row items-center justify-center gap-3 p-3
+              ${showProfilePanel ? "hidden" : "flex"}`}>
+              <label className="font-medium mb-1">Color:</label>
+              <input
+                type="color"
+                value={selectedColor}
+                onChange={(e) => handleColorChange(e.target.value)}
+                className="color-circle size-8 rounded-full cursor-pointer border border-slate-400 shadow-xl hover:scale-102 transition-transform duration-150"
+                style={{
+                  WebkitAppearance: "none",
+                  MozAppearance: "none",
+                  backgroundColor: selectedColor,
+                }}
+              />
+            </div>
             <button
             type="button"
             onClick={() => setOpenAvatarSelector(false)}
-            className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white  px-6 py-3 text-lg font-semibold items-center justify-center"
+            className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full px-6 py-3 text-lg font-semibold items-center justify-center"
             >
             Confirmar
             </button>
