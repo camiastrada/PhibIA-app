@@ -17,6 +17,7 @@ body:has(#encyclopediaLabel:hover) #encyclopediaIcon,
   border-left-color: #43a047;
 }
 
-body:has(#profileLabel:hover) #profileSection {
-  border: 3px solid #43a047;
+body:has(#profileLabel:hover) #profileIcon{
+  outline-width: 3px;
+  outline-color: #43a047;
 }

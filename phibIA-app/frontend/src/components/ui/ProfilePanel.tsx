@@ -5,7 +5,7 @@ import avatar2 from "../../assets/profileIcons/profileIcon2.png";
 import avatar3 from "../../assets/profileIcons/profileIcon3.png";
 
 interface UserAvatarProps {
-  size?: string; 
+  className?: string; 
 }
 
 const avatars = [
@@ -14,7 +14,7 @@ const avatars = [
   avatar3
 ];
 
-export default function UserAvatar({ size = "size-20" }: UserAvatarProps) {
+export default function UserAvatar({ className }: UserAvatarProps) {
   const [avatarId, setAvatarId] = useState<number | null>(null);
   const [currentAvatar, setCurrentAvatar] = useState(GuestAvatar);
   const [backgroundColor, setBackgroundColor] = useState<string>("#000000");
@@ -52,18 +52,18 @@ export default function UserAvatar({ size = "size-20" }: UserAvatarProps) {
   }, []);
 
   if (loading) {
-    return <div className={`rounded-full bg-gray-300 animate-pulse shadow-lg border-6 border-[var(--color-text-main)] ${size}`}></div>;
+    return <div className={`rounded-full bg-gray-300 animate-pulse shadow-lg border-[var(--color-text-main)] ${className}`}></div>;
   }
 
   return (
     <div
-      className={`rounded-full p-2 flex justify-center items-center shadow-lg border-6 border-[var(--color-text-main)] ${size}`}
+      className={`rounded-full p-2 flex justify-center items-center shadow-lg border-[var(--color-text-main)] ${className}`}
       style={{ backgroundColor }}
     >
       <img
         src={currentAvatar}
         alt="User Avatar"
-        className="rounded-full object-cover"
+        className={`rounded-full object-cover ${currentAvatar == GuestAvatar ? "size-full" : ""}`}
       />
     </div>
   );

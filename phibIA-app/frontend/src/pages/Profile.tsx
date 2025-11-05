@@ -36,7 +36,7 @@ function Login() {
       <div className="flex flex-col w-full lg:w-1/2 items-center justify-center lg:border-r-2 border-[var(--color-text-main)]/70">
 
         <div className="rounded-full size-50 relative">
-          <ProfilePanel size="size-50"/>
+          <ProfilePanel className="size-50 border-6"/>
           <button type="button" className="absolute right-2 top-2 shadow-xl bg-white rounded-full size-10 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110">
             <EditIcon/>
           </button> 
