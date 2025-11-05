@@ -52,12 +52,12 @@ export default function UserAvatar({ size = "size-20" }: UserAvatarProps) {
   }, []);
 
   if (loading) {
-    return <div className={`rounded-full bg-gray-300 animate-pulse ${size}`}></div>;
+    return <div className={`rounded-full bg-gray-300 animate-pulse shadow-lg border-6 border-[var(--color-text-main)] ${size}`}></div>;
   }
 
   return (
     <div
-      className={`rounded-full p-2 flex justify-center items-center shadow-lg border-6 border-white ${size}`}
+      className={`rounded-full p-2 flex justify-center items-center shadow-lg border-6 border-[var(--color-text-main)] ${size}`}
       style={{ backgroundColor }}
     >
       <img
