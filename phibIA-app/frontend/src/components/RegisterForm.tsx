@@ -23,7 +23,7 @@ export default function RegisterForm() {
   const[error, setError] = useState("");
 
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL ?? '/api';
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
@@ -50,6 +50,7 @@ export default function RegisterForm() {
       const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           nombre_usuario: formData.user,
           email: formData.email,
