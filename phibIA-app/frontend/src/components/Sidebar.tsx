@@ -7,6 +7,7 @@ import SidebarLabel from "./SidebarLabel.tsx";
 import HomeIcon from "../assets/sidebarIcons/home.tsx";
 import CapturesIcon from "../assets/sidebarIcons/mydetections.tsx";
 import EncyclopediaIcon from "../assets/sidebarIcons/encyclopedia.tsx";
+import MapIcon from "../assets/sidebarIcons/mapIcon.tsx"
 import OcultBar from "../assets/sidebarIcons/ocultBar.tsx";
 import ShowBar from "../assets/sidebarIcons/showBar.tsx";
 import ProfilePanel from "./ui/ProfilePanel";
@@ -41,6 +42,10 @@ export default function Sidebar() {
             to="/encyclopedia"
             id="encyclopediaIcon"
             icon={EncyclopediaIcon} />  
+          <SidebarIcon
+            to="/map"
+            id="mapIcon"
+            icon={MapIcon} />  
         </nav>
         <Link
           to="/profile"
@@ -85,6 +90,12 @@ export default function Sidebar() {
               to="/encyclopedia"
               id="encyclopediaLabel"
               label="Enciclopedia"
+              isOpen={isOpen}
+              />
+            <SidebarLabel
+              to="/map"
+              id="mapLabel"
+              label="Mapa de capturas"
               isOpen={isOpen}
               />
           </nav>

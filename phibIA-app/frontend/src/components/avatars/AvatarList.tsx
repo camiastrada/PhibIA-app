@@ -14,6 +14,7 @@ export default function AvatarList({ onSelect, selectedId }: Props) {
         justify-items-center 
         overflow-y-auto 
         max-h-[60vh] 
+        w-full
         p-2
       "
     >
