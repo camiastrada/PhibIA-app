@@ -46,9 +46,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(userInfo);
   };
   
-  const logout = () => {
-    setUser(null); // Limpiar el estado del usuario
-    window.location.href = "/"; // Redirigir a la página de inicio
+  const logout = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include', // Incluir cookies HTTP-only
+      });
+
+      if (response.ok) {
+        setUser(null); // Limpiar el estado del usuario
+        window.location.href = "/"; // Redirigir a la página de inicio
+      } else {
+        console.error('Error al cerrar sesión:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   const updateAvatar = (avatar_id: number) => {
