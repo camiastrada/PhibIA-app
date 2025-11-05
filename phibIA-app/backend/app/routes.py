@@ -63,7 +63,16 @@ def init_routes(app):
             )
             # Guardarlo en la DB
             db.session.add(nuevo_audio)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as db_exc:
+                db.session.rollback()
+                # Remove the uploaded file to avoid orphaned files
+                try:
+                    os.remove(file_path)
+                except Exception as file_exc:
+                    print(f"Error deleting orphaned file: {file_path}: {file_exc}")
+                return jsonify({"error": f"Database commit failed: {str(db_exc)}"}), 500
             return jsonify({
                 "prediccion": especie_predicha,
                 "confianza": round(confianza, 2)  
