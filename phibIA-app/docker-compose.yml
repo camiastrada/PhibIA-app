@@ -9,7 +9,8 @@ services:
       MYSQL_USER: phibia_user
       MYSQL_PASSWORD: user123
     volumes:
-      - ./db/anfibios.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
     ports:
       - "3307:3306"
     healthcheck:

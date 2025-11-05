@@ -1,5 +1,7 @@
 from flask import jsonify, request
 from .models import Usuario
+from .models import Audio
+from datetime import datetime
 from .ml_model import predict_species
 from . import db
 import os
@@ -8,7 +10,8 @@ from flask_jwt_extended import (
     jwt_required, 
     get_jwt_identity,
     unset_jwt_cookies,
-    set_access_cookies
+    set_access_cookies,
+    verify_jwt_in_request
 )
 
 UPLOAD_FOLDER = "app/uploads"
@@ -21,6 +24,18 @@ def init_routes(app):
 
     @app.route("/predict", methods=["POST"])
     def predict():
+        
+        current_user_id = 1  # Valor por defecto (usuario invitado)
+        #obtener el usuario actual desde el token JWT
+        try:
+            verify_jwt_in_request()  # Verifica si hay token
+            user_id = get_jwt_identity()
+            if user_id:
+                current_user_id = int(user_id)
+        except Exception:
+            pass  # Si no hay token, sigue como invitado
+            
+        
         if "audio" not in request.files:
             return jsonify({"error": "No se envió archivo"}), 400
 
@@ -35,6 +50,29 @@ def init_routes(app):
 
         try:
             especie_predicha, confianza = predict_species(file_path)
+            # Separar ID y nombre
+            especie_id_str, nombre_especie = especie_predicha.split('-', 1)
+            especie_id = int(especie_id_str)  # convertir a entero
+            # Crear el objeto Audio
+            nuevo_audio = Audio(
+                ruta=file_path,
+                fecha_grabacion=datetime.now(),
+                especie_id=especie_id,     
+                usuario_id=current_user_id,      # aca deberia ir el usuario actual
+                ubicacion_id=1    # aca iria la ubicacion real
+            )
+            # Guardarlo en la DB
+            db.session.add(nuevo_audio)
+            try:
+                db.session.commit()
+            except Exception as db_exc:
+                db.session.rollback()
+                # Remove the uploaded file to avoid orphaned files
+                try:
+                    os.remove(file_path)
+                except Exception as file_exc:
+                    print(f"Error deleting orphaned file: {file_path}: {file_exc}")
+                return jsonify({"error": f"Database commit failed: {str(db_exc)}"}), 500
             return jsonify({
                 "prediccion": especie_predicha,
                 "confianza": round(confianza, 2)  
