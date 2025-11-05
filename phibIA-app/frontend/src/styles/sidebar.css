@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@media (min-widht: 768px){
+@media (min-width: 768px){
   body:has(#homeIcon:hover) #homeLabel,
   body:has(#capturesIcon:hover) #capturesLabel,
   body:has(#encyclopediaIcon:hover) #encyclopediaLabel,
