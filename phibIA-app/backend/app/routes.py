@@ -88,7 +88,9 @@ def init_routes(app):
                 'user_info': { 
                     'id': user.usuario_id,
                     'name': user.name,
-                    'email': user.email
+                    'email': user.email,
+                    'avatar_id': user.avatar_id,
+                    'background_color': user.background_color
                 }
             }), 200
 
@@ -111,3 +113,23 @@ def init_routes(app):
             "avatar_id": user.avatar_id,
             "background_color": user.background_color
         })
+    
+    @app.route("/update_avatar", methods=["PUT"])
+    @jwt_required()
+    def update_avatar():
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+
+        avatar_id = data.get("avatar_id")
+        if avatar_id is None:
+            return jsonify({"error": "Missing avatar_id"}), 400
+
+        user = Usuario.query.get(current_user_id)
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user.avatar_id = avatar_id
+        db.session.commit()
+
+        return jsonify({"message": "Avatar updated successfully", "avatar_id": avatar_id}), 200

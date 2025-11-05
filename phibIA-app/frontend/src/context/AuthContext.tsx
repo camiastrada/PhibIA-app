@@ -1,14 +1,17 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
 interface UserInfo {
-  id?: number;
-  name?: string;
-  email?: string;
+  id: number;
+  name: string;
+  email: string;
+  avatar_id: number | null;
+  background_color?: string;
 }
 
 interface AuthContextType {
   token: string | null;
   user: UserInfo | null;
+  updateAvatar: (avatar_id: number) => void;
   login: (token: string, user: UserInfo | null) => void;
   logout: () => void;
 }
@@ -38,8 +41,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('authUser');
   };
 
+  const updateAvatar = (avatar_id: number) => {
+    if (!user) return;
+    const updatedUser = { ...user, avatar_id };
+    setUser(updatedUser);
+    localStorage.setItem("authUser", JSON.stringify(updatedUser));
+  };
+
+
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, login, logout, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );

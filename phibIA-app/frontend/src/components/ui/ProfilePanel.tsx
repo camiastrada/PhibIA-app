@@ -1,59 +1,19 @@
-import { useEffect, useState } from "react";
-import GuestAvatar from "../../assets/singleLogo.png" 
-import avatar1 from "../../assets/profileIcons/profileIcon1.png";
-import avatar2 from "../../assets/profileIcons/profileIcon2.png";
-import avatar3 from "../../assets/profileIcons/profileIcon3.png";
+import { useAuth } from "../../context/AuthContext";
+import GuestAvatar from "../../assets/singleLogo.png";
+import { avatarsData } from "../avatars/avatarsData";
 
 interface UserAvatarProps {
-  className?: string; 
+  className?: string;
 }
 
-const avatars = [
-  avatar1,
-  avatar2,
-  avatar3
-];
-
 export default function UserAvatar({ className }: UserAvatarProps) {
-  const [avatarId, setAvatarId] = useState<number | null>(null);
-  const [currentAvatar, setCurrentAvatar] = useState(GuestAvatar);
-  const [backgroundColor, setBackgroundColor] = useState<string>("#000000");
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-        console.log("TOKEN: ", token);
+  // Si no hay usuario, mostrar el avatar genérico
+  const avatarSrc =
+    user?.avatar_id != null ? avatarsData[user.avatar_id]?.src : GuestAvatar;
 
-        const response = await fetch("http://localhost:5000/api/user/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) throw new Error("Error al obtener perfil");
-
-        const data = await response.json();
-        setAvatarId(data.avatar_id);
-        if (data.avatar_id !== null && avatars[data.avatar_id]) {
-          setCurrentAvatar(avatars[data.avatar_id]);
-        } else {
-          setCurrentAvatar(GuestAvatar);
-        }
-        setBackgroundColor(data.background_color || "#000000");
-        console.log("AVATAR ID: ", avatarId, " COLOR: ", backgroundColor)
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  if (loading) {
-    return <div className={`rounded-full bg-gray-300 animate-pulse shadow-lg border-[var(--color-text-main)] ${className}`}></div>;
-  }
+  const backgroundColor = user?.background_color || "#000000";
 
   return (
     <div
@@ -61,9 +21,11 @@ export default function UserAvatar({ className }: UserAvatarProps) {
       style={{ backgroundColor }}
     >
       <img
-        src={currentAvatar}
+        src={avatarSrc}
         alt="User Avatar"
-        className={`rounded-full object-cover ${currentAvatar == GuestAvatar ? "size-full" : ""}`}
+        className={`rounded-full object-cover ${
+          avatarSrc === GuestAvatar ? "size-full" : ""
+        }`}
       />
     </div>
   );

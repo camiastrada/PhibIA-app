@@ -9,7 +9,6 @@ import CapturesIcon from "../assets/sidebarIcons/mydetections.tsx";
 import EncyclopediaIcon from "../assets/sidebarIcons/encyclopedia.tsx";
 import OcultBar from "../assets/sidebarIcons/ocultBar.tsx";
 import ShowBar from "../assets/sidebarIcons/showBar.tsx";
-import ProfileIcon from "../assets/profileIcons/profileIcon1.png";
 import ProfilePanel from "./ui/ProfilePanel";
 
 export default function Sidebar() {
