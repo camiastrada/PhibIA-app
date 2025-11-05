@@ -53,12 +53,11 @@ export default function LoginForm() {
       }
 
       const user_info = data.user_info ?? null;
-      const token = data.token ?? '';
-      if (user_info && token) {
-        auth.login(token, user_info);
+      if (user_info) {
+        auth.login(user_info);
         navigate('/');
       } else {
-        setError('No se recibió información del usuario o token');
+        setError('No se recibió información del usuario');
       }
     } catch (err) {
       setError('Error de conexión con el servidor');

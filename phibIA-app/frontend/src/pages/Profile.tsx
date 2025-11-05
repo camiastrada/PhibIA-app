@@ -4,34 +4,23 @@ import ProfilePanel from "../components/ui/ProfilePanel";
 import EditIcon from "../assets/uiIcons/editIcon";
 import Logout from "../components/Logout";
 import AvatarSelector from "../components/avatars/AvatarSelector";
-
-
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
-  const [username, setUsername] = useState<String>("...");
+  const { user, refreshUser } = useAuth(); // Eliminar logout del contexto
   const [openAvatarSelector, setOpenAvatarSelector] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        console.log("TOKEN: ", token);
-
-        const response = await fetch("http://localhost:5000/api/user/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) throw new Error("Error al obtener perfil");
-
-        const data = await response.json();
-        setUsername(data.name); 
+        await refreshUser(); // Usar la función del contexto para obtener los datos del usuario
       } catch (error) {
-        console.error(error);
+        console.error("Error al obtener perfil:", error);
       }
     };
 
     fetchUserData();
-  }, []);
+  }, [refreshUser]);
 
   return (
   <>
@@ -56,9 +45,9 @@ function Login() {
           </button> 
         </div>
 
-        <p className="text-lg font-medium mt-2 mb-6"> {username} </p>
+        <p className="text-lg font-medium mt-2 mb-6"> {user?.name || "..."} </p>
 
-        <Logout/>
+        <Logout />
       </div>
 
       <div id="info" className="hidden lg:flex flex-col w-1/2 items-center justify-center gap-4">
