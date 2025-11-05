@@ -37,26 +37,26 @@ function Home() {
   );
 
   const resetState = () => {
-  // Detener grabación si está activa
-  stopRecording();
+    // Detener grabación si está activa
+    stopRecording();
 
-  // Limpiar todos los estados
-  setListening(false);
-  setIsImport(false);
-  setIsProcessing(false);
-  setPredictedSpecies(null);
-  setConfidence(null);
-  setError(null);
+    // Limpiar todos los estados
+    setListening(false);
+    setIsImport(false);
+    setIsProcessing(false);
+    setPredictedSpecies(null);
+    setConfidence(null);
+    setError(null);
 
-  // Asegurar que el stream se detenga
-  if (streamRef.current) {
-    streamRef.current.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-  }
+    // Asegurar que el stream se detenga
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
 
-  mediaRecorderRef.current = null;
-  chunksRef.current = [];
-};
+    mediaRecorderRef.current = null;
+    chunksRef.current = [];
+  };
 
 
 

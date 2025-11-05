@@ -9,7 +9,7 @@ import CapturesIcon from "../assets/sidebarIcons/mydetections.tsx";
 import EncyclopediaIcon from "../assets/sidebarIcons/encyclopedia.tsx";
 import OcultBar from "../assets/sidebarIcons/ocultBar.tsx";
 import ShowBar from "../assets/sidebarIcons/showBar.tsx";
-import ProfileIcon from "../assets/sidebarIcons/profileIcon1.png";
+import ProfilePanel from "./ui/ProfilePanel";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
@@ -42,17 +42,12 @@ export default function Sidebar() {
             id="encyclopediaIcon"
             icon={EncyclopediaIcon} />  
         </nav>
-        <div id="profileSection" className="size-12 bg-slate-300 rounded-full flex items-center justify-center mb-4 border-3 border-white hover:border-[#43a047]">
-          <Link
-            to="/profile"
-            id="profileIcon">
-            <img
-              src={ProfileIcon}
-              alt="Profile"
-              className="size-12 rounded-full"
-              />
-          </Link>
-        </div>
+        <Link
+          to="/profile"
+          id="profileIcon"
+          className="mb-4 size-12 rounded-full outline-2 flex items-center justify-center">
+          <ProfilePanel className="size-12 border-none"/>
+        </Link>
       </div>
 
       <div className={`flex h-full ${isOpen ? "w-80" : "w-20"} bg-[#02372E] rounded-r-2xl transition-all duration-500 ease-in-out`}>  

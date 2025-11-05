@@ -131,13 +131,71 @@ def init_routes(app):
                 'user_info': { 
                     'id': user.usuario_id,
                     'name': user.name,
-                    'email': user.email
+                    'email': user.email,
+                    'avatar_id': user.avatar_id,
+                    'background_color': user.background_color
                 }
             })
             set_access_cookies(response, access_token)
             return response, 200
         else:
             return jsonify({'message': 'Wrong password or email'}), 401        
+        
+    @app.route("/api/user/profile", methods=["GET"])
+    @jwt_required()
+    def get_user_profile():
+        user_id = get_jwt_identity() 
+        user = Usuario.query.filter_by(usuario_id=user_id).first()
+
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        return jsonify({
+            "id": user.usuario_id,
+            "name": user.name,
+            "email": user.email,
+            "avatar_id": user.avatar_id,
+            "background_color": user.background_color
+        })
+    
+    @app.route("/update_avatar", methods=["PUT"])
+    @jwt_required()
+    def update_avatar():
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+
+        avatar_id = data.get("avatar_id")
+        if avatar_id is None:
+            return jsonify({"error": "Missing avatar_id"}), 400
+
+        user = Usuario.query.get(current_user_id)
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user.avatar_id = avatar_id
+        db.session.commit()
+
+        return jsonify({"message": "Avatar updated successfully", "avatar_id": avatar_id}), 200
+
+    @app.route("/update_background", methods=["PUT"])
+    @jwt_required()
+    def update_background():
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+        color = data.get("background_color")
+
+        if not color:
+            return jsonify({"error": "Missing background_color"}), 400
+
+        user = Usuario.query.get(current_user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user.background_color = color
+        db.session.commit()
+
+        return jsonify({"message": "Background updated successfully", "background_color": color}), 200
 
     @app.route('/logout', methods=['POST'])
     @jwt_required()

@@ -1,3 +1,4 @@
+
 services:
   db:
     image: mysql:8.0
@@ -14,19 +15,9 @@ services:
     ports:
       - "3307:3306"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-proot123",
-        ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
       interval: 5s
-      timeout: 2s
+      timeout: 10s
       retries: 10
 
   frontend:

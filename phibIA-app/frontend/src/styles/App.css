@@ -8,6 +8,31 @@
   align-items: center;
   background-color: #152C28;
   --color-bg-light: #e8f5e9;
-  --color-text-main: #1b5e20;
+  --color-text-main: #004D40;
+  --color-text-secondary: #43a047;
 }
 
+/* Elimina el recuadro del color input en todos los navegadores */
+.color-circle {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Elimina el recuadro interno en navegadores WebKit (Chrome, Edge, Safari) */
+.color-circle::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-circle::-webkit-color-swatch {
+  border: none;
+  border-radius: 9999px; /* círculo perfecto */
+}
+
+/* Elimina el borde interno en Firefox */
+.color-circle::-moz-color-swatch {
+  border: none;
+  border-radius: 9999px;
+}
