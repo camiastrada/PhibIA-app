@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 
 const paths: Record<string, string> = {
     home: "Inicio",
+    profile: "Perfil"
 }
 export default function Topbar(){
     const {pathname} = useLocation(); 

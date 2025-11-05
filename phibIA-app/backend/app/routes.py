@@ -133,3 +133,22 @@ def init_routes(app):
         db.session.commit()
 
         return jsonify({"message": "Avatar updated successfully", "avatar_id": avatar_id}), 200
+
+    @app.route("/update_background", methods=["PUT"])
+    @jwt_required()
+    def update_background():
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+        color = data.get("background_color")
+
+        if not color:
+            return jsonify({"error": "Missing background_color"}), 400
+
+        user = Usuario.query.get(current_user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        user.background_color = color
+        db.session.commit()
+
+        return jsonify({"message": "Background updated successfully", "background_color": color}), 200

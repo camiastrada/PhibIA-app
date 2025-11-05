@@ -9,15 +9,20 @@ interface UserAvatarProps {
 export default function UserAvatar({ className }: UserAvatarProps) {
   const { user } = useAuth();
 
-  // Si no hay usuario, mostrar el avatar genérico
   const avatarSrc =
     user?.avatar_id != null ? avatarsData[user.avatar_id]?.src : GuestAvatar;
-
   const backgroundColor = user?.background_color || "#000000";
 
   return (
     <div
-      className={`rounded-full p-2 flex justify-center items-center shadow-lg border-[var(--color-text-main)] ${className}`}
+      className={`
+        relative 
+        flex items-center justify-center 
+        rounded-full overflow-hidden shadow-lg 
+        border-[var(--color-text-main)] 
+        ${className ?? ""} 
+        shrink-0
+      `}
       style={{ backgroundColor }}
     >
       <img
