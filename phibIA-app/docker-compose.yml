@@ -10,7 +10,8 @@ services:
       MYSQL_USER: phibia_user
       MYSQL_PASSWORD: user123
     volumes:
-      - ./db/anfibios.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
     ports:
       - "3307:3306"
     healthcheck:
@@ -19,10 +20,19 @@ services:
       timeout: 10s
       retries: 10
 
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    # No exponer puerto directamente - solo accesible a través de nginx
+    environment:
+      - VITE_API_URL=/api # Las direcciones sin api son front
+    depends_on:
+      - backend 
+
   backend:
     build: ./backend
     container_name: flask_app
-
+    # Puerto 5000 solo para debug directo - en producción comentar esta línea
     ports:
       - "5000:5000"
     volumes:
@@ -34,15 +44,20 @@ services:
       - MYSQL_PASSWORD=user123
       - MYSQL_DATABASE=anfibios
       - MYSQL_PORT=3306
+      - JWT_SECRET_KEY= cd0562e2a7cce7ce24d960874ac7bb01349507dffa165f1c9f58a5676cbe9cf1
+    command: python run.py
     depends_on:
       db:
         condition: service_healthy
-    command: python run.py
-
-  frontend:
-    build: ./frontend
-    container_name: frontend_app
+        
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
     ports:
-      - "3000:80"
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
+      - frontend
       - backend
+    restart: unless-stopped

@@ -9,7 +9,6 @@ interface UserInfo {
 }
 
 interface AuthContextType {
-  token: string | null;
   user: UserInfo | null;
   updateAvatar: (avatar_id: number) => void;
   login: (token: string, user: UserInfo | null) => void;
@@ -27,15 +26,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return userData ? JSON.parse(userData) : null;
   });
 
-  const login = (newToken: string, userInfo: UserInfo | null) => {
-    setToken(newToken);
+  const login = (userInfo: UserInfo | null) => {
     setUser(userInfo);
     localStorage.setItem('authToken', newToken);
     localStorage.setItem('authUser', JSON.stringify(userInfo));
   };
   
   const logout = () => {
-    setToken(null);
     setUser(null);
     localStorage.removeItem('authToken');
     localStorage.removeItem('authUser');

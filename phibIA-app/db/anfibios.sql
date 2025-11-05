@@ -11,10 +11,9 @@ create table usuarios(
     name VARCHAR(20) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    register_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    register_date DATE NOT NULL DEFAULT (CURRENT_DATE),
     avatar_id INTEGER DEFAULT 0,
     background_color VARCHAR(10) DEFAULT "#FFFFFF"
-
 );
 
 create table especies(
@@ -51,3 +50,4 @@ create table audios(
     CONSTRAINT fk_especie_audio FOREIGN KEY (especie_id) REFERENCES especies(especie_id),
     CONSTRAINT fk_ubicacione_audio FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
 );
+

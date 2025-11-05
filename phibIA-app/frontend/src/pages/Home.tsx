@@ -19,6 +19,8 @@ function Home() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  
+  const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
@@ -95,8 +97,9 @@ function Home() {
           formData.append("audio", blob, `recording_${Date.now()}.${ext}`);
 
           // enviar al backend
-          const res = await fetch("http://localhost:5000/predict", {
+          const res = await fetch(`${API_URL}/predict`, {
             method: "POST",
+            credentials: 'include',
             body: formData,
           });
 
@@ -181,8 +184,9 @@ function Home() {
     formData.append("audio", file);
 
     try {
-      const response = await fetch("http://localhost:5000/predict", {
+      const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
+        credentials: 'include',
         body: formData,
       });
 

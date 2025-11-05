@@ -21,8 +21,7 @@ export default function LoginForm() {
 
   const navigate = useNavigate();
   const auth = useAuth();
-  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
-
+  const API_URL = import.meta.env.VITE_API_URL ?? '/api';
   const handleChange = (
     e: ChangeEvent<HTMLInputElement>
   ): void => {
@@ -44,6 +43,7 @@ export default function LoginForm() {
       const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include credentials for cookie support
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json().catch(() => ({}));
@@ -51,14 +51,13 @@ export default function LoginForm() {
         setError(data.message || data.error || 'Error en el login');
         return;
       }
-      const token = data.access_token;
-      console.log("TOKEN RECIBIDO:", token);
+
       const user_info = data.user_info ?? null;
-      if (token) {
-        auth.login(token, user_info);
+      if (user_info) {
+        auth.login(user_info);
         navigate('/');
       } else {
-        setError('No se recibió token del servidor');
+        setError('No se recibió información del usuario');
       }
     } catch (err) {
       setError('Error de conexión con el servidor');
