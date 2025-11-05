@@ -9,6 +9,7 @@ interface UserInfo {
 }
 
 interface AuthContextType {
+  token: string | null;
   user: UserInfo | null;
   updateAvatar: (avatar_id: number) => void;
   login: (token: string, user: UserInfo | null) => void;
