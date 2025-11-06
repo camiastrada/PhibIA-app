@@ -19,8 +19,8 @@ export default function AvatarSelector(
   const [selectedAvatar, setSelectedAvatar] = useState<number>(user?.avatar_id ?? 0);
   const [selectedColor, setSelectedColor] = useState<string>(user?.background_color ?? "#000000");
   const [showProfilePanel, setShowProfilePanel] = useState(true);
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
   //detecta el ancho del contenedor
   useEffect(() => {
