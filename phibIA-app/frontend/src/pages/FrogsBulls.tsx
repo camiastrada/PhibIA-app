@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import "../styles/App.css";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
 import BackIcon from "../assets/uiIcons/backIcon";
+import LocationMap from "../components/LocationMaps";
 
 export default function FrogsBulls() {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -10,6 +11,7 @@ export default function FrogsBulls() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     if (isCameraOn && videoRef.current) {
@@ -237,6 +239,19 @@ export default function FrogsBulls() {
             </button>
           </div>
         )}
+        <div className="mt-8 flex flex-col items-center">
+          <button
+            className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-xl font-semibold text-lg"
+            onClick={() => setShowMap(!showMap)}
+          >
+            {showMap ? "Ocultar mapa" : "Añadir ubicación"}
+          </button>
+          {showMap && (
+            <div className="mt-6 w-[600px] h-[400px] rounded-2xl overflow-hidden border-4 border-green-500 bg-red-100">
+              <LocationMap />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
