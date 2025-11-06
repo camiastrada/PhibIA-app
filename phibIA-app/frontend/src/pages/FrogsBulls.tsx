@@ -226,17 +226,17 @@ export default function FrogsBulls() {
                 <BackIcon className="size-5" />
                 Volver a Capturar
               </button>
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 font-semibold"
+                onClick={() => {
+                  setPhoto(null);
+                  savePhoto();
+                }}
+                disabled={isSaving}
+              >
+                {isSaving ? "Guardando..." : "Guardar Foto"}
+              </button>
             </div>
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 font-semibold"
-              onClick={() => {
-                setPhoto(null);
-                savePhoto();
-              }}
-              disabled={isSaving}
-            >
-              {isSaving ? "Guardando..." : "Guardar Foto"}
-            </button>
           </div>
         )}
         <div className="mt-8 flex flex-col items-center">
