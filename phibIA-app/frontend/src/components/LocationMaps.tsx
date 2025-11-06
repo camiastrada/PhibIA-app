@@ -174,7 +174,26 @@ export default function LocationMap() {
           </Popup>
         )}
 
-        {/* Remove pin */}
+        {selectedPin !== null && (
+          <Popup
+            longitude={pins.find((p) => p.id === selectedPin)!.coords[0]}
+            latitude={pins.find((p) => p.id === selectedPin)!.coords[1]}
+            closeButton={true}
+            onClose={() => setSelectedPin(null)}
+            anchor="top"
+          >
+            <div style={{ textAlign: "center" }}>
+              <button
+                onClick={() => {
+                  setPins((prev) => prev.filter((p) => p.id !== selectedPin));
+                  setSelectedPin(null);
+                }}
+              >
+                Eliminar
+              </button>
+            </div>
+          </Popup>
+        )}
 
         {pendingPin && (
           <Popup
