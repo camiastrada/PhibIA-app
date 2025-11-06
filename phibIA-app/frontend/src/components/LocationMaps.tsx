@@ -15,7 +15,7 @@ export default function LocationMap() {
   >([]);
   const [_selectedPin, setSelectedPin] = useState<number | null>(null);
   const [hoveredPin, setHoveredPin] = useState<number | null>(null);
-  const [_userAddress, setUserAddress] = useState<string | null>(null);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
   const [_pendingPin, _setPendingPin] = useState<{
     coords: [number, number];
     address: string;
@@ -86,6 +86,20 @@ export default function LocationMap() {
               onMouseLeave={() => setHoveredPin(null)}
             />
           </Marker>
+        )}
+
+        {hoveredPin === -1 && userLocation && userAddress && (
+          <Popup
+            longitude={userLocation[0]}
+            latitude={userLocation[1]}
+            closeButton={false}
+            closeOnClick={false}
+            anchor="top"
+          >
+            <div style={{ padding: "8px", color: "black", fontSize: "14px" }}>
+              {userAddress}
+            </div>
+          </Popup>
         )}
 
         {pins.map((pin) => (
