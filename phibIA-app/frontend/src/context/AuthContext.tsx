@@ -11,44 +11,71 @@ interface UserInfo {
 interface AuthContextType {
   user: UserInfo | null;
   updateAvatar: (avatar_id: number) => void;
-  login: (token: string, user: UserInfo | null) => void;
+  updateBackgroundColor: (color: string) => void;
+  login: (user: UserInfo) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem('authToken');
-  });
-  const [user, setUser] = useState<UserInfo | null>(() => {
-    const userData = localStorage.getItem('authUser');
-    return userData ? JSON.parse(userData) : null;
-  });
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
-  const login = (token: string, userInfo: UserInfo | null) => {
-    setToken(token);
+  // Función para obtener datos del usuario desde el servidor
+  const refreshUser = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/user/profile`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error al obtener perfil:', error);
+      setUser(null);
+    }
+  };
+
+  const login = (userInfo: UserInfo) => {
     setUser(userInfo);
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('authUser', JSON.stringify(userInfo));
   };
   
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('authUser');
+  const logout = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include', // Incluir cookies HTTP-only
+      });
+
+      if (response.ok) {
+        setUser(null); // Limpiar el estado del usuario
+        window.location.href = "/"; // Redirigir a la página de inicio
+      } else {
+        console.error('Error al cerrar sesión:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   const updateAvatar = (avatar_id: number) => {
     if (!user) return;
-    const updatedUser = { ...user, avatar_id };
-    setUser(updatedUser);
-    localStorage.setItem("authUser", JSON.stringify(updatedUser));
+    setUser({ ...user, avatar_id });
   };
 
+  const updateBackgroundColor = (color: string) => {
+    if (!user) return;
+    setUser({ ...user, background_color: color });
+  };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, updateAvatar }}>
+    <AuthContext.Provider value={{ user, login, logout, updateAvatar, updateBackgroundColor, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
