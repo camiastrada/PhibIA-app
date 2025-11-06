@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Map, { Marker, Popup } from "react-map-gl";
+import { SearchBox } from "@mapbox/search-js-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import frogIcon from "../assets/frog1.png";
 
@@ -16,13 +17,13 @@ export default function LocationMap() {
   const [_selectedPin, setSelectedPin] = useState<number | null>(null);
   const [hoveredPin, setHoveredPin] = useState<number | null>(null);
   const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [_pendingPin, _setPendingPin] = useState<{
+  const [_pendingPin, setPendingPin] = useState<{
     coords: [number, number];
     address: string;
   } | null>(null);
 
   {
-    /*It convert the gps cordenate by using mapbox geocoding */
+    /*It convert the gps coordenate by using mapbox geocoding */
   }
   async function fetchAddressFromCoords(lng: number, lat: number) {
     try {
@@ -57,7 +58,37 @@ export default function LocationMap() {
 
   return (
     <div style={{ height: "80vh", width: "80vw", position: "relative" }}>
-      {/* search box */}
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 2,
+          top: 10,
+          left: 10,
+          width: "300px",
+        }}
+      >
+        <SearchBox
+          accessToken={MAPBOX_TOKEN}
+          onRetrieve={(res) => {
+            const feature: any = res.features[0];
+            if (!feature) return;
+            const [lng, lat] = feature.geometry.coordinates;
+
+            const address =
+              feature.properties.full_address ||
+              feature.place_name ||
+              "Dirección no encontrada";
+
+            setPendingPin({ coords: [lng, lat], address });
+          }}
+          options={{
+            country: "AR",
+            language: "es",
+            proximity: [-64.3493, -33.123],
+          }}
+        />
+      </div>
+
       <Map
         mapboxAccessToken={MAPBOX_TOKEN}
         initialViewState={{
