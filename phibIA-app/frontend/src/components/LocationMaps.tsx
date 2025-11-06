@@ -11,13 +11,13 @@ export default function LocationMap() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null
   );
-  const [pins, _setPins] = useState<
+  const [pins, setPins] = useState<
     { id: number; coords: [number, number]; address: string }[]
   >([]);
-  const [_selectedPin, setSelectedPin] = useState<number | null>(null);
+  const [selectedPin, setSelectedPin] = useState<number | null>(null);
   const [hoveredPin, setHoveredPin] = useState<number | null>(null);
   const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [_pendingPin, setPendingPin] = useState<{
+  const [pendingPin, setPendingPin] = useState<{
     coords: [number, number];
     address: string;
   } | null>(null);
@@ -175,7 +175,38 @@ export default function LocationMap() {
         )}
 
         {/* Remove pin */}
-        {/* Confirmate location*/}
+
+        {pendingPin && (
+          <Popup
+            longitude={pendingPin.coords[0]}
+            latitude={pendingPin.coords[1]}
+            closeButton={true}
+            onClose={() => setPendingPin(null)}
+            anchor="top"
+          >
+            <div
+              style={{ textAlign: "center", color: "black", fontSize: "14px" }}
+            >
+              <p>¿Agregar esta ubicación?</p>
+              <button
+                onClick={() => {
+                  setPins((prev) => [
+                    ...prev,
+                    {
+                      id: Date.now(),
+                      coords: pendingPin.coords,
+                      address: pendingPin.address,
+                    },
+                  ]);
+                  setPendingPin(null);
+                }}
+              >
+                Si
+              </button>
+              <button onClick={() => setPendingPin(null)}>Cancelar</button>
+            </div>
+          </Popup>
+        )}
       </Map>
     </div>
   );
