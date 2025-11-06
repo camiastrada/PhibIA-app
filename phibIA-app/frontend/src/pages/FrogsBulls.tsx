@@ -9,6 +9,7 @@ export default function FrogsBulls() {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [_isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (isCameraOn && videoRef.current) {
@@ -110,6 +111,32 @@ export default function FrogsBulls() {
       if (videoRef.current) videoRef.current.srcObject = null;
     }
     setIsCameraOn(false);
+  };
+
+  const savePhoto = async () => {
+    if (!photo) return;
+    setIsSaving(true);
+    try {
+      const blob = await (await fetch(photo)).blob();
+      const formData = new FormData();
+      formData.append("image", blob, `frog_${Date.now()}.jpeg`);
+
+      const res = await fetch("/api/save-photo", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        console.error("Error al guardar la foto");
+      } else {
+        alert("Foto guardada con éxito");
+        setPhoto(null);
+      }
+    } catch (err) {
+      console.error("Error al guardar la foto", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
