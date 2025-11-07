@@ -18,9 +18,8 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/logout" element={<Logout />} />
         <Route path="/add-photo" element={<FrogsBulls />} />
-        <Route path="/frogs-map" element={<FrogsMap />} />
+        <Route path="/map" element={<FrogsMap />} />
       </Routes>
     </Router>
   );
