@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 
 interface UserInfo {
   id: number;
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
   // Función para obtener datos del usuario desde el servidor
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/api/user/profile`, {
         credentials: 'include'
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error al obtener perfil:', error);
       setUser(null);
     }
-  };
+  }, [BACKEND_URL]);
 
   const login = (userInfo: UserInfo) => {
     setUser(userInfo);
