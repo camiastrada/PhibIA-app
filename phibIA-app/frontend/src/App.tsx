@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import FrogsMap from "./pages/Maps";
 import "./styles/App.css";
+import FrogsBulls from "./pages/FrogsBulls";
+
 function App() {
   return (
     <Router>
@@ -16,6 +18,8 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/add-photo" element={<FrogsBulls />} />
         <Route path="/frogs-map" element={<FrogsMap />} />
       </Routes>
     </Router>
