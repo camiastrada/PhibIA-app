@@ -2,15 +2,14 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import "../styles/App.css";
-import ResultPanel from "../components/ui/ResultPanel"
-import Upload from "../components/Upload"
-import TitleWithSubtitle from "../components/ui/TitleWithSubtitle"
-import StopRecordIcon from "../assets/uiIcons/stopRecordIcon"
-import MicrophoneIcon from "../assets/uiIcons/microphoneIcon"
-import UploadIcon from "../assets/uiIcons/uploadIcon"
-import InfoIcon from "../assets/uiIcons/infoIcon"
-import BackIcon from "../assets/uiIcons/backIcon"
-
+import ResultPanel from "../components/ui/ResultPanel";
+import Upload from "../components/Upload";
+import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import StopRecordIcon from "../assets/uiIcons/stopRecordIcon";
+import MicrophoneIcon from "../assets/uiIcons/microphoneIcon";
+import UploadIcon from "../assets/uiIcons/uploadIcon";
+import InfoIcon from "../assets/uiIcons/infoIcon";
+import BackIcon from "../assets/uiIcons/backIcon";
 
 function Home() {
   const [listening, setListening] = useState(false);
@@ -19,8 +18,8 @@ function Home() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  
-  const API_URL = import.meta.env.VITE_API_URL ?? '/api';
+
+  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
@@ -29,49 +28,115 @@ function Home() {
 
   const [file, setFile] = useState<File | null>(null);
 
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [_locationError, setLocationError] = useState<string | null>(null);
+  const [_isGettingLocation, setIsGettingLocation] = useState(false);
+
   const specieNumber = predictedSpecies?.split("-")[0];
   const specieName = predictedSpecies?.split("-")[1];
 
   const hasPrediction = Boolean(
-    !listening && !isProcessing && !error && predictedSpecies && predictedSpecies !== "No detectada"
+    !listening &&
+      !isProcessing &&
+      !error &&
+      predictedSpecies &&
+      predictedSpecies !== "No detectada"
   );
 
+  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocalización no soportada"));
+        return;
+      }
+
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 10000, // 10 segundos
+        maximumAge: 0, // No usar posición cacheada
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          resolve({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          let errorMessage = "Error obteniendo ubicación: ";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += "Permiso denegado por el usuario";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += "Ubicación no disponible";
+              break;
+            case error.TIMEOUT:
+              errorMessage += "Tiempo de espera agotado";
+              break;
+            default:
+              errorMessage += error.message;
+          }
+          reject(new Error(errorMessage));
+        },
+        options
+      );
+    });
+  };
+
   const resetState = () => {
-  // Detener grabación si está activa
-  stopRecording();
+    // Detener grabación si está activa
+    stopRecording();
 
-  // Limpiar todos los estados
-  setListening(false);
-  setIsImport(false);
-  setIsProcessing(false);
-  setPredictedSpecies(null);
-  setConfidence(null);
-  setError(null);
+    // Limpiar todos los estados
+    setListening(false);
+    setIsImport(false);
+    setIsProcessing(false);
+    setPredictedSpecies(null);
+    setConfidence(null);
+    setError(null);
+    setUserLocation(null);
+    setLocationError(null);
+    setIsGettingLocation(false);
 
-  // Asegurar que el stream se detenga
-  if (streamRef.current) {
-    streamRef.current.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-  }
+    // Asegurar que el stream se detenga
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
 
-  mediaRecorderRef.current = null;
-  chunksRef.current = [];
-};
-
-
+    mediaRecorderRef.current = null;
+    chunksRef.current = [];
+  };
 
   // Iniciar grabación
   const startRecording = async () => {
     setError(null);
     setPredictedSpecies(null);
     setConfidence(null);
+    setLocationError(null);
+    setUserLocation(null);
 
     try {
+      // Obtener ubicación actual antes de empezar a grabar
+      setIsGettingLocation(true);
+      try {
+        const location = await getCurrentLocation();
+        setUserLocation(location);
+      } catch (locationErr: any) {
+        setLocationError(locationErr.message);
+        // No detenemos la grabación si falla la ubicación
+      } finally {
+        setIsGettingLocation(false);
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       chunksRef.current = [];
 
-      setListening(true)
+      setListening(true);
 
       const options: any = {};
 
@@ -86,29 +151,45 @@ function Home() {
 
       recorder.onstop = async () => {
         try {
-          setListening(false)
+          setListening(false);
           setIsProcessing(true);
           const mime = chunksRef.current[0]?.type || "audio/webm";
-          const ext = mime.includes("webm") ? "webm" : mime.includes("wav") ? "wav" : "audio";
+          const ext = mime.includes("webm")
+            ? "webm"
+            : mime.includes("wav")
+            ? "wav"
+            : "audio";
           const blob = new Blob(chunksRef.current, { type: mime });
 
           // preparar FormData con la clave que el backend espera: 'audio'
           const formData = new FormData();
           formData.append("audio", blob, `recording_${Date.now()}.${ext}`);
 
+          if (userLocation) {
+            formData.append("latitude", userLocation.lat.toString());
+            formData.append("longitude", userLocation.lng.toString());
+          }
+
           // enviar al backend
           const res = await fetch(`${API_URL}/predict`, {
             method: "POST",
-            credentials: 'include',
+            credentials: "include",
             body: formData,
           });
 
           const data = await res.json().catch(() => null);
           if (!res.ok) {
-            setError((data && data.error) || `Error del servidor: ${res.status}`);
+            setError(
+              (data && data.error) || `Error del servidor: ${res.status}`
+            );
           } else {
             // backend devuelve { prediccion: 'Nombre' }
-            setPredictedSpecies(data?.prediccion ?? data?.prediction ?? data?.species ?? "No detectada");
+            setPredictedSpecies(
+              data?.prediccion ??
+                data?.prediction ??
+                data?.species ??
+                "No detectada"
+            );
             setConfidence(data?.confianza ?? null);
           }
         } catch (err: any) {
@@ -128,9 +209,9 @@ function Home() {
 
       recorder.start();
       setListening(true);
-
     } catch (err: any) {
       setError("No se pudo acceder al micrófono: " + (err?.message || err));
+      setIsGettingLocation(false);
     }
   };
 
@@ -159,7 +240,6 @@ function Home() {
     }
   };
 
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -167,6 +247,8 @@ function Home() {
       setError(null);
       setPredictedSpecies(null);
       setConfidence(null);
+      setLocationError(null);
+      setUserLocation(null);
     }
   };
 
@@ -179,14 +261,32 @@ function Home() {
       return;
     }
 
+    // Obtener ubicación actual para archivos subidos también
+    let currentLocation = null;
+    setIsGettingLocation(true);
+    try {
+      currentLocation = await getCurrentLocation();
+      setUserLocation(currentLocation);
+    } catch (locationErr: any) {
+      setLocationError(locationErr.message);
+    } finally {
+      setIsGettingLocation(false);
+    }
+
     setListening(true);
     const formData = new FormData();
     formData.append("audio", file);
 
+    // Agregar ubicación si está disponible
+    if (currentLocation) {
+      formData.append("latitude", currentLocation.lat.toString());
+      formData.append("longitude", currentLocation.lng.toString());
+    }
+
     try {
       const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
-        credentials: 'include',
+        credentials: "include",
         body: formData,
       });
 
@@ -209,47 +309,80 @@ function Home() {
 
   return (
     <div className="flex flex-col justify-center items-center md:min-h-4/5 md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
-      <div className={isImport ? "absolute flex w-full h-full justify-center items-center z-10" : "hidden"}>
-        <Upload handleFileChange={handleFileChange} handleSubmit={handleSubmit} setIsImport={setIsImport}/>
+      <div
+        className={
+          isImport
+            ? "absolute flex w-full h-full justify-center items-center z-10"
+            : "hidden"
+        }
+      >
+        <Upload
+          handleFileChange={handleFileChange}
+          handleSubmit={handleSubmit}
+          setIsImport={setIsImport}
+        />
       </div>
       <div id="content" className={isImport ? "blur-xl" : ""}>
         <TitleWithSubtitle
-        title={hasPrediction ? specieName: "¡Comienza a grabar!"}
-        subtitle={hasPrediction ? "*nombre comun*" : "Acercate al anfibio y graba su canto para detectar su especie"}
+          title={hasPrediction ? specieName : "¡Comienza a grabar!"}
+          subtitle={
+            hasPrediction
+              ? "*nombre comun*"
+              : "Acercate al anfibio y graba su canto para detectar su especie"
+          }
         />
-        
-        <ResultPanel listening={listening} prediction={hasPrediction} specie={specieNumber}/>
-        
-        {!hasPrediction && (
-          listening ? (
+
+        <ResultPanel
+          listening={listening}
+          prediction={hasPrediction}
+          specie={specieNumber}
+        />
+
+        {!hasPrediction &&
+          (listening ? (
             <p className="text-md mb-6">Escuchando...</p>
           ) : (
-            <p className="text-md mb-6">Comienza a grabar para obtener resultados</p>
-          )
+            <p className="text-md mb-6">
+              Comienza a grabar para obtener resultados
+            </p>
+          ))}
+        {hasPrediction && (
+          <>
+            <div className="flex flex-col items-center gap-6">
+              <Link
+                to={"/encyclopedia/" + specieNumber}
+                className="text-[#004D40] hover:text-[#02372E] flex gap-1"
+              >
+                <InfoIcon />
+                ver informacion detallada
+              </Link>
+
+              {userLocation && (
+                <Link
+                  to={`/frogs-map?lat=${userLocation.lat}&lng=${userLocation.lng}`}
+                  className="flex bg-[#1976D2] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                >
+                  Ver en mapa
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={resetState}
+                className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+              >
+                Volver
+                <BackIcon className="size-5" />
+              </button>
+            </div>
+          </>
         )}
-        {hasPrediction &&
-        <>
-        <div className="flex flex-col items-center gap-6">
-          <Link 
-          to={"/encyclopedia/" + specieNumber}
-          className="text-[#004D40] hover:text-[#02372E] flex gap-1">
-          <InfoIcon/>
-          ver informacion detallada
-          </Link>
-          <button 
-          type="button"
-          onClick={resetState}
-          className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1">
-            Volver 
-            <BackIcon className="size-5"/>
-          </button>
-        </div>
-        </>
-        }
 
         <div
           id="buttonsSection"
-          className={`${hasPrediction ? "hidden" : "flex"} flex-col justify-around items-center`}
+          className={`${
+            hasPrediction ? "hidden" : "flex"
+          } flex-col justify-around items-center`}
         >
           <button
             type="button"
@@ -265,16 +398,15 @@ function Home() {
           >
             {listening ? (
               <>
-                <StopRecordIcon className="size-15"/>
+                <StopRecordIcon className="size-15" />
               </>
             ) : (
               <>
                 <p>Grabar</p>
-                <MicrophoneIcon className="size-6"/>
+                <MicrophoneIcon className="size-6" />
               </>
             )}
           </button>
-
 
           <button
             type="button"
@@ -289,7 +421,6 @@ function Home() {
             Importar grabación
             <UploadIcon className="size-4 inline-block" />
           </button>
-
         </div>
         {/* mostrar error */}
         <div className="mt-4 text-center">
