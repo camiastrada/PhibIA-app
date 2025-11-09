@@ -35,7 +35,8 @@ function Profile() {
     <div className={`flex-col lg:flex-row justify-center items-center md:min-h-4/5 md:w-4/5 w-full bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4
        ${openAvatarSelector ? "hidden" : "flex"}`}>
     
-      <div className="flex flex-col w-full lg:w-1/2 items-center justify-center lg:border-r-2 border-[var(--color-text-main)]/70">
+      <div className={`flex flex-col w-full lg:w-1/2 items-center justify-center 
+        ${isGuest ? "border-none" : "lg:border-r-2 border-[var(--color-text-main)]/70"}`}>
 
         <div className="rounded-full size-50 relative">
           <ProfilePanel className="size-50 border-6"/>
@@ -54,7 +55,8 @@ function Profile() {
         {isGuest ? (<LoginButton/>) : (<LogoutButton />)}
       </div>
 
-      <div id="info" className="hidden lg:flex flex-col w-1/2 items-center justify-center gap-4">
+      <div id="info" className={` flex-col w-1/2 items-center justify-center gap-4
+        ${isGuest ? "hidden" : "hidden lg:flex"}`} >
         <div className="flex gap-2">
           <p className="font-medium text-[var(--color-text-main)]">Nº de detecciones: </p>
           <p>*detecciones totales*</p>
