@@ -77,7 +77,6 @@ export default function AvatarSelector(
         updateAvatar(selectedAvatar);
       } catch (error) {
         console.error("Error:", error);
-        alert("Error al actualizar el avatar");
       }
     };
 

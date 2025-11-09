@@ -2,18 +2,21 @@ import "../styles/App.css";
 import {useEffect, useState} from "react";
 import ProfilePanel from "../components/ui/ProfilePanel";
 import EditIcon from "../assets/uiIcons/editIcon";
-import Logout from "../components/Logout";
+import LogoutButton from "../components/LogoutButton";
+import LoginButton from "../components/LoginButton";
 import AvatarSelector from "../components/avatars/AvatarSelector";
 import { useAuth } from "../context/AuthContext";
 
-function Login() {
+function Profile() {
   const { user, refreshUser } = useAuth(); // Eliminar logout del contexto
+  const [ isGuest, setIsGuest ] = useState(true);
   const [openAvatarSelector, setOpenAvatarSelector] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         await refreshUser(); // Usar la función del contexto para obtener los datos del usuario
+        setIsGuest(user == null);
       } catch (error) {
         console.error("Error al obtener perfil:", error);
       }
@@ -40,14 +43,15 @@ function Login() {
           type="button" 
           onClick={() => setOpenAvatarSelector(true)}
           disabled = {openAvatarSelector} 
-          className="absolute right-2 top-2 shadow-xl bg-white rounded-full size-10 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110">
+          className={`absolute right-2 top-2 shadow-xl bg-white rounded-full size-10 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110
+          ${isGuest ? "hidden" : "flex"}`}>
             <EditIcon/>
           </button> 
         </div>
 
         <p className="text-lg font-medium mt-2 mb-6"> {user?.name || "Invitado"} </p>
 
-        <Logout />
+        {isGuest ? (<LoginButton/>) : (<LogoutButton />)}
       </div>
 
       <div id="info" className="hidden lg:flex flex-col w-1/2 items-center justify-center gap-4">
@@ -65,4 +69,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Profile;

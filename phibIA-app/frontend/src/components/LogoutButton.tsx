@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import LogoutIcon from "../assets/uiIcons/logoutIcon"
 import "../styles/App.css"
 
-export default function Logout() {
+export default function LogoutButton() {
   const { logout } = useAuth(); // Usar directamente el método logout del contexto
 
   return (
