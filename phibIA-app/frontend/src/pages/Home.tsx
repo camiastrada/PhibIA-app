@@ -279,7 +279,7 @@ function Home() {
       setIsGettingLocation(false);
     }
 
-    setListening(true);
+
     const formData = new FormData();
     formData.append("audio", file);
 
@@ -407,7 +407,7 @@ function Home() {
           >
             {listening ? (
               <>
-                <StopRecordIcon className="size-15" />
+                {file?(<p>Detectando..</p>):(<StopRecordIcon className="size-15" />)}
               </>
             ) : (
               <>
