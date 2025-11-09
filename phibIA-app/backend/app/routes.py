@@ -303,3 +303,129 @@ def init_routes(app):
         return jsonify({
             'message': f'Hola {user.name}, estás autenticado!'
         }), 200
+
+    @app.route('/user/captures', methods=['GET'])
+    @jwt_required()
+    def get_user_detections():
+        """
+        Obtiene todas las detecciones (audios) del usuario autenticado
+        """
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'message': 'Invalid token subject'}), 422
+
+        user = db.session.get(Usuario, current_user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 401
+
+        # Obtener todos los audios del usuario con información relacionada
+        audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+
+        detections = []
+        for audio in audios:
+            detections.append({
+                'audio_id': audio.audio_id,
+                'ruta': audio.ruta,
+                'fecha_grabacion': audio.fecha_grabacion.isoformat(),
+                'especie': {
+                    'id': audio.especie.especie_id,
+                    'nombre_cientifico': audio.especie.nombre_cientifico,
+                    'nombre_comun': audio.especie.nombre_comun,
+                    'descripcion': audio.especie.descripcion,
+                    'imagen': audio.especie.imagen
+                },
+                'ubicacion': {
+                    'id': audio.ubicacion.ubicacion_id,
+                    'descripcion': audio.ubicacion.descripcion
+                }
+            })
+
+        return jsonify({
+            'detections': detections,
+            'total': len(detections)
+        }), 200
+    
+    @app.route('/audio/<int:audio_id>', methods=['GET'])
+    @jwt_required()
+    def get_audio_file(audio_id):
+        """
+        Sirve el archivo de audio para reproducción
+        """
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'message': 'Invalid token subject'}), 422
+
+        # Verificar que el audio existe y pertenece al usuario
+        audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
+        
+        if not audio:
+            return jsonify({'error': 'Audio not found or access denied'}), 404
+
+        # Construir la ruta correcta del archivo
+        # Si la ruta ya es absoluta y comienza con /, usarla directamente
+        # Si no, construirla desde el directorio actual
+        file_path = audio.ruta
+        
+        # Si la ruta no es absoluta, construirla
+        if not os.path.isabs(file_path):
+            file_path = os.path.join(os.getcwd(), file_path)
+        
+        print(f"Intentando servir archivo de audio: {file_path}")
+        
+        # Verificar que el archivo existe
+        if not os.path.exists(file_path):
+            print(f"Error: Archivo no encontrado en {file_path}")
+            return jsonify({'error': f'Audio file not found on server: {file_path}'}), 404
+
+        from flask import send_file
+        
+        # Detectar el tipo de archivo
+        if file_path.endswith('.webm'):
+            mimetype = 'audio/webm'
+        elif file_path.endswith('.wav'):
+            mimetype = 'audio/wav'
+        else:
+            mimetype = 'audio/mpeg'
+            
+        return send_file(file_path, mimetype=mimetype)
+
+    @app.route('/audio/<int:audio_id>', methods=['DELETE'])
+    @jwt_required()
+    def delete_audio_file(audio_id):
+        """
+        Elimina un audio del usuario autenticado
+        """
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'message': 'Invalid token subject'}), 422
+
+        # Verificar que el audio existe y pertenece al usuario
+        audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
+        
+        if not audio:
+            return jsonify({'error': 'Audio not found or access denied'}), 404
+
+        # Intentar eliminar el archivo físico
+        file_path = audio.ruta
+        if not os.path.isabs(file_path):
+            file_path = os.path.join(os.getcwd(), file_path)
+        
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"Archivo de audio eliminado: {file_path}")
+        except Exception as file_error:
+            print(f"Error al eliminar archivo físico: {file_error}")
+            # Continuamos con la eliminación de la base de datos aunque falle el archivo
+        
+        # Eliminar el registro de la base de datos
+        try:
+            db.session.delete(audio)
+            db.session.commit()
+            return jsonify({'message': 'Audio deleted successfully'}), 200
+        except Exception as db_error:
+            db.session.rollback()
+            return jsonify({'error': f'Error deleting audio from database: {str(db_error)}'}), 500

@@ -36,3 +36,13 @@
   border: none;
   border-radius: 9999px;
 }
+
+/* Ocultar scrollbar del contenedor de detecciones */
+.detections-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.detections-container::-webkit-scrollbar {
+  display: none;
+}
