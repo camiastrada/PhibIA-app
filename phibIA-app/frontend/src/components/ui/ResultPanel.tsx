@@ -10,6 +10,19 @@ import specieShadow4 from "../../assets/speciesShadow/CeratophrysCranwelliShadow
 import specie4 from "../../assets/species/CeratophrysCranwelli4.png";
 import specieShadow5 from "../../assets/speciesShadow/LeptodactylusGracilisShadow5.png";
 import specie5 from "../../assets/species/LeptodactylusGracilis5.png";
+import specieShadow6 from "../../assets/speciesShadow/LeptodactylusLatinasusShadow6.png";
+import specie6 from "../../assets/species/LeptodactylusLatinasus6.png";
+import specieShadow7 from "../../assets/speciesShadow/LeptodactylusLuctatorShadow7.png";
+import specie7 from "../../assets/species/LeptodactylusLuctator7.png";
+import specieShadow8 from "../../assets/speciesShadow/LeptodactylusMystacinusShadow8.png";
+import specie8 from "../../assets/species/LeptodactylusMystacinus8.png";
+import specieShadow9 from "../../assets/speciesShadow/PleurodemaTucumanumShadow9.png";
+import specie9 from "../../assets/species/PleurodemaTucumanum9.png";
+import specieShadow10 from "../../assets/speciesShadow/ScinaxNasicusShadow10.png";
+import specie10 from "../../assets/species/ScinaxNasicus10.png";
+import specieShadow11 from "../../assets/speciesShadow/PhysalaemusBiligonigerus11Shadow.png";
+import specie11 from "../../assets/species/PhysalaemusBiligonigerus11.png";
+
 
 interface Params{
   listening: boolean;
@@ -22,8 +35,8 @@ export default function ResultPanel({listening, prediction , specie, confidence}
     const [actualSpecie, setActualSpecie] = useState(specie1);
     const [showSpecie, setShowSpecie] = useState(false);
     const [thinking, setThinking] = useState(false)
-    const shadowsList = [specieShadow1, specieShadow2, specieShadow3, specieShadow4, specieShadow5];
-    const speciesList = [specie1, specie2, specie3, specie4, specie5];
+    const shadowsList = [specieShadow1, specieShadow2, specieShadow3, specieShadow4, specieShadow5, specieShadow6, specieShadow7, specieShadow8, specieShadow9, specieShadow10, specieShadow11];
+    const speciesList = [specie1, specie2, specie3, specie4, specie5, specie6, specie7, specie8, specie9, specie10, specie11];
     
 
     const changeShadow = () => {
@@ -76,7 +89,7 @@ export default function ResultPanel({listening, prediction , specie, confidence}
                   <img
                     src={actualShadow}
                     alt="Species Shadow"
-                    className={`w-30 md:w-50 h-auto absolute z-10 transition-opacity duration-1000 ${
+                    className={`w-30 md:w-50 h-auto absolute z-10 transition-opacity duration-1000 border${
                       showSpecie && !listening ? "opacity-0" : "opacity-100"
                     }`}
                     />
