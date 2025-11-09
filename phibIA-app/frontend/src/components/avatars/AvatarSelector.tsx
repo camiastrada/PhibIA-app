@@ -114,7 +114,7 @@ export default function AvatarSelector(
   return (
     <div 
       ref={containerRef}
-      className="flex flex-col w-full md:w-4/5 h-2/3 md:h-4/5 rounded-3xl items-center justify-center shadow-xl"
+      className="flex flex-col w-full h-full  rounded-3xl items-center justify-center shadow-xl"
       style={{ backgroundColor: selectedColor }} // Aplicar el color seleccionado como fondo
     >
       <div 
@@ -137,7 +137,7 @@ export default function AvatarSelector(
             selectedId={selectedAvatar}
             onSelect={(id) => setSelectedAvatar(id)}
           />
-          <div className={`flex-col md:flex-row items-center justify-center gap-3 p-3
+          <div className={`flex-row items-center justify-center gap-3 p-3
             ${showProfilePanel ? "hidden" : "flex"}`}>
             <label className="font-medium mb-1">Color:</label>
             <input
@@ -160,6 +160,7 @@ export default function AvatarSelector(
             Confirmar
           </button>
         </div>
+
         {showProfilePanel && (
           <div className="flex flex-col">
             <ProfilePanel className="size-45 xl:size-60 border-6" />

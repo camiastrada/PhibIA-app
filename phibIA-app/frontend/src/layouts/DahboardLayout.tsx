@@ -24,17 +24,15 @@ export default function DashboardLayout() {
         <Sidebar />
         
         {/* Contenido principal */}
-        <main className="flex-1 flex justify-center items-center overflow-y-auto overflow-x-hidden">
-          {/* Espaciador superior mobile (para topbar) */}
-          <div className="flex md:hidden h-12 w-full fixed top-0 pointer-events-none"/>
-          
-          {/* Contenido de la página */}
-          <div className="w-full h-full flex justify-center items-center p-5 mt-12 md:mt-0 mb-16 md:mb-0">
-            <Outlet />
+        <main className="flex-1 relative flex justify-center items-center">
+          {/* Container principal con márgenes automáticos para topbar/bottombar */}
+          <div className="absolute inset-0 md:static flex justify-center overflow-y-auto md:h-full md:w-full">
+            <div className="container mx-auto max-w-5xl w-full flex justify-center items-center p-5 mt-12 mb-16 md:my-8">
+              <div className="w-full h-full overflow-y-auto flex items-center justify-center">
+                <Outlet />
+              </div>
+            </div>
           </div>
-          
-          {/* Espaciador inferior mobile (para bottombar) */}
-          <div className="flex md:hidden h-16 w-full fixed bottom-0 pointer-events-none"/>
         </main>
       </div>
       

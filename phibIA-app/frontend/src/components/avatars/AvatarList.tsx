@@ -13,7 +13,7 @@ export default function AvatarList({ onSelect, selectedId }: Props) {
         grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4 
         justify-items-center 
         overflow-y-auto 
-        max-h-[60vh] 
+        max-h-[30vh] md:max-h-full
         w-full
         p-2
       "
