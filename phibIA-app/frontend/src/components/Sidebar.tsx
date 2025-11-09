@@ -15,113 +15,88 @@ import ProfilePanel from "./ui/ProfilePanel";
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   return (
-    <>
-    <div className="hidden md:block h-full">
-      <div className="fixed h-screen w-20 bg-[#004D40] text-white flex flex-col rounded-r-2xl bottom-0 left-0 top-0 shadow-lg z-10 items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-2xl font-bold mt-4 hover:bg-[#04463b] p-2 rounded-2xl cursor-pointer"
+    <div className="hidden md:block h-screen">
+      <div 
+        className={`fixed h-screen bg-[#004D40] text-white flex rounded-r-2xl bottom-0 left-0 top-0 shadow-lg z-20 transition-all duration-500 ease-in-out ${
+          isOpen ? "w-80" : "w-20"
+        }`}
+      >
+        {/* Columna de iconos (siempre visible) */}
+        <div className="w-20 flex flex-col items-center py-4">
+          {/* Botón toggle arriba */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-2xl font-bold hover:bg-[#04463b] p-2 rounded-2xl cursor-pointer mb-8"
           >
-          {isOpen ? (
-            <OcultBar className="size-10 inline-block"/>
-          ) : (
-            <ShowBar className="size-10 inline-block"/>
-          )}
-        </button>
-        <nav className="relative flex flex-col bottom-30 gap-6 w-full justify-center">
-          <SidebarIcon
-            to="/"
-            id="homeIcon"
-            icon={HomeIcon} />
-          <SidebarIcon
-            to="/captures"
-            id="capturesIcon"
-            icon={CapturesIcon} />
-          <SidebarIcon
-            to="/encyclopedia"
-            id="encyclopediaIcon"
-            icon={EncyclopediaIcon} />  
-          <SidebarIcon
-            to="/map"
-            id="mapIcon"
-            icon={MapIcon} />  
-        </nav>
-        <Link
-          to="/profile"
-          id="profileIcon"
-          className="mb-4 size-12 rounded-full outline-2 flex items-center justify-center">
-          <ProfilePanel className="size-12 border-none"/>
-        </Link>
-      </div>
-
-      <div className={`flex h-full ${isOpen ? "w-80" : "w-20"} bg-[#02372E] rounded-r-2xl transition-all duration-500 ease-in-out`}>  
-
-        <div className={`w-20 h-full ${isOpen ? "opacity-100 duration 700" : "opacity-0 duration-250"} `}>
-
-        </div>
- 
-        <div
-          className="text-white flex flex-1 flex-col pt-2 justify-between shadow-lg transition-all duration-500 ease-in-out"
-          style={isOpen ? { width: "320px" } : { width: "80px" }}
-          >
-          <img src={Logo} alt="Logo" className={`transition-all ease-in-out mt-2 ml-4 w-40 h-auto ${isOpen ? " opacity-100 duration-700" : "opacity-0 duration-200"}`} />
+            {isOpen ? (
+              <OcultBar className="size-10 inline-block"/>
+            ) : (
+              <ShowBar className="size-10 inline-block"/>
+            )}
+          </button>
           
-          <nav
-            className={`${
-              isOpen
-              ? "opacity-100 duration-700"
-              : "opacity-0 duration-250"
-            } relative flex flex-col gap-6 bottom-30 transition-all ease-in-out `}
-            >
-            <SidebarLabel
-              to="/"
-              id="homeLabel"
-              label="Inicio"
-              isOpen={isOpen}
-              />
-            <SidebarLabel
-              to="/captures"
-              id="capturesLabel"
-              label="Mis detecciones"
-              isOpen={isOpen}
-              />
-            <SidebarLabel
-              to="/encyclopedia"
-              id="encyclopediaLabel"
-              label="Enciclopedia"
-              isOpen={isOpen}
-              />
-            <SidebarLabel
-              to="/map"
-              id="mapLabel"
-              label="Mapa de capturas"
-              isOpen={isOpen}
-              />
+          {/* Navegación principal centrada */}
+          <nav className="flex flex-col gap-6 w-full flex-1 justify-center">
+            <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
+            <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon} />
+            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />  
+            <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />  
           </nav>
-          <div className={`${
-            isOpen
-            ? "opacity-100 duration-700"
-            : "opacity-0 duration-250"
-          } flex mb-5 h-12 transition-all ease-in-out `}>
+          
+          {/* Perfil abajo */}
+          <Link
+            to="/profile"
+            id="profileIcon"
+            className="size-12 rounded-full outline-2 flex items-center justify-center mt-4"
+          >
+            <ProfilePanel className="size-12 border-none"/>
+          </Link>
+        </div>
+
+        {/* Panel expandible con labels */}
+        <div 
+          className={`flex-1 bg-[#02372E] rounded-r-2xl flex flex-col justify-between py-2 overflow-hidden transition-all duration-500 ease-in-out ${
+            isOpen ? "opacity-100 w-60" : "opacity-0 w-0"
+          }`}
+        >
+          <img 
+            src={Logo} 
+            alt="Logo" 
+            className={`mt-2 ml-4 w-40 h-auto transition-opacity duration-500 ${
+              isOpen ? "opacity-100" : "opacity-0"
+            }`} 
+          />
+          
+          <nav className={`flex flex-col gap-6 transition-opacity duration-500 ${
+            isOpen ? "opacity-100" : "opacity-0"
+          }`}>
+            <SidebarLabel to="/" id="homeLabel" label="Inicio" isOpen={isOpen} />
+            <SidebarLabel to="/captures" id="capturesLabel" label="Mis detecciones" isOpen={isOpen} />
+            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen} />
+            <SidebarLabel to="/map" id="mapLabel" label="Mapa de capturas" isOpen={isOpen} />
+          </nav>
+          
+          <div className={`flex mb-3 h-12 transition-opacity duration-500 ${
+            isOpen ? "opacity-100" : "opacity-0"
+          }`}>
             <Link
               to="/profile"
               id="profileLabel"
               className="sidebarLabel flex items-center justify-start w-full h-full p-2"
-              >
-              <label
-                className={` text-lg ml-3 cursor-pointer transition-all duration-300 ${
-                  isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-                }`}
-                >
+            >
+              <label className="text-lg ml-3 cursor-pointer">
                 Perfil
               </label>
             </Link>
-
           </div>
         </div>
       </div>
+      
+      {/* Espaciador para empujar el contenido */}
+      <div className={`transition-all duration-500 ease-in-out ${
+        isOpen ? "w-80" : "w-20"
+      }`} />
     </div>
-    </>
   );
 }
