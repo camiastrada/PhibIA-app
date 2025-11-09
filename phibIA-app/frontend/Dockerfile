@@ -28,5 +28,8 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copiar los archivos compilados al servidor
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Copiar las imágenes de las especies desde el contexto de build
+COPY --from=build /app/public/images /usr/share/nginx/html/images
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
