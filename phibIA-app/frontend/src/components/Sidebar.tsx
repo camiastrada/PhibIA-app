@@ -17,12 +17,12 @@ export default function Sidebar() {
   return (
     <div className="hidden md:block h-screen">
       <div 
-        className={`fixed h-screen bg-[#004D40] text-white flex rounded-r-2xl bottom-0 left-0 top-0 shadow-lg z-20 transition-all duration-500 ease-in-out ${
+        className={`fixed h-screen bg-[#02372E] text-white flex rounded-r-2xl bottom-0 left-0 top-0 shadow-lg z-20 transition-all duration-500 ease-in-out ${
           isOpen ? "w-80" : "w-20"
         }`}
       >
         {/* Columna de iconos (siempre visible) */}
-        <div className="w-20 flex flex-col items-center py-4">
+        <div className="w-20 flex flex-col items-center py-4 rounded-r-2xl bg-[#004D40]">
           {/* Botón toggle arriba */}
           <button
             type="button"
@@ -37,7 +37,7 @@ export default function Sidebar() {
           </button>
           
           {/* Navegación principal centrada */}
-          <nav className="flex flex-col gap-6 w-full flex-1 justify-center">
+          <nav className="flex flex-col gap-6 w-full flex-1 justify-center mb-20">
             <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
             <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon} />
             <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />  
@@ -68,7 +68,7 @@ export default function Sidebar() {
             }`} 
           />
           
-          <nav className={`flex flex-col gap-6 transition-opacity duration-500 ${
+          <nav className={`flex flex-col flex-1 justify-center pt-4 gap-6 transition-opacity duration-500 mb-20 ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}>
             <SidebarLabel to="/" id="homeLabel" label="Inicio" isOpen={isOpen} />

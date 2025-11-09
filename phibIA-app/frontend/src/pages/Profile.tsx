@@ -45,7 +45,7 @@ function Login() {
           </button> 
         </div>
 
-        <p className="text-lg font-medium mt-2 mb-6"> {user?.name || "..."} </p>
+        <p className="text-lg font-medium mt-2 mb-6"> {user?.name || "Invitado"} </p>
 
         <Logout />
       </div>
