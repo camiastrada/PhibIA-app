@@ -14,9 +14,10 @@ import specie5 from "../../assets/species/LeptodactylusGracilis5.png";
 interface Params{
   listening: boolean;
   prediction: boolean;
-  specie?: string; 
+  specie?: string;
+  confidence?: number | null;
 }
-export default function ResultPanel({listening, prediction , specie} : Params){
+export default function ResultPanel({listening, prediction , specie, confidence} : Params){
     const [actualShadow, setActualShadow] = useState(specieShadow1);
     const [actualSpecie, setActualSpecie] = useState(specie1);
     const [showSpecie, setShowSpecie] = useState(false);
@@ -93,6 +94,15 @@ export default function ResultPanel({listening, prediction , specie} : Params){
                 )
             }
           </div>
+          
+          {/* Mostrar confianza cuando hay predicción */}
+          {prediction && confidence !== null && confidence !== undefined && (
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-[#004D40] text-lg md:text-xl font-semibold">
+                Confianza: {confidence.toFixed(1)}%
+              </p>
+            </div>
+          )}
         </div>
     )
 }

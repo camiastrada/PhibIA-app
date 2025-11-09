@@ -18,8 +18,8 @@ create table usuarios(
 
 create table especies(
     especie_id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_cientifico VARCHAR(40) NOT NULL,
-    nombre_comun VARCHAR(20) DEFAULT NULL,
+    nombre_cientifico VARCHAR(40) NOT NULL UNIQUE,
+    nombre_comun VARCHAR(100) DEFAULT NULL,
     descripcion VARCHAR(250) DEFAULT NULL,
     imagen VARCHAR(100) DEFAULT NULL
     /*IMAGEN ?*/

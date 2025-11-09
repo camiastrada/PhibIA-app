@@ -1,6 +1,5 @@
 from flask import jsonify, request
-from .models import Usuario
-from .models import Audio
+from .models import Usuario, Audio, Especie, Ubicacion
 from datetime import datetime
 from .ml_model import predict_species
 from . import db
@@ -25,15 +24,29 @@ def init_routes(app):
     @app.route("/predict", methods=["POST"])
     def predict():
         
-        current_user_id = 1  # Valor por defecto (usuario invitado)
+        current_user_id = None  # None para usuarios no autenticados
         #obtener el usuario actual desde el token JWT
         try:
-            verify_jwt_in_request()  # Verifica si hay token
+            verify_jwt_in_request(optional=True)  # Verifica si hay token (opcional)
             user_id = get_jwt_identity()
             if user_id:
                 current_user_id = int(user_id)
-        except Exception:
-            pass  # Si no hay token, sigue como invitado
+                # Verificar que el usuario exista
+                usuario = Usuario.query.get(current_user_id)
+                if not usuario:
+                    current_user_id = None
+        except Exception as e:
+            print(f"Error verificando JWT: {e}")
+            current_user_id = None
+        
+        # Si no hay usuario autenticado, buscar o crear usuario invitado
+        if current_user_id is None:
+            usuario_invitado = Usuario.query.filter_by(name='Invitado').first()
+            if not usuario_invitado:
+                return jsonify({
+                    "error": "Usuario invitado no encontrado en la base de datos."
+                }), 500
+            current_user_id = usuario_invitado.usuario_id
             
         
         if "audio" not in request.files:
@@ -50,16 +63,32 @@ def init_routes(app):
 
         try:
             especie_predicha, confianza = predict_species(file_path)
-            # Separar ID y nombre
-            especie_id_str, nombre_especie = especie_predicha.split('-', 1)
-            especie_id = int(especie_id_str)  # convertir a entero
-            # Crear el objeto Audio
+            
+            # La predicción viene en formato "ID-Nombre científico"
+            # Ejemplo: "1-Rhinella arenarum"
+            try:
+                especie_id_str, nombre_cientifico = especie_predicha.split('-', 1)
+                especie_id = int(especie_id_str)
+            except ValueError:
+                # Si no se puede hacer split, el formato es incorrecto
+                raise ValueError(f"Formato de predicción incorrecto: '{especie_predicha}'. Se esperaba 'ID-Nombre'")
+            
+            # Buscar la especie en la base de datos para obtener información completa
+            especie = Especie.query.filter_by(especie_id=especie_id).first()
+            
+            if not especie:
+                
+                return jsonify({
+                    "error": f"Especie con ID {especie_id} ('{nombre_cientifico}') no encontrada en la base de datos"
+                }), 404
+            
+            
             nuevo_audio = Audio(
                 ruta=file_path,
                 fecha_grabacion=datetime.now(),
                 especie_id=especie_id,     
-                usuario_id=current_user_id,      # aca deberia ir el usuario actual
-                ubicacion_id=1    # aca iria la ubicacion real
+                usuario_id=current_user_id,
+                ubicacion_id=1
             )
             # Guardarlo en la DB
             db.session.add(nuevo_audio)
@@ -72,13 +101,36 @@ def init_routes(app):
                     os.remove(file_path)
                 except Exception as file_exc:
                     print(f"Error deleting orphaned file: {file_path}: {file_exc}")
-                return jsonify({"error": f"Database commit failed: {str(db_exc)}"}), 500
+                return jsonify({"error": f"Error al guardar en la base de datos: {str(db_exc)}"}), 500
+            
+            # Retornar información completa de la predicción
             return jsonify({
                 "prediccion": especie_predicha,
-                "confianza": round(confianza, 2)  
+                "confianza": round(confianza, 2),
+                "especie_info": {
+                    "id": especie.especie_id,
+                    "nombre_cientifico": especie.nombre_cientifico,
+                    "nombre_comun": especie.nombre_comun,
+                    "descripcion": especie.descripcion,
+                    "imagen": especie.imagen
+                },
+                "audio_id": nuevo_audio.audio_id
             })
+        except ValueError as ve:
+            # Error específico de procesamiento de audio
+            try:
+                os.remove(file_path)
+            except:
+                pass
+            return jsonify({"error": f"Error procesando el audio: {str(ve)}"}), 400
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            # Limpiar archivo si hay error
+            try:
+                os.remove(file_path)
+            except:
+                pass
+            print(f"Error en predict: {str(e)}")
+            return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
 
 
     @app.route("/register", methods=["POST"])

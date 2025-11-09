@@ -23,7 +23,9 @@ function Home() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
-  const [_confidence, setConfidence] = useState<number | null>(null);
+  const [confidence, setConfidence] = useState<number | null>(null);
+  const [commonName, setCommonName] = useState<string | null>(null);
+  const [_description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -96,6 +98,8 @@ function Home() {
     setIsProcessing(false);
     setPredictedSpecies(null);
     setConfidence(null);
+    setCommonName(null);
+    setDescription(null);
     setError(null);
     setUserLocation(null);
     setLocationError(null);
@@ -183,7 +187,7 @@ function Home() {
               (data && data.error) || `Error del servidor: ${res.status}`
             );
           } else {
-            // backend devuelve { prediccion: 'Nombre' }
+            // backend devuelve { prediccion, confianza, especie_info }
             setPredictedSpecies(
               data?.prediccion ??
                 data?.prediction ??
@@ -191,6 +195,8 @@ function Home() {
                 "No detectada"
             );
             setConfidence(data?.confianza ?? null);
+            setCommonName(data?.especie_info?.nombre_comun ?? null);
+            setDescription(data?.especie_info?.descripcion ?? null);
           }
         } catch (err: any) {
           setError(err?.message || String(err));
@@ -295,6 +301,8 @@ function Home() {
       if (response.ok) {
         setPredictedSpecies(data.prediccion);
         setConfidence(data.confianza ?? null);
+        setCommonName(data?.especie_info?.nombre_comun ?? null);
+        setDescription(data?.especie_info?.descripcion ?? null);
         setError(null);
       } else {
         setError(data.error || "Error en la predicción");
@@ -327,7 +335,7 @@ function Home() {
           title={hasPrediction ? specieName : "¡Comienza a grabar!"}
           subtitle={
             hasPrediction
-              ? "*nombre comun*"
+              ? commonName || "Nombre común no disponible"
               : "Acercate al anfibio y graba su canto para detectar su especie"
           }
         />
@@ -336,6 +344,7 @@ function Home() {
           listening={listening}
           prediction={hasPrediction}
           specie={specieNumber}
+          confidence={confidence}
         />
 
         {!hasPrediction &&
