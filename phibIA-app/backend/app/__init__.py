@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import os 
@@ -49,11 +49,27 @@ def create_app():
     app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"
     app.config["JWT_COOKIE_PATH"] = "/"
 
+    # Limitar tamaño máximo de subida a 50 MB (ajustable)
+    # Esto evita que Flask intente procesar uploads demasiado grandes.
+    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
+
     db.init_app(app)
     jwt.init_app(app)
 
 
     from .routes import init_routes
     init_routes(app)
+
+    # Manejar 413 Request Entity Too Large y devolver JSON legible
+    try:
+        # import here to avoid top-level dependency issues
+        from werkzeug.exceptions import RequestEntityTooLarge
+
+        @app.errorhandler(RequestEntityTooLarge)
+        def handle_file_too_large(e):
+            return jsonify({"error": "Archivo demasiado grande. Límite: 50 MB"}), 413
+    except Exception:
+        # En entornos antiguos o por seguridad, si import falla simplemente no registrar
+        pass
     
     return app

@@ -89,7 +89,7 @@ export default function ResultPanel({listening, prediction , specie, confidence}
                   <img
                     src={actualShadow}
                     alt="Species Shadow"
-                    className={`w-30 md:w-50 h-auto absolute z-10 transition-opacity duration-1000 border${
+                    className={`w-30 md:w-50 h-auto absolute z-10 transition-opacity duration-1000 ${
                       showSpecie && !listening ? "opacity-0" : "opacity-100"
                     }`}
                     />
