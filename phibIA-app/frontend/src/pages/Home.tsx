@@ -316,7 +316,8 @@ function Home() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-full w-full bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
+    <div className={`flex-col lg:flex-row justify-center items-center md:min-h-4/5 md:w-4/5 w-full bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ${isImport ? "hidden" : "flex"}`}>
+     {/*  <div className="flex flex-col justify-center items-center h-full w-full bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">*/}
       <div
         className={
           isImport
