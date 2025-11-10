@@ -316,22 +316,24 @@ function Home() {
   };
 
   return (
-    <div className={`flex-col lg:flex-row justify-center items-center md:min-h-4/5 md:w-4/5 w-full bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4`}>
-     {/*  <div className="flex flex-col justify-center items-center h-full w-full bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">*/}
-      <div
-        className={
-          isImport
-            ? "absolute flex w-full h-full justify-center items-center z-10"
-            : "hidden"
-        }
-      >
-        <Upload
-          handleFileChange={handleFileChange}
-          handleSubmit={handleSubmit}
-          setIsImport={setIsImport}
-        />
-      </div>
-      <div id="content" className={isImport ? "blur-xl" : ""}>
+    <>
+    <div
+      className={
+        isImport
+          ? "absolute flex w-auto justify-center items-center z-10"
+          : "hidden"
+      }
+    >
+      <Upload
+        handleFileChange={handleFileChange}
+        handleSubmit={handleSubmit}
+        setIsImport={setIsImport}
+      />
+    </div>
+    <div
+      className="flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4"
+    >
+      <div id="content" className={`${isImport ? "blur-xl" : ""} w-full h-full flex flex-col items-center justify-center`}>
         <TitleWithSubtitle
           title={hasPrediction ? specieName : "¡Comienza a grabar!"}
           subtitle={
@@ -438,6 +440,7 @@ function Home() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

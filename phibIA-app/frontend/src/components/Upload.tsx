@@ -15,9 +15,9 @@ export default function Upload({
   setIsImport,
 }: UploadProps) {
   return (
-    <div className="flex flex-col w-full md:w-3/5 h-2/3 md:h-3/5 md:rounded-3xl items-center justify-center shadow-xl">
+    <div className="flex flex-col max-w-9/10 md:min-w-full md:h-3/5 rounded-3xl items-center justify-center shadow-xl">
       <div 
-        className="relative w-full p-6 md:rounded-t-3xl flex justify-center items-center"
+        className="relative w-full p-6 rounded-t-3xl flex justify-center items-center"
         style={{
           backgroundImage: `url(${Background})`,
           backgroundSize: "cover",
@@ -39,7 +39,7 @@ export default function Upload({
       </div>
 
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white w-full flex-1 flex flex-col justify-center items-center md:rounded-b-3xl">
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white w-full flex-1 flex flex-col justify-center items-center rounded-b-3xl p-5">
         <div className="flex flex-col w-2/3 items-start justify-center">
           <label className="text-md m-1">Audio:</label>
           <input
