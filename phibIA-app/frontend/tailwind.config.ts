@@ -6,21 +6,7 @@ const config = {
     theme: {
         extend: {},
     },
-    plugins: [
-        function ({ addUtilities }: any) {
-            const newUtilities = {
-                '.scrollbar-hide': {
-                    /* Firefox */
-                    'scrollbar-width': 'none',
-                    /* Chrome, Safari, Edge */
-                    '&::-webkit-scrollbar': {
-                        display: 'none',
-                    },
-                },
-            };
-            addUtilities(newUtilities);
-        },
-    ],
+    plugins: [],
 };
 
 export default config;

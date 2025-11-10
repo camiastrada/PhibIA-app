@@ -112,7 +112,7 @@ export default function ResultPanel({listening, prediction , specie, confidence}
           {prediction && confidence !== null && confidence !== undefined && (
             <div className="flex flex-col items-center gap-1">
               <p className="text-[#004D40] text-lg md:text-xl font-semibold">
-                Certeza: {confidence.toFixed(1)}%
+                Confianza: {confidence.toFixed(1)}%
               </p>
             </div>
           )}

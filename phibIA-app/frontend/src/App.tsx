@@ -7,7 +7,6 @@ import Profile from "./pages/Profile";
 import FrogsMap from "./pages/Maps";
 import "./styles/App.css";
 import FrogsBulls from "./pages/FrogsBulls";
-import Detections from "./pages/Detections";
 
 function App() {
   return (
@@ -16,7 +15,6 @@ function App() {
         <Route path="/" element={<DashboardLayout />}>
           <Route path="" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/captures" element={<Detections />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

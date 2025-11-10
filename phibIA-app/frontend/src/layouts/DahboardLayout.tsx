@@ -1,20 +1,11 @@
 // src/layouts/DashboardLayout.tsx
-import { useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Bottombar from "../components/Bottombar";
 import { Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import Background from "/images/bgMainImage.jpg";
 
 export default function DashboardLayout() {
-  const { refreshUser } = useAuth();
-
-  useEffect(() => {
-    // Cargar información del usuario al montar el componente
-    refreshUser();
-  }, [refreshUser]);
-
   return (
     <div
       className="h-screen w-screen overflow-hidden"
