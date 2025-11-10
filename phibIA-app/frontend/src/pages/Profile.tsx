@@ -9,14 +9,15 @@ import { useAuth } from "../context/AuthContext";
 
 function Profile() {
   const { user, refreshUser } = useAuth(); // Eliminar logout del contexto
-  const [ isGuest, setIsGuest ] = useState(true);
+  const isGuest = !user;
   const [openAvatarSelector, setOpenAvatarSelector] = useState(false);
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         await refreshUser(); // Usar la función del contexto para obtener los datos del usuario
-        setIsGuest(user == null);
+        
       } catch (error) {
         console.error("Error al obtener perfil:", error);
       }
