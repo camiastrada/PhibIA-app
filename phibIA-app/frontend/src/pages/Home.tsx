@@ -22,6 +22,7 @@ function Home() {
   const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [listeningFile, setListeningFile] = useState(false);
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [commonName, setCommonName] = useState<string | null>(null);
@@ -94,6 +95,7 @@ function Home() {
 
     // Limpiar todos los estados
     setListening(false);
+    setListeningFile(false);
     setIsImport(false);
     setIsProcessing(false);
     setPredictedSpecies(null);
@@ -261,12 +263,13 @@ function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsImport(false);
-
+    
     if (!file) {
       setError("Por favor selecciona un archivo de audio");
       return;
     }
-
+    
+    setListeningFile(true);
     // Obtener ubicación actual para archivos subidos también
     let currentLocation = null;
     setIsGettingLocation(true);
@@ -310,7 +313,7 @@ function Home() {
     } catch (err) {
       setError("Error al conectar con el servidor");
     } finally {
-      setListening(false);
+      setListeningFile(false);
       setFile(null);
     }
   };
@@ -344,7 +347,7 @@ function Home() {
         />
 
         <ResultPanel
-          listening={listening}
+          listening={listening || listeningFile}
           prediction={hasPrediction}
           specie={specieNumber}
           confidence={confidence}
@@ -398,6 +401,7 @@ function Home() {
         >
           <button
             type="button"
+            disabled={listeningFile}
             onClick={() => {
               listening ? stopRecording() : startRecording();
               setIsImport(false);
@@ -408,9 +412,9 @@ function Home() {
                 : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
             }`}
           >
-            {listening ? (
+            {listening || listeningFile ? (
               <>
-                {file?(<p>Detectando..</p>):(<StopRecordIcon className="size-15" />)}
+                {listeningFile?(<p>Detectando...</p>):(<StopRecordIcon className="size-15" />)}
               </>
             ) : (
               <>
@@ -425,9 +429,10 @@ function Home() {
             onClick={() => {
               setIsImport(true);
               setListening(false);
+              setListeningFile(false);
             }}
             className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
-              listening ? "hidden" : "flex"
+              listening || listeningFile ? "hidden" : "flex"
             }`}
           >
             Importar grabación
