@@ -110,7 +110,15 @@ function Home() {
     }
     
     // Detener grabación si está activa
-    stopRecording();
+    if (listening && mediaRecorderRef.current) {
+      stopRecording();
+    } else {
+      // Si no hay recorder activo, solo limpiar
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+    }
 
     // Limpiar todos los estados
     setListening(false);
@@ -125,13 +133,9 @@ function Home() {
     setUserLocation(null);
     setLocationError(null);
     setIsGettingLocation(false);
+    setFile(null);
 
-    // Asegurar que el stream se detenga
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
-
+    // Limpiar referencias
     mediaRecorderRef.current = null;
     chunksRef.current = [];
     abortControllerRef.current = null;
@@ -146,21 +150,24 @@ function Home() {
     setUserLocation(null);
 
     try {
-      // Obtener ubicación actual antes de empezar a grabar
-      setIsGettingLocation(true);
-      try {
-        const location = await getCurrentLocation();
-        setUserLocation(location);
-      } catch (locationErr: any) {
-        setLocationError(locationErr.message);
-        // No detenemos la grabación si falla la ubicación
-      } finally {
-        setIsGettingLocation(false);
-      }
-
+      // Primero solicitar permisos del micrófono
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       chunksRef.current = [];
+
+      // Una vez que tenemos el micrófono, obtener ubicación en paralelo
+      setIsGettingLocation(true);
+      getCurrentLocation()
+        .then((location) => {
+          setUserLocation(location);
+        })
+        .catch((locationErr: any) => {
+          setLocationError(locationErr.message);
+          // No detenemos la grabación si falla la ubicación
+        })
+        .finally(() => {
+          setIsGettingLocation(false);
+        });
 
       const options: any = {};
 
@@ -248,8 +255,28 @@ function Home() {
       recorder.start();
       setListening(true); // Solo aquí se activa listening
     } catch (err: any) {
-      setError("No se pudo acceder al micrófono: " + (err?.message || err));
+      // Limpiar stream si hay error
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+      
+      // Manejar diferentes tipos de errores
+      let errorMessage = "No se pudo acceder al micrófono: ";
+      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+        errorMessage += "Permiso denegado. Por favor, permite el acceso al micrófono en la configuración de tu navegador.";
+      } else if (err.name === "NotFoundError") {
+        errorMessage += "No se encontró ningún micrófono conectado.";
+      } else if (err.name === "NotReadableError") {
+        errorMessage += "El micrófono está siendo usado por otra aplicación.";
+      } else {
+        errorMessage += (err?.message || err);
+      }
+      
+      setError(errorMessage);
       setIsGettingLocation(false);
+      setListening(false); // Asegurar que listening esté en false
+      mediaRecorderRef.current = null;
     }
   };
 
@@ -269,11 +296,12 @@ function Home() {
       return;
     }
 
-    if (recorder.state !== "inactive") {
+    // Solo detener si está grabando
+    if (recorder.state === "recording") {
       recorder.stop();
-      // Se cierra el stream en onstop
+      // El stream se cierra en el handler onstop
     } else {
-      //limpiar manualmente
+      // Si ya está detenido, limpiar manualmente
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => {
           track.stop();
@@ -407,25 +435,10 @@ function Home() {
           <>
             <ResultPanel
               listening={listening}
-              prediction={hasPrediction}
+              prediction={hasPrediction|| listeningFile}
               specie={specieNumber}
               confidence={confidence}
             />
-        <ResultPanel
-          listening={listening || listeningFile}
-          prediction={hasPrediction}
-          specie={specieNumber}
-          confidence={confidence}
-        />
-
-            {!hasPrediction &&
-              (listening ? (
-                <p className="text-md mb-6">Escuchando...</p>
-              ) : (
-                <p className="text-md mb-6">
-                  Comienza a grabar para obtener resultados
-                </p>
-              ))}
           </>
         )}
         {hasPrediction && (
@@ -507,7 +520,7 @@ function Home() {
                   setListening(false);
                 }}
                 className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
-                  listening ? "hidden" : "flex"
+                  listening || listeningFile ? "hidden" : "flex"
                 }`}
               >
                 Importar grabación
@@ -515,20 +528,7 @@ function Home() {
               </button>
             </>
           )}
-          <button
-            type="button"
-            onClick={() => {
-              setIsImport(true);
-              setListening(false);
-              setListeningFile(false);
-            }}
-            className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
-              listening || listeningFile ? "hidden" : "flex"
-            }`}
-          >
-            Importar grabación
-            <UploadIcon className="size-4 inline-block" />
-          </button>
+          
         </div>
         {/* mostrar error */}
         <div className="mt-4 text-center">
