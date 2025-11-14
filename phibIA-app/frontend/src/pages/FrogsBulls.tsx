@@ -21,12 +21,7 @@ export default function FrogsBulls() {
       };
 
       const handleLoadedMetadata = () => {
-        console.log(
-          "📏 Dimensiones del video:",
-          video.videoWidth,
-          "x",
-          video.videoHeight
-        );
+        // Video metadata loaded
       };
 
       video.addEventListener("canplay", handleCanPlay);

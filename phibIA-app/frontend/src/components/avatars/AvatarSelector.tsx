@@ -41,11 +41,9 @@ export default function AvatarSelector(
       try {
         if (user?.avatar_id != null) {
           setSelectedAvatar(user.avatar_id);
-          console.log("Avatar actual del usuario:", user.avatar_id);
         }
         if (user?.background_color != null) {
           setSelectedColor(user.background_color);
-          console.log("Color actual del usuario:", user.background_color);
         }
       } catch (error) {
         console.error("Error al cargar avatar actual:", error);
@@ -72,8 +70,6 @@ export default function AvatarSelector(
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Error al actualizar avatar");
 
-        console.log("✅ Avatar actualizado:", data.avatar_id);
-
         updateAvatar(selectedAvatar);
       } catch (error) {
         console.error("Error:", error);
@@ -99,12 +95,9 @@ export default function AvatarSelector(
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Error al actualizar color");
 
-      console.log("🎨 Color actualizado en el backend:", data.background_color);
-
       // Refrescar el usuario para obtener los datos actualizados
       await refreshUser();
 
-      console.log("Usuario actualizado:", user); // Verificar si el usuario se actualiza correctamente
     } catch (error) {
       console.error("Error al actualizar el color:", error);
       alert("Error al actualizar el color");

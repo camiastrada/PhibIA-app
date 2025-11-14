@@ -2,7 +2,10 @@ import { useLocation } from "react-router-dom";
 
 const paths: Record<string, string> = {
     home: "Inicio",
-    profile: "Perfil"
+    profile: "Perfil",
+    captures: "Mis Detecciones",
+    maps: "Mapa",
+    "frogs-bulls": "Ranas y Sapos"
 }
 export default function Topbar(){
     const {pathname} = useLocation(); 
@@ -16,7 +19,7 @@ export default function Topbar(){
             </div>
             <div className="absolute inset-x-0 flex items-center justify-center">
                 <p className="text-xl">
-                    {page === "" ? "Inicio" : paths[page] ?? "pagina descocnocida"}
+                    {page === "" ? "Inicio" : paths[page] ?? "pagina desconocida"}
                 </p>
             </div>
         </div>

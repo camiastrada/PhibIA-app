@@ -18,6 +18,7 @@ function Home() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
@@ -89,7 +90,25 @@ function Home() {
     });
   };
 
+  const cancelProcessing = () => {
+    // Abortar la petición fetch si está en curso
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    
+    // Limpiar estados
+    setIsProcessing(false);
+    setError(null);
+    chunksRef.current = [];
+  };
+
   const resetState = () => {
+    // Cancelar procesamiento si está activo
+    if (isProcessing) {
+      cancelProcessing();
+    }
+    
     // Detener grabación si está activa
     stopRecording();
 
@@ -115,6 +134,7 @@ function Home() {
 
     mediaRecorderRef.current = null;
     chunksRef.current = [];
+    abortControllerRef.current = null;
   };
 
   // Iniciar grabación
@@ -142,8 +162,6 @@ function Home() {
       streamRef.current = stream;
       chunksRef.current = [];
 
-      setListening(true);
-
       const options: any = {};
 
       const recorder = new MediaRecorder(stream as MediaStream, options);
@@ -156,8 +174,17 @@ function Home() {
       };
 
       recorder.onstop = async () => {
+        // Cerrar el micrófono INMEDIATAMENTE
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((t) => {
+            t.stop();
+          });
+          streamRef.current = null;
+        }
+        
+        setListening(false); // Desactivar el estado de escucha
+        
         try {
-          setListening(false);
           setIsProcessing(true);
           const mime = chunksRef.current[0]?.type || "audio/webm";
           const ext = mime.includes("webm")
@@ -176,11 +203,15 @@ function Home() {
             formData.append("longitude", userLocation.lng.toString());
           }
 
+          // Crear AbortController para poder cancelar
+          abortControllerRef.current = new AbortController();
+
           // enviar al backend
           const res = await fetch(`${API_URL}/predict`, {
             method: "POST",
             credentials: "include",
             body: formData,
+            signal: abortControllerRef.current.signal,
           });
 
           const data = await res.json().catch(() => null);
@@ -201,22 +232,21 @@ function Home() {
             setDescription(data?.especie_info?.descripcion ?? null);
           }
         } catch (err: any) {
-          setError(err?.message || String(err));
+          if (err.name === 'AbortError') {
+            setError(null); // No mostrar error si fue cancelado
+          } else {
+            setError(err?.message || String(err));
+          }
         } finally {
           setIsProcessing(false);
-          // limpiar y detener stream
-          if (streamRef.current) {
-            streamRef.current.getTracks().forEach((t) => t.stop());
-            streamRef.current = null;
-          }
           mediaRecorderRef.current = null;
           chunksRef.current = [];
-          setListening(false);
+          abortControllerRef.current = null;
         }
       };
 
       recorder.start();
-      setListening(true);
+      setListening(true); // Solo aquí se activa listening
     } catch (err: any) {
       setError("No se pudo acceder al micrófono: " + (err?.message || err));
       setIsGettingLocation(false);
@@ -226,21 +256,28 @@ function Home() {
   // Detener grabación
   const stopRecording = () => {
     const recorder = mediaRecorderRef.current;
-    if (!recorder) return;
-
-    // forzar envío de datos pendientes si el navegador lo soporta
-    try {
-      if (typeof (recorder as any).requestData === "function") {
-        (recorder as any).requestData();
+    
+    if (!recorder) {
+      // Si no hay recorder, limpiar stream y estado
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
+        streamRef.current = null;
       }
-    } catch (e) {}
+      setListening(false);
+      return;
+    }
 
     if (recorder.state !== "inactive") {
       recorder.stop();
+      // Se cierra el stream en onstop
     } else {
-      // seguridad: detener stream
+      //limpiar manualmente
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
         streamRef.current = null;
       }
       mediaRecorderRef.current = null;
@@ -282,7 +319,7 @@ function Home() {
       setIsGettingLocation(false);
     }
 
-
+    setIsProcessing(true);
     const formData = new FormData();
     formData.append("audio", file);
 
@@ -292,11 +329,15 @@ function Home() {
       formData.append("longitude", currentLocation.lng.toString());
     }
 
+    // Crear AbortController para poder cancelar
+    abortControllerRef.current = new AbortController();
+
     try {
       const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
         credentials: "include",
         body: formData,
+        signal: abortControllerRef.current.signal,
       });
 
       const data = await response.json();
@@ -310,11 +351,17 @@ function Home() {
       } else {
         setError(data.error || "Error en la predicción");
       }
-    } catch (err) {
-      setError("Error al conectar con el servidor");
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        setError(null); // No mostrar error si fue cancelado
+      } else {
+        setError("Error al conectar con el servidor");
+      }
     } finally {
+      setIsProcessing(false);
       setListeningFile(false);
       setFile(null);
+      abortControllerRef.current = null;
     }
   };
 
@@ -346,6 +393,24 @@ function Home() {
           }
         />
 
+        {isProcessing ? (
+          <div className="flex flex-col items-center justify-center gap-6 my-12">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
+            <p className="text-lg text-[#004D40] font-semibold">
+              Analizando audio...
+            </p>
+            <p className="text-sm text-gray-600">
+              Esto puede tomar unos segundos
+            </p>
+          </div>
+        ) : (
+          <>
+            <ResultPanel
+              listening={listening}
+              prediction={hasPrediction}
+              specie={specieNumber}
+              confidence={confidence}
+            />
         <ResultPanel
           listening={listening || listeningFile}
           prediction={hasPrediction}
@@ -353,14 +418,16 @@ function Home() {
           confidence={confidence}
         />
 
-        {!hasPrediction &&
-          (listening ? (
-            <p className="text-md mb-6">Escuchando...</p>
-          ) : (
-            <p className="text-md mb-6">
-              Comienza a grabar para obtener resultados
-            </p>
-          ))}
+            {!hasPrediction &&
+              (listening ? (
+                <p className="text-md mb-6">Escuchando...</p>
+              ) : (
+                <p className="text-md mb-6">
+                  Comienza a grabar para obtener resultados
+                </p>
+              ))}
+          </>
+        )}
         {hasPrediction && (
           <>
             <div className="flex flex-col items-center gap-6">
@@ -399,31 +466,55 @@ function Home() {
             hasPrediction ? "hidden" : "flex"
           } flex-col justify-around items-center`}
         >
-          <button
-            type="button"
-            disabled={listeningFile}
-            onClick={() => {
-              listening ? stopRecording() : startRecording();
-              setIsImport(false);
-            }}
-            className={`flex flex-row justify-center cursor-pointer ${
-              listening
-                ? "bg-transparent text-red-600 animate-pulse"
-                : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-            }`}
-          >
-            {listening || listeningFile ? (
-              <>
-                {listeningFile?(<p>Detectando...</p>):(<StopRecordIcon className="size-15" />)}
-              </>
-            ) : (
-              <>
-                <p>Grabar</p>
-                <MicrophoneIcon className="size-6" />
-              </>
-            )}
-          </button>
+          {isProcessing ? (
+            <button
+              type="button"
+              onClick={cancelProcessing}
+              className="flex bg-red-600 rounded-xl shadow-lg hover:shadow-xl hover:bg-red-700 text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+            >
+              Cancelar
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  listening ? stopRecording() : startRecording();
+                  setIsImport(false);
+                }}
+                className={`flex flex-row justify-center cursor-pointer ${
+                  listening
+                    ? "bg-transparent text-red-600 animate-pulse"
+                    : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                }`}
+              >
+                {listening ? (
+                  <>
+                    <StopRecordIcon className="size-15" />
+                  </>
+                ) : (
+                  <>
+                    <p>Grabar</p>
+                    <MicrophoneIcon className="size-6" />
+                  </>
+                )}
+              </button>
 
+              <button
+                type="button"
+                onClick={() => {
+                  setIsImport(true);
+                  setListening(false);
+                }}
+                className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
+                  listening ? "hidden" : "flex"
+                }`}
+              >
+                Importar grabación
+                <UploadIcon className="size-4 inline-block" />
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() => {
