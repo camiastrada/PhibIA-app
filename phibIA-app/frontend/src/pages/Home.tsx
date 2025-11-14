@@ -90,8 +90,6 @@ function Home() {
   };
 
   const cancelProcessing = () => {
-    console.log("Cancelando procesamiento...");
-    
     // Abortar la petición fetch si está en curso
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -174,14 +172,10 @@ function Home() {
       };
 
       recorder.onstop = async () => {
-        console.log("Evento onstop ejecutado");
-        
         // Cerrar el micrófono INMEDIATAMENTE
         if (streamRef.current) {
-          console.log("Cerrando stream en onstop");
           streamRef.current.getTracks().forEach((t) => {
             t.stop();
-            console.log("Track cerrado en onstop:", t.kind);
           });
           streamRef.current = null;
         }
@@ -237,7 +231,6 @@ function Home() {
           }
         } catch (err: any) {
           if (err.name === 'AbortError') {
-            console.log("Petición cancelada por el usuario");
             setError(null); // No mostrar error si fue cancelado
           } else {
             setError(err?.message || String(err));
@@ -267,7 +260,6 @@ function Home() {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => {
           track.stop();
-          console.log("Track detenido (sin recorder):", track.kind);
         });
         streamRef.current = null;
       }
@@ -276,16 +268,13 @@ function Home() {
     }
 
     if (recorder.state !== "inactive") {
-      console.log("Deteniendo recorder...");
       recorder.stop();
       // Se cierra el stream en onstop
     } else {
       //limpiar manualmente
-      console.log("Recorder ya inactivo, limpiando...");
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => {
           track.stop();
-          console.log("Track detenido (recorder inactivo):", track.kind);
         });
         streamRef.current = null;
       }
@@ -361,7 +350,6 @@ function Home() {
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        console.log("Petición cancelada por el usuario");
         setError(null); // No mostrar error si fue cancelado
       } else {
         setError("Error al conectar con el servidor");
