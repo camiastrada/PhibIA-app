@@ -238,12 +238,23 @@ function Detections() {
                     <div className="relative w-20 h-20 rounded-full bg-white/20 flex-shrink-0 overflow-hidden">
                       {detection.especie.imagen ? (
                         <img
-                          src={`/images/${detection.especie.imagen}`}
+                          src={`${API_URL}/species/${detection.especie.imagen}`}
                           alt={detection.especie.nombre_cientifico}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            console.error(`Error cargando imagen: /images/${detection.especie.imagen}`);
-                            e.currentTarget.style.display = "none";
+                            console.error(`Error cargando imagen: ${API_URL}/species/${detection.especie.imagen}`);
+                            const target = e.currentTarget;
+                            target.style.display = "none";
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `
+                                <div class="w-full h-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                                  <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 3a7 7 0 100 14 7 7 0 000-14zm0 2a5 5 0 110 10 5 5 0 010-10z"/>
+                                  </svg>
+                                </div>
+                              `;
+                            }
                           }}
                         />
                       ) : (

@@ -37,6 +37,7 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
+      - ./db:/db:ro
     environment:
       - FLASK_ENV=development
       - MYSQL_HOST=db

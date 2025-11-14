@@ -419,7 +419,6 @@ def init_routes(app):
                 print(f"Archivo de audio eliminado: {file_path}")
         except Exception as file_error:
             print(f"Error al eliminar archivo físico: {file_error}")
-            # Continuamos con la eliminación de la base de datos aunque falle el archivo
         
         # Eliminar el registro de la base de datos
         try:
@@ -429,3 +428,47 @@ def init_routes(app):
         except Exception as db_error:
             db.session.rollback()
             return jsonify({'error': f'Error deleting audio from database: {str(db_error)}'}), 500
+
+    @app.route('/species/<path:image_path>', methods=['GET'])
+    def get_species_image(image_path):
+        """
+        Sirve las imágenes de las especies desde la carpeta db/photo
+        """
+        from flask import send_file
+       
+        print(f"=== GET SPECIES IMAGE ===")
+        print(f"image_path recibido: '{image_path}'")
+        
+        # En Docker, la carpeta db está montada en /db
+        # En desarrollo local, está en ../db
+        if os.path.exists('/db'):
+            base_path = '/db'
+        else:
+            base_path = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), 'db')
+        
+        file_path = os.path.join(base_path, image_path)
+        
+        print(f"Base path: {base_path}")
+        print(f"Intentando servir imagen: {file_path}")
+        print(f"¿Existe el archivo?: {os.path.exists(file_path)}")
+        
+        # Verificar que el archivo existe
+        if not os.path.exists(file_path):
+            print(f"Error: Imagen no encontrada en {file_path}")
+            
+            # Listar directorios disponibles para debugging
+            print(f"Contenido de {base_path}:")
+            if os.path.exists(base_path):
+                print(os.listdir(base_path))
+                
+            photo_dir = os.path.join(base_path, 'photo')
+            if os.path.exists(photo_dir):
+                print(f"Archivos en {photo_dir}:")
+                print(os.listdir(photo_dir))
+            else:
+                print(f"Directorio {photo_dir} no existe")
+                
+            return jsonify({'error': 'Image not found', 'path': file_path}), 404
+
+        print(f"✓ Sirviendo imagen desde: {file_path}")
+        return send_file(file_path, mimetype='image/png')
