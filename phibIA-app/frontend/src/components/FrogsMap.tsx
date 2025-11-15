@@ -55,7 +55,7 @@ export default function FrogsMap() {
   }, []);
 
   return (
-    <div style={{ height: "75vh", width: "75vw", position: "relative" }}>
+    <div style={{ height: "100%", width: "100%", position: "relative" }}>
       <div
         style={{
           position: "absolute",

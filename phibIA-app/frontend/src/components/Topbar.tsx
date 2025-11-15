@@ -4,8 +4,9 @@ const paths: Record<string, string> = {
     home: "Inicio",
     profile: "Perfil",
     captures: "Mis Detecciones",
-    maps: "Mapa",
-    "frogs-bulls": "Ranas y Sapos"
+    map: "Mapa",
+    "add-photo": "Añadir Foto"
+
 }
 export default function Topbar(){
     const {pathname} = useLocation(); 

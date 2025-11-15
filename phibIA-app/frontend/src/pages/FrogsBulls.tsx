@@ -137,43 +137,41 @@ export default function FrogsBulls() {
   };
 
   return (
-    <div className="min-h-screen bg-green-800 flex justify-center items-center">
-      <div className="flex flex-col items-center justify-center md:min-h-4/5 md:w-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
-        <TitleWithSubtitle title="Ranas Toros" />
-
+    <div className="flex flex-col justify-center items-center w-full max-w-3xl h-auto my-4 md:my-0 max-h-[calc(100vh-8rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        <TitleWithSubtitle
+                  title={"¡Comienza a capturar!"}
+                  subtitle={"Acercate a la rana toro y toma una foto para notificar su ubicación"}
+                />
         {!photo ? (
-          <div className="flex flex-col items-center gap-4 mt-4">
+          <div className="flex flex-col items-center gap-3 mt-3">
             <div className={`relative ${isCameraOn ? "block" : "hidden"}`}>
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                className="border-4 border-green-500 rounded-lg w-80 h-60 bg-black object-cover"
+                className="border-4 border-white-500 rounded-lg w-72 h-52 md:w-80 md:h-60 bg-white object-cover"
               />
-              <div className="absolute top-2 left-2 bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-bold">
-                Cámara Activa
-              </div>
-              <div className="absolute bottom-2 left-2 bg-blue-600 text-white px-3 py-1 rounded-lg text-sm">
-                Mira hacia la cámara
-              </div>
+            
+              
             </div>
 
             {!isCameraOn && (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg w-80 h-60 flex items-center justify-center bg-gray-100">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg w-72 h-52 md:w-80 md:h-60 flex items-center justify-center bg-gray-100">
                 <div className="text-center text-gray-500">
                   <div className="text-4xl mb-2"></div>
-                  <p>Presiona "Activar cámara" para comenzar</p>
+                  <p className="text-sm md:text-base px-2">Presiona "Activar cámara" para comenzar</p>
                 </div>
               </div>
             )}
 
             <canvas ref={canvasRef} className="hidden" />
 
-            <div className="flex gap-4 mt-2">
+            <div className="flex flex-wrap gap-2 md:gap-4 mt-2 justify-center">
               {!isCameraOn && (
                 <button
-                  className="bg-[#43A047] hover:bg-[#357a38] text-white px-6 py-3 rounded-xl font-semibold text-lg"
+                  className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
                   onClick={startCamera}
                 >
                   Activar Cámara
@@ -182,13 +180,13 @@ export default function FrogsBulls() {
               {isCameraOn && (
                 <>
                   <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold text-lg"
+                    className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
                     onClick={takePhoto}
                   >
                     Tomar Foto
                   </button>
                   <button
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-semibold"
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
                     onClick={stopCamera}
                   >
                     Detener
@@ -198,31 +196,25 @@ export default function FrogsBulls() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center mt-4 gap-4">
-            <div className="text-center mb-4">
-              <h3 className="text-xl font-bold text-green-700">
-                ¡Foto tomada!
-              </h3>
-              <p className="text-gray-600">Revisa la imagen y guárdala</p>
-            </div>
+          <div className="flex flex-col items-center mt-3 gap-3">
             <img
               src={photo}
               alt="Rana Toro"
-              className="rounded-lg border-4 border-green-500 shadow-lg max-w-md"
+              className="rounded-lg border-4 border-[#43A047] shadow-lg w-full max-w-sm"
             />
-            <div className="flex gap-4 mt-4">
+            <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
               <button
-                className="bg-[#43A047] hover:bg-[#357a38] text-white px-6 py-3 rounded-xl flex items-center gap-2 font-semibold"
+                className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
                 onClick={() => {
                   setPhoto(null);
                   startCamera();
                 }}
               >
-                <BackIcon className="size-5" />
+                <BackIcon className="size-4 md:size-5" />
                 Volver a Capturar
               </button>
               <button
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 font-semibold"
+                className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
                 onClick={() => {
                   setPhoto(null);
                   savePhoto();
@@ -234,18 +226,20 @@ export default function FrogsBulls() {
             </div>
           </div>
         )}
-        <div className="mt-8 flex flex-col items-center">
-          <button
-            className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-xl font-semibold text-lg"
+        <div className="mt-4 md:mt-6 flex flex-col items-center w-full">
+         
+          <button disabled = {true}
+            className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
             onClick={() => setShowMap(!showMap)}
           >
             {showMap ? "Ocultar mapa" : "Añadir ubicación"}
           </button>
           {showMap && (
-            <div className="mt-6 w-[600px] h-[400px] rounded-2xl overflow-hidden border-4 border-green-500 bg-red-100">
+            <div className="mt-4 w-full max-w-[500px] h-[280px] md:h-[350px] rounded-2xl overflow-hidden border-4 border-[#43A047]">
               <LocationMap />
             </div>
           )}
+
         </div>
       </div>
     </div>

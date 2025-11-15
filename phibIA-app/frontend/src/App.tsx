@@ -17,11 +17,11 @@ function App() {
           <Route path="" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/captures" element={<Detections />} />
+          <Route path="/add-photo" element={<FrogsBulls />} />
+          <Route path="/map" element={<FrogsMap />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/add-photo" element={<FrogsBulls />} />
-        <Route path="/map" element={<FrogsMap />} />
       </Routes>
     </Router>
   );
