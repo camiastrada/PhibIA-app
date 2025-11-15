@@ -21,7 +21,8 @@ create table especies(
     nombre_cientifico VARCHAR(40) NOT NULL UNIQUE,
     nombre_comun VARCHAR(100) DEFAULT NULL,
     descripcion VARCHAR(250) DEFAULT NULL,
-    imagen VARCHAR(100) DEFAULT NULL
+    imagen VARCHAR(100) DEFAULT NULL,
+    ruta_audio VARCHAR(255) DEFAULT NULL
     /*IMAGEN ?*/
 );
 

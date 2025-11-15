@@ -42,6 +42,7 @@ class Especie(db.Model):
     nombre_comun = db.Column(db.String(20))
     descripcion = db.Column(db.String(250))
     imagen = db.Column(db.String(100))
+    ruta_audio = db.Column(db.String(255))
 
     # Relaciones
     audios = db.relationship('Audio', back_populates='especie')
