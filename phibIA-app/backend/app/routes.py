@@ -472,3 +472,26 @@ def init_routes(app):
 
         print(f"✓ Sirviendo imagen desde: {file_path}")
         return send_file(file_path, mimetype='image/png')
+
+    @app.route('/informacion/especies', methods=['GET'])
+    def obtener_especies():
+        especies = Especie.query.all()
+
+        resultado = [
+            {
+                "nombre_cientifico": e.nombre_cientifico,
+                "nombre_comun": e.nombre_comun,
+                "descripcion": e.descripcion,
+                "imagen": e.imagen,
+                "audio":  f"{request.host_url}audios/{e.ruta_audio}" if e.ruta_audio else None
+            }  
+            for e in especies
+        ]
+
+        return jsonify(resultado)
+
+    @app.route("/audios/<filename>")
+    def get_audio(filename):
+        return send_from_directory("static/especie_audios", filename)
+
+
