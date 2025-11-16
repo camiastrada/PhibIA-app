@@ -304,6 +304,13 @@ def init_routes(app):
             'message': f'Hola {user.name}, estás autenticado!'
         }), 200
 
+
+
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        """Health check endpoint para Docker"""
+        return jsonify({'status': 'healthy'}), 200
+
     @app.route('/user/captures', methods=['GET'])
     @jwt_required()
     def get_user_detections():

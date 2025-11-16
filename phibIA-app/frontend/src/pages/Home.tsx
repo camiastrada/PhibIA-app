@@ -11,6 +11,7 @@ import UploadIcon from "../assets/uiIcons/uploadIcon";
 import InfoIcon from "../assets/uiIcons/infoIcon";
 import BackIcon from "../assets/uiIcons/backIcon";
 
+
 function Home() {
   const [listening, setListening] = useState(false);
   const [isImport, setIsImport] = useState(false);
@@ -445,7 +446,7 @@ function Home() {
           <>
             <div className="flex flex-col items-center gap-6">
               <Link
-                to={"/encyclopedia/" + specieNumber}
+                to={"/encyclopedia/" + specieName}
                 className="text-[#004D40] hover:text-[#02372E] flex gap-1"
               >
                 <InfoIcon />

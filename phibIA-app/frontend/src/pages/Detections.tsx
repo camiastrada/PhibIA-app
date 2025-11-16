@@ -331,8 +331,8 @@ function Detections() {
                   {/* Botones de acción */}
                   <div className="grid grid-cols-3 gap-2">
                     {/* Botón Enciclopedia */}
-                    <button disabled
-                      onClick={() => navigate("/encyclopedia")}
+                    <button 
+                      onClick={() => navigate("/encyclopedia/" + detection.especie.nombre_cientifico)}
                       className="bg-[#00796B] hover:bg-[#004D40] text-white font-semibold py-3 px-2 rounded-xl transition-colors flex items-center justify-center gap-1 shadow-lg"
                       title="Ver en enciclopedia"
                     >
