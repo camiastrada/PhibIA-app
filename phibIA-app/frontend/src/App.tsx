@@ -9,6 +9,7 @@ import "./styles/App.css";
 import FrogsBulls from "./pages/FrogsBulls";
 import Detections from "./pages/Detections";
 import InfoFrog from './pages/InfoFrog';
+import Encyclopedia from './pages/Encyclopedia';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/captures" element={<Detections />} />
           <Route path="/add-photo" element={<FrogsBulls />} />
           <Route path="/map" element={<FrogsMap />} />
+          <Route path="/encyclopedia" element={<Encyclopedia />} />
           <Route path="/encyclopedia/:specieNumber" element={<InfoFrog />} />
         </Route>
         <Route path="/login" element={<Login />} />

@@ -40,7 +40,7 @@ export default function Sidebar() {
           <nav className="flex flex-col gap-6 w-full flex-1 justify-center mb-20">
             <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
             <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon}/>
-            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} disabled = {true} />  
+            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />  
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />  
           </nav>
           
@@ -73,7 +73,7 @@ export default function Sidebar() {
           }`}>
             <SidebarLabel to="/" id="homeLabel" label="Inicio" isOpen={isOpen} />
             <SidebarLabel to="/captures" id="capturesLabel" label="Mis detecciones" isOpen={isOpen} />
-            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen} disabled = {true}/>
+            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen} disabled = {false}/>
             <SidebarLabel to="/map" id="mapLabel" label="Mapa de capturas" isOpen={isOpen} />
           </nav>
           

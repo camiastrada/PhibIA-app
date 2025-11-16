@@ -36,3 +36,14 @@
   border: none;
   border-radius: 9999px;
 }
+
+
+/* Oculta scrollbar en Chrome, Edge y Safari */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Oculta scrollbar en Firefox */
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
