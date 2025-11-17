@@ -1,17 +1,19 @@
-// src/pages/FrogsBulls.tsx
 import { useState, useRef, useEffect } from "react";
 import "../styles/App.css";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
 import BackIcon from "../assets/uiIcons/backIcon";
-import LocationMap from "../components/LocationMaps";
 
 export default function FrogsBulls() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     if (isCameraOn && videoRef.current) {
@@ -20,22 +22,66 @@ export default function FrogsBulls() {
         video.play().catch((e) => console.error("Error al reproducir:", e));
       };
 
-      const handleLoadedMetadata = () => {
-        // Video metadata loaded
-      };
-
       video.addEventListener("canplay", handleCanPlay);
-      video.addEventListener("loadedmetadata", handleLoadedMetadata);
 
       return () => {
         video.removeEventListener("canplay", handleCanPlay);
-        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       };
     }
   }, [isCameraOn]);
 
+  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocalización no soportada"));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          resolve({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        (err) => {
+          let errorMsg = "Error obteniendo ubicación: ";
+          switch (err.code) {
+            case err.PERMISSION_DENIED:
+              errorMsg += "Permiso denegado";
+              break;
+            case err.POSITION_UNAVAILABLE:
+              errorMsg += "Ubicación no disponible";
+              break;
+            case err.TIMEOUT:
+              errorMsg += "Tiempo de espera agotado";
+              break;
+            default:
+              errorMsg += err.message;
+          }
+          reject(new Error(errorMsg));
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  };
+
   const startCamera = async () => {
     try {
+      setIsGettingLocation(true);
+      try {
+        const location = await getCurrentLocation();
+        setUserLocation(location);
+      } catch (error: any) {
+        console.error("Error de ubicación:", error.message);
+        alert(
+          `No se pudo obtener la ubicación: ${error.message}. Puedes continuar sin ubicación.`
+        );
+        setUserLocation(null);
+      } finally {
+        setIsGettingLocation(false);
+      }
+
       if (videoRef.current?.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
@@ -70,6 +116,7 @@ export default function FrogsBulls() {
       alert(
         "No se pudo acceder a la cámara. Por favor, permite los permisos de cámara."
       );
+      setIsGettingLocation(false);
     }
   };
 
@@ -114,23 +161,39 @@ export default function FrogsBulls() {
     if (!photo) return;
     setIsSaving(true);
     try {
-      const blob = await (await fetch(photo)).blob();
+      const response = await fetch(photo);
+      const blob = await response.blob();
+
       const formData = new FormData();
       formData.append("image", blob, `frog_${Date.now()}.jpeg`);
 
-      const res = await fetch("/api/save-photo", {
+      if (userLocation) {
+        formData.append("lat", userLocation.lat.toString());
+        formData.append("lng", userLocation.lng.toString());
+      }
+
+      const API_URL = import.meta.env.VITE_API_URL ?? "/api";
+      const res = await fetch(`${API_URL}/save-photo`, {
         method: "POST",
         body: formData,
       });
 
       if (!res.ok) {
-        console.error("Error al guardar la foto");
+        const errorData = await res.json();
+        console.error("Error al guardar la foto:", errorData);
+        alert(
+          `Error al guardar la foto: ${errorData.error || "Error desconocido"}`
+        );
       } else {
+        const result = await res.json();
+        console.log("✅ Foto guardada:", result);
         alert("Foto guardada con éxito");
         setPhoto(null);
+        setUserLocation(null);
       }
     } catch (err) {
       console.error("Error al guardar la foto", err);
+      alert("Error al guardar la foto. Intenta nuevamente.");
     } finally {
       setIsSaving(false);
     }
@@ -140,9 +203,12 @@ export default function FrogsBulls() {
     <div className="flex flex-col justify-center items-center w-full max-w-3xl h-auto my-4 md:my-0 max-h-[calc(100vh-8rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
       <div className="w-full h-full flex flex-col items-center justify-center">
         <TitleWithSubtitle
-                  title={"¡Comienza a capturar!"}
-                  subtitle={"Acercate a la rana toro y toma una foto para notificar su ubicación"}
-                />
+          title={"¡Comienza a capturar!"}
+          subtitle={
+            "Acercate a la rana toro y toma una foto para notificar su ubicación"
+          }
+        />
+
         {!photo ? (
           <div className="flex flex-col items-center gap-3 mt-3">
             <div className={`relative ${isCameraOn ? "block" : "hidden"}`}>
@@ -153,15 +219,22 @@ export default function FrogsBulls() {
                 muted
                 className="border-4 border-white-500 rounded-lg w-72 h-52 md:w-80 md:h-60 bg-white object-cover"
               />
-            
-              
             </div>
 
             {!isCameraOn && (
               <div className="border-2 border-dashed border-gray-300 rounded-lg w-72 h-52 md:w-80 md:h-60 flex items-center justify-center bg-gray-100">
                 <div className="text-center text-gray-500">
                   <div className="text-4xl mb-2"></div>
-                  <p className="text-sm md:text-base px-2">Presiona "Activar cámara" para comenzar</p>
+                  <p className="text-sm md:text-base px-2">
+                    {isGettingLocation
+                      ? "Obteniendo ubicación..."
+                      : "Presiona 'Activar cámara' para comenzar"}
+                  </p>
+                  {isGettingLocation && (
+                    <div className="mt-2">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500 mx-auto"></div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -171,10 +244,13 @@ export default function FrogsBulls() {
             <div className="flex flex-wrap gap-2 md:gap-4 mt-2 justify-center">
               {!isCameraOn && (
                 <button
-                  className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
+                  className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={startCamera}
+                  disabled={isGettingLocation}
                 >
-                  Activar Cámara
+                  {isGettingLocation
+                    ? "Obteniendo ubicación..."
+                    : "Activar Cámara"}
                 </button>
               )}
               {isCameraOn && (
@@ -202,6 +278,7 @@ export default function FrogsBulls() {
               alt="Rana Toro"
               className="rounded-lg border-4 border-[#43A047] shadow-lg w-full max-w-sm"
             />
+
             <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
               <button
                 className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
@@ -215,10 +292,7 @@ export default function FrogsBulls() {
               </button>
               <button
                 className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
-                onClick={() => {
-                  setPhoto(null);
-                  savePhoto();
-                }}
+                onClick={savePhoto}
                 disabled={isSaving}
               >
                 {isSaving ? "Guardando..." : "Guardar Foto"}
@@ -226,21 +300,6 @@ export default function FrogsBulls() {
             </div>
           </div>
         )}
-        <div className="mt-4 md:mt-6 flex flex-col items-center w-full">
-         
-          <button disabled = {true}
-            className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
-            onClick={() => setShowMap(!showMap)}
-          >
-            {showMap ? "Ocultar mapa" : "Añadir ubicación"}
-          </button>
-          {showMap && (
-            <div className="mt-4 w-full max-w-[500px] h-[280px] md:h-[350px] rounded-2xl overflow-hidden border-4 border-[#43A047]">
-              <LocationMap />
-            </div>
-          )}
-
-        </div>
       </div>
     </div>
   );
