@@ -136,16 +136,16 @@ export default function FrogsMap({
         console.error("Error en response:", response.status);
       }
     } catch (error) {
-      console.error("❌ Error fetching locations:", error);
+      console.error("Error fetching locations:", error);
     }
   };
 
-  // ✅ Cargar ubicaciones al montar el componente
+  // Cargar ubicaciones al montar el componente
   useEffect(() => {
     fetchLocations();
   }, []);
 
-  // ✅ Ubicación del usuario en tiempo real
+  // Ubicación del usuario en tiempo real
   useEffect(() => {
     if (!navigator.geolocation) {
       console.log("Geolocalización no soportada");
@@ -157,14 +157,11 @@ export default function FrogsMap({
     const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
-        console.log("📍 Ubicación obtenida:", latitude, longitude);
         setUserLocation([longitude, latitude]);
         const address = await fetchAddressFromCoords(longitude, latitude);
         setUserAddress(address);
-        console.log("📍 Dirección:", address);
       },
       (err) => {
-        console.error("❌ Error obteniendo ubicación:", err);
         if (err.code === err.PERMISSION_DENIED) {
           console.log("Permiso de ubicación denegado por el usuario");
         }
@@ -177,7 +174,6 @@ export default function FrogsMap({
     );
 
     return () => {
-      console.log("📍 Limpiando seguimiento de ubicación");
       navigator.geolocation.clearWatch(watchId);
     };
   }, []);
@@ -221,7 +217,7 @@ export default function FrogsMap({
     </div>
   );
 
-  // ✅ Determinar la ubicación inicial del mapa
+  // Determinar la ubicación inicial del mapa
   const getInitialViewState = () => {
     if (mode === "view" && initialLocation) {
       return {
@@ -321,7 +317,7 @@ export default function FrogsMap({
           });
         }}
       >
-        {/* ✅ Marcador de ubicación del usuario en tiempo real - MISMO COLOR */}
+        {/* Marcador de ubicación del usuario en tiempo real*/}
         {userLocation && (
           <Marker
             key="user-location"
@@ -372,7 +368,7 @@ export default function FrogsMap({
           </Marker>
         )}
 
-        {/* ✅ Marcador de ubicación inicial en modo view - MISMO COLOR */}
+        {/*Marcador de ubicación inicial en modo view */}
         {mode === "view" && initialLocation && (
           <Marker
             key="initial-location"
@@ -394,7 +390,7 @@ export default function FrogsMap({
           >
             <div
               style={{
-                background: "#43A047", // ✅ MISMO COLOR VERDE
+                background: "#43A047",
                 borderRadius: "50%",
                 width: "32px",
                 height: "32px",
@@ -419,7 +415,7 @@ export default function FrogsMap({
           </Marker>
         )}
 
-        {/* ✅ Marcadores de TODAS las ubicaciones - MISMO COLOR */}
+        {/* Marcadores de TODAS las ubicaciones */}
         {filteredLocations.map((location) => (
           <Marker
             key={location.id}
@@ -433,7 +429,7 @@ export default function FrogsMap({
           >
             <div
               style={{
-                background: "#43A047", // ✅ MISMO COLOR VERDE
+                background: "#43A047",
                 borderRadius: "50%",
                 width: "32px",
                 height: "32px",
