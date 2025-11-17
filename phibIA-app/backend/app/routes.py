@@ -2,6 +2,7 @@ from flask import jsonify, request
 from .models import Usuario, Audio, Especie, Ubicacion
 from datetime import datetime
 from .ml_model import predict_species
+from werkzeug.utils import secure_filename 
 from . import db
 import os
 from flask_jwt_extended import (
@@ -162,7 +163,6 @@ def init_routes(app):
             print(f"Error en predict: {str(e)}")
             return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
         
-   
     @app.route("/save-photo", methods=["POST"])
     def save_photo():
         try:
