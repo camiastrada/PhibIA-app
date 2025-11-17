@@ -37,7 +37,9 @@ create table usuarios_especies(
 
 create table ubicaciones(
     ubicacion_id INT AUTO_INCREMENT PRIMARY KEY,
-    descripcion VARCHAR(100) NOT NULL
+    descripcion VARCHAR(100) NOT NULL,
+    longitud FLOAT,
+    latitud FLOAT
 );
 
 create table audios(

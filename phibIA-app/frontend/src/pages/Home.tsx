@@ -11,6 +11,8 @@ import UploadIcon from "../assets/uiIcons/uploadIcon";
 import InfoIcon from "../assets/uiIcons/infoIcon";
 import BackIcon from "../assets/uiIcons/backIcon";
 
+// Mini-mapa
+import FrogsMap from "../components/FrogsMap";
 
 function Home() {
   const [listening, setListening] = useState(false);
@@ -28,21 +30,22 @@ function Home() {
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [commonName, setCommonName] = useState<string | null>(null);
-  const [_description, setDescription] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
   const [file, setFile] = useState<File | null>(null);
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [_locationError, setLocationError] = useState<string | null>(null);
-  const [_isGettingLocation, setIsGettingLocation] = useState(false);
+  const [manualLocation, setManualLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [showMiniMap, setShowMiniMap] = useState(false);
 
   const specieNumber = predictedSpecies?.split("-")[0];
   const specieName = predictedSpecies?.split("-")[1];
-
   const hasPrediction = Boolean(
     !listening &&
       !isProcessing &&
@@ -51,77 +54,44 @@ function Home() {
       predictedSpecies !== "No detectada"
   );
 
-  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("Geolocalización no soportada"));
-        return;
-      }
-
-      const options = {
-        enableHighAccuracy: true,
-        timeout: 10000, // 10 segundos
-        maximumAge: 0, // No usar posición cacheada
-      };
+  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> =>
+    new Promise((resolve, reject) => {
+      if (!navigator.geolocation)
+        return reject(new Error("Geolocalización no soportada"));
 
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          resolve({ lat: latitude, lng: longitude });
-        },
-        (error) => {
-          let errorMessage = "Error obteniendo ubicación: ";
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage += "Permiso denegado por el usuario";
+        (pos) =>
+          resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => {
+          let msg = "Error obteniendo ubicación: ";
+          switch (err.code) {
+            case err.PERMISSION_DENIED:
+              msg += "Permiso denegado";
               break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage += "Ubicación no disponible";
+            case err.POSITION_UNAVAILABLE:
+              msg += "Ubicación no disponible";
               break;
-            case error.TIMEOUT:
-              errorMessage += "Tiempo de espera agotado";
+            case err.TIMEOUT:
+              msg += "Tiempo de espera agotado";
               break;
             default:
-              errorMessage += error.message;
+              msg += err.message;
           }
-          reject(new Error(errorMessage));
+          reject(new Error(msg));
         },
-        options
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     });
-  };
-
-  const cancelProcessing = () => {
-    // Abortar la petición fetch si está en curso
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    
-    // Limpiar estados
-    setIsProcessing(false);
-    setError(null);
-    chunksRef.current = [];
-  };
 
   const resetState = () => {
-    // Cancelar procesamiento si está activo
-    if (isProcessing) {
-      cancelProcessing();
-    }
-    
-    // Detener grabación si está activa
-    if (listening && mediaRecorderRef.current) {
-      stopRecording();
-    } else {
-      // Si no hay recorder activo, solo limpiar
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
+    if (isProcessing && abortControllerRef.current)
+      abortControllerRef.current.abort();
+    if (listening && mediaRecorderRef.current) stopRecording();
+    else if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
 
-    // Limpiar todos los estados
     setListening(false);
     setListeningFile(false);
     setIsImport(false);
@@ -132,66 +102,49 @@ function Home() {
     setDescription(null);
     setError(null);
     setUserLocation(null);
-    setLocationError(null);
-    setIsGettingLocation(false);
+    setManualLocation(null);
     setFile(null);
+    setShowMiniMap(false);
 
-    // Limpiar referencias
     mediaRecorderRef.current = null;
     chunksRef.current = [];
     abortControllerRef.current = null;
   };
 
-  // Iniciar grabación
   const startRecording = async () => {
     setError(null);
     setPredictedSpecies(null);
     setConfidence(null);
-    setLocationError(null);
     setUserLocation(null);
 
     try {
-      // Primero solicitar permisos del micrófono
+      const loc = await getCurrentLocation();
+      setUserLocation(loc);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "No se pudo obtener ubicación");
+      return;
+    }
+
+    try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       chunksRef.current = [];
 
-      // Una vez que tenemos el micrófono, obtener ubicación en paralelo
-      setIsGettingLocation(true);
-      getCurrentLocation()
-        .then((location) => {
-          setUserLocation(location);
-        })
-        .catch((locationErr: any) => {
-          setLocationError(locationErr.message);
-          // No detenemos la grabación si falla la ubicación
-        })
-        .finally(() => {
-          setIsGettingLocation(false);
-        });
-
-      const options: any = {};
-
-      const recorder = new MediaRecorder(stream as MediaStream, options);
+      const recorder = new MediaRecorder(stream);
       mediaRecorderRef.current = recorder;
 
-      recorder.ondataavailable = (e: BlobEvent) => {
-        if (e.data && e.data.size > 0) {
-          chunksRef.current.push(e.data);
-        }
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
       recorder.onstop = async () => {
-        // Cerrar el micrófono INMEDIATAMENTE
         if (streamRef.current) {
-          streamRef.current.getTracks().forEach((t) => {
-            t.stop();
-          });
+          streamRef.current.getTracks().forEach((t) => t.stop());
           streamRef.current = null;
         }
-        
-        setListening(false); // Desactivar el estado de escucha
-        
+        setListening(false);
+
         try {
           setIsProcessing(true);
           const mime = chunksRef.current[0]?.type || "audio/webm";
@@ -202,19 +155,15 @@ function Home() {
             : "audio";
           const blob = new Blob(chunksRef.current, { type: mime });
 
-          // preparar FormData con la clave que el backend espera: 'audio'
           const formData = new FormData();
           formData.append("audio", blob, `recording_${Date.now()}.${ext}`);
 
-          if (userLocation) {
-            formData.append("latitude", userLocation.lat.toString());
-            formData.append("longitude", userLocation.lng.toString());
-          }
+          // Ubicación real o desconocida
+          const locToSend = userLocation || { lat: 0, lng: 0 }; // "desconocido"
+          formData.append("latitud", locToSend.lat.toString());
+          formData.append("longitud", locToSend.lng.toString());
 
-          // Crear AbortController para poder cancelar
           abortControllerRef.current = new AbortController();
-
-          // enviar al backend
           const res = await fetch(`${API_URL}/predict`, {
             method: "POST",
             credentials: "include",
@@ -223,28 +172,16 @@ function Home() {
           });
 
           const data = await res.json().catch(() => null);
-          if (!res.ok) {
-            setError(
-              (data && data.error) || `Error del servidor: ${res.status}`
-            );
-          } else {
-            // backend devuelve { prediccion, confianza, especie_info }
-            setPredictedSpecies(
-              data?.prediccion ??
-                data?.prediction ??
-                data?.species ??
-                "No detectada"
-            );
+          if (!res.ok)
+            setError(data?.error || `Error del servidor: ${res.status}`);
+          else {
+            setPredictedSpecies(data?.prediccion ?? "No detectada");
             setConfidence(data?.confianza ?? null);
             setCommonName(data?.especie_info?.nombre_comun ?? null);
             setDescription(data?.especie_info?.descripcion ?? null);
           }
         } catch (err: any) {
-          if (err.name === 'AbortError') {
-            setError(null); // No mostrar error si fue cancelado
-          } else {
-            setError(err?.message || String(err));
-          }
+          if (err.name !== "AbortError") setError(err?.message || String(err));
         } finally {
           setIsProcessing(false);
           mediaRecorderRef.current = null;
@@ -254,61 +191,32 @@ function Home() {
       };
 
       recorder.start();
-      setListening(true); // Solo aquí se activa listening
+      setListening(true);
     } catch (err: any) {
-      // Limpiar stream si hay error
-      if (streamRef.current) {
+      if (streamRef.current)
         streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
-      
-      // Manejar diferentes tipos de errores
-      let errorMessage = "No se pudo acceder al micrófono: ";
-      if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
-        errorMessage += "Permiso denegado. Por favor, permite el acceso al micrófono en la configuración de tu navegador.";
-      } else if (err.name === "NotFoundError") {
-        errorMessage += "No se encontró ningún micrófono conectado.";
-      } else if (err.name === "NotReadableError") {
-        errorMessage += "El micrófono está siendo usado por otra aplicación.";
-      } else {
-        errorMessage += (err?.message || err);
-      }
-      
-      setError(errorMessage);
-      setIsGettingLocation(false);
-      setListening(false); // Asegurar que listening esté en false
-      mediaRecorderRef.current = null;
+      let msg = "No se pudo acceder al micrófono: ";
+      if (err.name === "NotAllowedError") msg += "Permiso denegado";
+      else if (err.name === "NotFoundError") msg += "No se encontró micrófono";
+      else msg += err?.message || err;
+      setError(msg);
+      setListening(false);
     }
   };
 
-  // Detener grabación
   const stopRecording = () => {
     const recorder = mediaRecorderRef.current;
-    
     if (!recorder) {
-      // Si no hay recorder, limpiar stream y estado
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => {
-          track.stop();
-        });
-        streamRef.current = null;
-      }
+      if (streamRef.current)
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
       setListening(false);
       return;
     }
-
-    // Solo detener si está grabando
-    if (recorder.state === "recording") {
-      recorder.stop();
-      // El stream se cierra en el handler onstop
-    } else {
-      // Si ya está detenido, limpiar manualmente
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => {
-          track.stop();
-        });
-        streamRef.current = null;
-      }
+    if (recorder.state === "recording") recorder.stop();
+    else {
+      if (streamRef.current)
+        streamRef.current.getTracks().forEach((t) => t.stop());
       mediaRecorderRef.current = null;
       setListening(false);
     }
@@ -321,44 +229,27 @@ function Home() {
       setError(null);
       setPredictedSpecies(null);
       setConfidence(null);
-      setLocationError(null);
-      setUserLocation(null);
+
+      setShowMiniMap(true);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsImport(false);
-    
-    if (!file) {
-      setError("Por favor selecciona un archivo de audio");
-      return;
-    }
-    
-    setListeningFile(true);
-    // Obtener ubicación actual para archivos subidos también
-    let currentLocation = null;
-    setIsGettingLocation(true);
-    try {
-      currentLocation = await getCurrentLocation();
-      setUserLocation(currentLocation);
-    } catch (locationErr: any) {
-      setLocationError(locationErr.message);
-    } finally {
-      setIsGettingLocation(false);
-    }
+    if (!file) return setError("Selecciona un archivo de audio");
 
+    setIsImport(false);
+    setListeningFile(true);
     setIsProcessing(true);
+
     const formData = new FormData();
     formData.append("audio", file);
 
-    // Agregar ubicación si está disponible
-    if (currentLocation) {
-      formData.append("latitude", currentLocation.lat.toString());
-      formData.append("longitude", currentLocation.lng.toString());
-    }
+    // Si no hay ubicación seleccionada se envía "desconocido"
+    const locToSend = manualLocation || { lat: 0, lng: 0 };
+    formData.append("latitud", locToSend.lat.toString());
+    formData.append("longitud", locToSend.lng.toString());
 
-    // Crear AbortController para poder cancelar
     abortControllerRef.current = new AbortController();
 
     try {
@@ -368,24 +259,17 @@ function Home() {
         body: formData,
         signal: abortControllerRef.current.signal,
       });
-
       const data = await response.json();
-
       if (response.ok) {
         setPredictedSpecies(data.prediccion);
         setConfidence(data.confianza ?? null);
         setCommonName(data?.especie_info?.nombre_comun ?? null);
         setDescription(data?.especie_info?.descripcion ?? null);
         setError(null);
-      } else {
-        setError(data.error || "Error en la predicción");
-      }
+      } else setError(data.error || "Error en la predicción");
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError(null); // No mostrar error si fue cancelado
-      } else {
+      if (err.name !== "AbortError")
         setError("Error al conectar con el servidor");
-      }
     } finally {
       setIsProcessing(false);
       setListeningFile(false);
@@ -396,67 +280,141 @@ function Home() {
 
   return (
     <>
-    <div
-      className={
-        isImport
-          ? "absolute flex w-auto justify-center items-center z-10"
-          : "hidden"
-      }
-    >
-      <Upload
-        handleFileChange={handleFileChange}
-        handleSubmit={handleSubmit}
-        setIsImport={setIsImport}
-      />
-    </div>
-    <div
-      className="flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4"
-    >
-      <div id="content" className={`${isImport ? "blur-xl" : ""} w-full h-full flex flex-col items-center justify-center`}>
-        <TitleWithSubtitle
-          title={hasPrediction ? specieName : "¡Comienza a grabar!"}
-          subtitle={
-            hasPrediction
-              ? commonName || "Nombre común no disponible"
-              : "Acercate al anfibio y graba su canto para detectar su especie"
-          }
-        />
-
-        {isProcessing ? (
-          <div className="flex flex-col items-center justify-center gap-6 my-12">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
-            <p className="text-lg text-[#004D40] font-semibold">
-              Analizando audio...
-            </p>
-            <p className="text-sm text-gray-600">
-              Esto puede tomar unos segundos
-            </p>
+      {showMiniMap && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl p-4 w-80 h-80 md:w-96 md:h-96 flex flex-col">
+            // En el modal del mini-mapa:
+            <FrogsMap
+              onSelectLocation={(location) => {
+                setManualLocation({ lat: location.lat, lng: location.lng });
+                setShowMiniMap(false);
+              }}
+              especieDetectada={commonName || ""} // ✅ USA commonName EN LUGAR DE predictedSpecies
+            />
+            <button
+              type="button"
+              onClick={() => setShowMiniMap(false)}
+              className="mt-2 bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 self-center"
+            >
+              Cerrar
+            </button>
           </div>
-        ) : (
-          <>
+        </div>
+      )}
+
+      <div className="flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <TitleWithSubtitle
+            title={hasPrediction ? specieName : "¡Comienza a grabar!"}
+            subtitle={
+              hasPrediction
+                ? commonName || "Nombre común no disponible"
+                : "Acercate al anfibio y graba su canto para detectar su especie"
+            }
+          />
+
+          {isProcessing ? (
+            <div className="flex flex-col items-center justify-center gap-6 my-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
+              <p className="text-lg text-[#004D40] font-semibold">
+                Analizando audio...
+              </p>
+              <p className="text-sm text-gray-600">
+                Esto puede tomar unos segundos
+              </p>
+            </div>
+          ) : (
             <ResultPanel
               listening={listening}
-              prediction={hasPrediction|| listeningFile}
+              prediction={hasPrediction || listeningFile}
               specie={specieNumber}
               confidence={confidence}
             />
-          </>
-        )}
-        {hasPrediction && (
-          <>
-            <div className="flex flex-col items-center gap-6">
+          )}
+
+          {description && (
+            <p className="mt-2 text-center text-gray-700 px-4">{description}</p>
+          )}
+
+          {/* Botones grabar/importar */}
+          {!hasPrediction && (
+            <div className="flex flex-col justify-around items-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  listening ? stopRecording() : startRecording();
+                  setIsImport(false);
+                }}
+                className={`flex flex-row justify-center cursor-pointer ${
+                  listening
+                    ? "bg-transparent text-red-600 animate-pulse"
+                    : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                }`}
+              >
+                {listening ? (
+                  <StopRecordIcon className="size-15" />
+                ) : (
+                  <>
+                    <p>Grabar</p>
+                    <MicrophoneIcon className="size-6" />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsImport(true);
+                  setListening(false);
+                  setUserLocation(null);
+                  setPredictedSpecies(null);
+                  setConfidence(null);
+                }}
+                className="mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer"
+              >
+                Importar grabación
+                <UploadIcon className="size-4 inline-block" />
+              </button>
+            </div>
+          )}
+
+          {isImport && (
+            <div className="absolute flex w-auto flex-col justify-center items-center z-10">
+              <Upload
+                handleFileChange={handleFileChange}
+                handleSubmit={handleSubmit}
+                setIsImport={setIsImport}
+              />
+
+              {/* Solo para archivos importados, permite seleccionar ubicación manual */}
+              {file && !manualLocation && (
+                <button
+                  type="button"
+                  onClick={() => setShowMiniMap(true)}
+                  className="mt-4 bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold flex justify-center items-center gap-1"
+                >
+                  Seleccionar ubicación
+                </button>
+              )}
+            </div>
+          )}
+
+          {hasPrediction && (
+            <div className="flex flex-col items-center gap-4 mt-4">
               <Link
                 to={"/encyclopedia/" + specieName}
                 className="text-[#004D40] hover:text-[#02372E] flex gap-1"
               >
                 <InfoIcon />
-                ver informacion detallada
+                Ver información detallada
               </Link>
 
-              {userLocation && (
+              {(userLocation || manualLocation) && (
                 <Link
-                  to={`/frogs-map?lat=${userLocation.lat}&lng=${userLocation.lng}`}
-                  className="flex bg-[#1976D2] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                  to={`/map?lat=${(userLocation || manualLocation)?.lat}&lng=${
+                    (userLocation || manualLocation)?.lng
+                  }&especie=${encodeURIComponent(commonName || "")}`} // ✅ USA commonName
+                  className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
                 >
                   Ver en mapa
                 </Link>
@@ -471,72 +429,13 @@ function Home() {
                 <BackIcon className="size-5" />
               </button>
             </div>
-          </>
-        )}
-
-        <div
-          id="buttonsSection"
-          className={`${
-            hasPrediction ? "hidden" : "flex"
-          } flex-col justify-around items-center`}
-        >
-          {isProcessing ? (
-            <button
-              type="button"
-              onClick={cancelProcessing}
-              className="flex bg-red-600 rounded-xl shadow-lg hover:shadow-xl hover:bg-red-700 text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-            >
-              Cancelar
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  listening ? stopRecording() : startRecording();
-                  setIsImport(false);
-                }}
-                className={`flex flex-row justify-center cursor-pointer ${
-                  listening
-                    ? "bg-transparent text-red-600 animate-pulse"
-                    : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                }`}
-              >
-                {listening ? (
-                  <>
-                    <StopRecordIcon className="size-15" />
-                  </>
-                ) : (
-                  <>
-                    <p>Grabar</p>
-                    <MicrophoneIcon className="size-6" />
-                  </>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsImport(true);
-                  setListening(false);
-                }}
-                className={`mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer ${
-                  listening || listeningFile ? "hidden" : "flex"
-                }`}
-              >
-                Importar grabación
-                <UploadIcon className="size-4 inline-block" />
-              </button>
-            </>
           )}
-          
-        </div>
-        {/* mostrar error */}
-        <div className="mt-4 text-center">
-          {error && <p className="text-red-600">Error: {error}</p>}
+
+          {error && (
+            <p className="mt-4 text-red-600 text-center">Error: {error}</p>
+          )}
         </div>
       </div>
-    </div>
     </>
   );
 }

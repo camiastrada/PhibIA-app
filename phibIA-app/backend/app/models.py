@@ -56,6 +56,8 @@ class Ubicacion(db.Model):
 
     ubicacion_id = db.Column(db.Integer, primary_key=True)
     descripcion = db.Column(db.String(100), nullable=False)
+    longitud = db.Column(db.Float) 
+    latitud = db.Column(db.Float)
 
     # Relación
     audios = db.relationship('Audio', back_populates='ubicacion')
