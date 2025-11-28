@@ -56,6 +56,13 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
+    # Precargar modelo CNN para evitar delay en primera predicción
+    print("\n" + "="*60)
+    print("🤖 INICIALIZANDO MODELO DE MACHINE LEARNING")
+    print("="*60)
+    from .ml_model import load_model
+    load_model()
+    print("="*60 + "\n")
 
     from .routes import init_routes
     init_routes(app)
