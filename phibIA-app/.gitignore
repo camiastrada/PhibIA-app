@@ -68,5 +68,9 @@ coverage/
 # JetBrains IDEs
 .idea/
 
+# Backend uploads (archivos temporales de audio)
+backend/app/uploads/*.wav
+backend/app/uploads/*.webm
+
 # Misc
 *.log
