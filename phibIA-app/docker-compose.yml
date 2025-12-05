@@ -9,7 +9,9 @@ services:
       MYSQL_DATABASE: anfibios
       MYSQL_USER: phibia_user
       MYSQL_PASSWORD: user123
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
     volumes:
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
     ports:

@@ -34,6 +34,7 @@ def create_app():
         f"{os.getenv('MYSQL_HOST')}:"
         f"{os.getenv('MYSQL_PORT')}/"
         f"{os.getenv('MYSQL_DATABASE')}"
+        f"?charset=utf8mb4"
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     

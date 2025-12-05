@@ -1,4 +1,7 @@
-create database if not exists anfibios;
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
+create database if not exists anfibios CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 use anfibios;
 
 drop table if exists usuarios;

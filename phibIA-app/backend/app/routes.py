@@ -95,12 +95,15 @@ def init_routes(app):
             # Obtener ubicación (opcional)
             latitud = request.form.get("latitud")
             longitud = request.form.get("longitud")
+            descripcion = request.form.get("descripcion", "Ubicación del usuario")
 
             if latitud is not None and longitud is not None:
+                # Buscar si ya existe una ubicación con estas coordenadas
                 ubicacion = Ubicacion.query.filter_by(latitud=latitud, longitud=longitud).first()
                 if not ubicacion:
+                    # Crear nueva ubicación con la descripción proporcionada o por defecto
                     ubicacion = Ubicacion(
-                        descripcion="Ubicación del usuario",
+                        descripcion=descripcion if descripcion else "Ubicación del usuario",
                         latitud=latitud,
                         longitud=longitud
                     )

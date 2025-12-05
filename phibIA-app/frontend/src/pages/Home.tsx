@@ -14,6 +14,8 @@ import BackIcon from "../assets/uiIcons/backIcon";
 // Mini-mapa
 import FrogsMap from "../components/FrogsMap";
 
+const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
+
 function Home() {
   const [listening, setListening] = useState(false);
   const [isImport, setIsImport] = useState(false);
@@ -22,6 +24,7 @@ function Home() {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
@@ -53,6 +56,41 @@ function Home() {
       predictedSpecies &&
       predictedSpecies !== "No detectada"
   );
+
+  // Función para obtener la descripción de ubicación desde Mapbox
+  const getLocationDescription = async (lng: number, lat: number): Promise<string> => {
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&language=es`
+      );
+      
+      if (!response.ok) {
+        return "Ubicación del usuario";
+      }
+      
+      const data = await response.json();
+      const features = data.features || [];
+      
+      if (features.length === 0) {
+        return "Ubicación del usuario";
+      }
+      
+      // Buscar la ciudad o lugar más relevante
+      const place = features.find((f: any) => 
+        f.place_type.includes('place') || f.place_type.includes('locality')
+      );
+      
+      if (place) {
+        return place.text || "Ubicación del usuario";
+      }
+      
+      // Si no hay ciudad, usar el primer resultado
+      return features[0]?.text || "Ubicación del usuario";
+    } catch (error) {
+      console.error("Error al obtener descripción de ubicación:", error);
+      return "Ubicación del usuario";
+    }
+  };
 
   const getCurrentLocation = (): Promise<{ lat: number; lng: number }> =>
     new Promise((resolve, reject) => {
@@ -116,14 +154,16 @@ function Home() {
     setPredictedSpecies(null);
     setConfidence(null);
     setUserLocation(null);
+    userLocationRef.current = null;
 
+  
     try {
       const loc = await getCurrentLocation();
       setUserLocation(loc);
+      userLocationRef.current = loc; 
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "No se pudo obtener ubicación");
-      return;
+      console.warn("No se pudo obtener ubicación:", err.message);
+      // Continuar sin ubicación
     }
 
     try {
@@ -158,10 +198,15 @@ function Home() {
           const formData = new FormData();
           formData.append("audio", blob, `recording_${Date.now()}.${ext}`);
 
-          // Ubicación real o desconocida
-          const locToSend = userLocation || { lat: 0, lng: 0 }; // "desconocido"
-          formData.append("latitud", locToSend.lat.toString());
-          formData.append("longitud", locToSend.lng.toString());
+          // Solo enviar ubicación si existe
+          if (userLocationRef.current) {
+            formData.append("latitud", userLocationRef.current.lat.toString());
+            formData.append("longitud", userLocationRef.current.lng.toString());
+            
+            // Obtener descripción de ubicación
+            const descripcion = await getLocationDescription(userLocationRef.current.lng, userLocationRef.current.lat);
+            formData.append("descripcion", descripcion);
+          }
 
           abortControllerRef.current = new AbortController();
           const res = await fetch(`${API_URL}/predict`, {
@@ -245,10 +290,15 @@ function Home() {
     const formData = new FormData();
     formData.append("audio", file);
 
-    // Si no hay ubicación seleccionada se envía "desconocido"
-    const locToSend = manualLocation || { lat: 0, lng: 0 };
-    formData.append("latitud", locToSend.lat.toString());
-    formData.append("longitud", locToSend.lng.toString());
+    // Solo enviar ubicación si fue seleccionada manualmente
+    if (manualLocation) {
+      formData.append("latitud", manualLocation.lat.toString());
+      formData.append("longitud", manualLocation.lng.toString());
+      
+      // Obtener descripción de ubicación
+      const descripcion = await getLocationDescription(manualLocation.lng, manualLocation.lat);
+      formData.append("descripcion", descripcion);
+    }
 
     abortControllerRef.current = new AbortController();
 
