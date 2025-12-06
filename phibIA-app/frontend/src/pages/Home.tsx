@@ -41,11 +41,11 @@ function Home() {
     lat: number;
     lng: number;
   } | null>(null);
+
   const [manualLocation, setManualLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [showMiniMap, setShowMiniMap] = useState(false);
 
   const specieNumber = predictedSpecies?.split("-")[0];
   const specieName = predictedSpecies?.split("-")[1];
@@ -142,7 +142,6 @@ function Home() {
     setUserLocation(null);
     setManualLocation(null);
     setFile(null);
-    setShowMiniMap(false);
 
     mediaRecorderRef.current = null;
     chunksRef.current = [];
@@ -275,11 +274,11 @@ function Home() {
       setPredictedSpecies(null);
       setConfidence(null);
 
-      setShowMiniMap(true);
+      // setShowMiniMap(true);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleImportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return setError("Selecciona un archivo de audio");
 
@@ -330,29 +329,18 @@ function Home() {
 
   return (
     <>
-      {showMiniMap && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl p-4 w-80 h-80 md:w-96 md:h-96 flex flex-col">
-            // En el modal del mini-mapa:
-            <FrogsMap
-              onSelectLocation={(location) => {
-                setManualLocation({ lat: location.lat, lng: location.lng });
-                setShowMiniMap(false);
-              }}
-              especieDetectada={commonName || ""} // ✅ USA commonName EN LUGAR DE predictedSpecies
-            />
-            <button
-              type="button"
-              onClick={() => setShowMiniMap(false)}
-              className="mt-2 bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 self-center"
-            >
-              Cerrar
-            </button>
-          </div>
+      {isImport && (
+        <div className="absolute flex w-auto flex-col justify-center items-center z-10">
+          <Upload
+            handleFileChange={handleFileChange}
+            handleSubmit={handleImportSubmit}
+            setIsImport={setIsImport}
+            setManualLocation={setManualLocation}
+          />
         </div>
       )}
 
-      <div className="flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
+      <div className={`flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ${isImport ? "blur-xs" : ""}`}>
         <div className="w-full h-full flex flex-col items-center justify-center">
           <TitleWithSubtitle
             title={hasPrediction ? specieName : "¡Comienza a grabar!"}
@@ -391,15 +379,19 @@ function Home() {
             <div className="flex flex-col justify-around items-center mt-4">
               <button
                 type="button"
+                disabled = {isImport}
                 onClick={() => {
                   listening ? stopRecording() : startRecording();
                   setIsImport(false);
                 }}
-                className={`flex flex-row justify-center cursor-pointer ${
+                className={`flex flex-row justify-center ${
                   listening
                     ? "bg-transparent text-red-600 animate-pulse"
+                    : isImport
+                    ? "bg-[#43A047] rounded-xl shadow-lg text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
                     : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                }`}
+                }
+                ${isImport ? "" : "cursor-pointer"}`}
               >
                 {listening ? (
                   <StopRecordIcon className="size-15" />
@@ -413,6 +405,7 @@ function Home() {
 
               <button
                 type="button"
+                disabled = {isImport}
                 onClick={() => {
                   setIsImport(true);
                   setListening(false);
@@ -420,7 +413,7 @@ function Home() {
                   setPredictedSpecies(null);
                   setConfidence(null);
                 }}
-                className="mt-4 text-[#004D40] hover:text-[#02372E] flex-row justify-center items-center gap-1 cursor-pointer"
+                className={`mt-4 text-[#004D40] flex-row justify-center items-center gap-1  ${isImport ? "" : "hover:text-[#02372E] cursor-pointer"}`}
               >
                 Importar grabación
                 <UploadIcon className="size-4 inline-block" />
@@ -428,26 +421,7 @@ function Home() {
             </div>
           )}
 
-          {isImport && (
-            <div className="absolute flex w-auto flex-col justify-center items-center z-10">
-              <Upload
-                handleFileChange={handleFileChange}
-                handleSubmit={handleSubmit}
-                setIsImport={setIsImport}
-              />
-
-              {/* Solo para archivos importados, permite seleccionar ubicación manual */}
-              {file && !manualLocation && (
-                <button
-                  type="button"
-                  onClick={() => setShowMiniMap(true)}
-                  className="mt-4 bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold flex justify-center items-center gap-1"
-                >
-                  Seleccionar ubicación
-                </button>
-              )}
-            </div>
-          )}
+          
 
           {hasPrediction && (
             <div className="flex flex-col items-center gap-4 mt-4">
