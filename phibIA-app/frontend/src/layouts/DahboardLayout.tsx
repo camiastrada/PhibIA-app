@@ -22,7 +22,7 @@ export default function DashboardLayout() {
       <div className="flex h-full scrollbar-hidde">
         {/* Sidebar solo en desktop */}
         <Sidebar />
-        <main className="flex-1 flex justify-center items-center overflow-y-auto overflow-x-hidden scrollbar-hidde">
+        <main className="flex-1 flex justify-center items-center overflow-y-hidden overflow-x-hidden scrollbar-hidde">
           {/* Espaciador superior mobile (para topbar) */}
           <div className="flex md:hidden h-12 w-full fixed top-0 pointer-events-none"></div>
           
