@@ -24,11 +24,19 @@ export default function SidebarIcon({ to, icon: Icon, id, disabled }: SidebarIco
         <Link
           to={to}
           id={id}
-          className={`sidebarIcon p-2 h-15 ${
+          className={`sidebarIcon p-2 h-15 group inline-block${
             pathname === to ? "md:pl-0 md:border-l-6 md:border-l-[#43a047] md:text-[#43a047]" : ""
           }`}
           >
           <Icon className="size-10 inline-block" />
+
+          <div className="absolute left-1/2 -translate-x-1/2 -top-2 -translate-y-full
+               group-hover:opacity-100
+              pointer-events-none transition
+              bg-black text-white text-sm px-3 py-1 rounded-lg
+              shadow-lg whitespace-nowrap">
+             Este es un mensaje flotante
+          </div>
         </Link>
       )}
     </>

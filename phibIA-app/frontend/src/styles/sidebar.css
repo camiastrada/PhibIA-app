@@ -15,7 +15,7 @@
   body:has(#encyclopediaLabel:hover) #encyclopediaIcon,
   body:has(#mapLabel:hover) #mapIcon,
   .sidebarIcon:hover {
-    padding-left: 0;
+
     border-left-width: 6px;
     border-left-color: #43a047;
   }

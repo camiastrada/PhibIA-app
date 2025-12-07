@@ -59,12 +59,12 @@ function Encyclopedia() {
   return (
     <div className="min-h-screen px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-y-auto">
       <div className="w-full max-w-6xl mx-auto bg-[#004D40]/30 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
-      <div className="text-white">
-        <TitleWithSubtitle
-          title="Enciclopedia de Especies"
-          subtitle={`${species.length} especies registradas`}
-        />
-      </div>
+        <div className="text-white">
+          <TitleWithSubtitle
+            title="Enciclopedia de Especies"
+            subtitle={`${species.length} especies registradas`}
+          />
+        </div>
 
         <div className="w-full overflow-y-auto max-h-[calc(100vh-120px)] px-2 scrollbar-hidden">
 

@@ -11,9 +11,6 @@ import UploadIcon from "../assets/uiIcons/uploadIcon";
 import InfoIcon from "../assets/uiIcons/infoIcon";
 import BackIcon from "../assets/uiIcons/backIcon";
 
-// Mini-mapa
-import FrogsMap from "../components/FrogsMap";
-
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
 
 function Home() {
@@ -280,9 +277,10 @@ function Home() {
 
   const handleImportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsImport(false);
+    
     if (!file) return setError("Selecciona un archivo de audio");
 
-    setIsImport(false);
     setListeningFile(true);
     setIsProcessing(true);
 
@@ -333,7 +331,7 @@ function Home() {
         <div className="absolute flex w-auto flex-col justify-center items-center z-10">
           <Upload
             handleFileChange={handleFileChange}
-            handleSubmit={handleImportSubmit}
+            handleImportSubmit={handleImportSubmit}
             setIsImport={setIsImport}
             setManualLocation={setManualLocation}
           />

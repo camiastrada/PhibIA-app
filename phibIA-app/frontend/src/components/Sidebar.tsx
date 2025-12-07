@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "/images/whiteLogo.png";
 import "../styles/sidebar.css";
@@ -11,9 +11,26 @@ import MapIcon from "../assets/sidebarIcons/mapIcon.tsx"
 import OcultBar from "../assets/sidebarIcons/ocultBar.tsx";
 import ShowBar from "../assets/sidebarIcons/showBar.tsx";
 import ProfilePanel from "./ui/ProfilePanel";
+import {useAuth} from "../context/AuthContext.tsx"
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
+  const { user, refreshUser } = useAuth();
+  const isGuest = !user; 
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        await refreshUser();
+        
+      } catch (error) {
+        console.error("Error al obtener perfil:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [refreshUser]);
+
   return (
     <div className="hidden md:block h-screen">
       <div 
@@ -39,8 +56,8 @@ export default function Sidebar() {
           {/* Navegación principal centrada */}
           <nav className="flex flex-col gap-6 w-full flex-1 justify-center mb-20">
             <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
-            <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon}/>
-            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />  
+            <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon} disabled = {isGuest}/>
+            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} disabled = {isGuest}/>  
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />  
           </nav>
           
@@ -72,8 +89,8 @@ export default function Sidebar() {
             isOpen ? "opacity-100" : "opacity-0"
           }`}>
             <SidebarLabel to="/" id="homeLabel" label="Inicio" isOpen={isOpen} />
-            <SidebarLabel to="/captures" id="capturesLabel" label="Mis detecciones" isOpen={isOpen} />
-            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen} disabled = {false}/>
+            <SidebarLabel to="/captures" id="capturesLabel" label="Mis detecciones" isOpen={isOpen} disabled = {isGuest}/>
+            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen} disabled = {isGuest}/>
             <SidebarLabel to="/map" id="mapLabel" label="Mapa de capturas" isOpen={isOpen} />
           </nav>
           

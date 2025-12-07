@@ -8,7 +8,7 @@ import MapPin from "../assets/uiIcons/ubicationPinIcon"
 
 interface UploadProps {
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (e: FormEvent) => void;
+  handleImportSubmit: (e: FormEvent) => void;
   setIsImport: Dispatch<SetStateAction<boolean>>;
   setManualLocation: Dispatch<SetStateAction<{
     lat: number;
@@ -17,7 +17,7 @@ interface UploadProps {
 
 export default function Upload({
   handleFileChange,
-  handleSubmit,
+  handleImportSubmit,
   setIsImport,
   setManualLocation
 }: UploadProps) {
@@ -69,13 +69,13 @@ export default function Upload({
       </div>
 
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white w-full flex-1 flex flex-col justify-center items-center rounded-b-3xl p-5">
+      <form onSubmit={handleImportSubmit} className="space-y-4 bg-white w-full flex-1 flex flex-col justify-center items-center rounded-b-3xl p-5">
         <div className="flex flex-col w-2/3 items-start justify-center">
           <label className="text-md m-1">Audio:</label>
           <input
             type="file"
             accept="audio/*"
-            onChange={() => {handleFileChange; setShowMiniMap(true);}}
+            onChange={ (e) => {handleFileChange(e); setShowMiniMap(true);}}
             className="
             w-full text-sm text-gray-300 bg-[#02372E] hover:bg-[#022721] cursor-pointer rounded-xl pr-3
             file:mr-4 file:py-2 file:px-4 

@@ -19,15 +19,15 @@ export default function DashboardLayout() {
       <Topbar />
       
       {/* Layout principal: Sidebar + Contenido */}
-      <div className="flex h-full">
+      <div className="flex h-full scrollbar-hidde">
         {/* Sidebar solo en desktop */}
         <Sidebar />
-        <main className="flex-1 flex justify-center items-center overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 flex justify-center items-center overflow-y-auto overflow-x-hidden scrollbar-hidde">
           {/* Espaciador superior mobile (para topbar) */}
           <div className="flex md:hidden h-12 w-full fixed top-0 pointer-events-none"></div>
           
           {/* Contenido de la página */}
-          <div className="w-full h-full flex justify-center items-center p-5 mt-12 md:mt-0 mb-16 md:mb-0">
+          <div className="w-full h-full flex justify-center items-center p-5 mt-12 md:mt-0 mb-16 md:mb-0 scrollbar-hidde">
             <Outlet />
           </div>
         </main>
