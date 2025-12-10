@@ -29,14 +29,6 @@ export default function SidebarIcon({ to, icon: Icon, id, disabled }: SidebarIco
           }`}
           >
           <Icon className="size-10 inline-block" />
-
-          <div className="absolute left-1/2 -translate-x-1/2 -top-2 -translate-y-full
-               group-hover:opacity-100
-              pointer-events-none transition
-              bg-black text-white text-sm px-3 py-1 rounded-lg
-              shadow-lg whitespace-nowrap">
-             Este es un mensaje flotante
-          </div>
         </Link>
       )}
     </>
