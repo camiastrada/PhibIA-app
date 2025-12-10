@@ -257,11 +257,11 @@ function Detections() {
 
                     <div className="flex-1">
                       <h3 className="text-lg font-bold text-white mb-1">
-                        {detection.especie.nombre_cientifico}
+                        {detection.especie.nombre_comun}
                       </h3>
                       {detection.especie.nombre_comun && (
                         <p className="text-sm text-white/80">
-                          {detection.especie.nombre_comun}
+                          {detection.especie.nombre_cientifico}                          
                         </p>
                       )}
                     </div>

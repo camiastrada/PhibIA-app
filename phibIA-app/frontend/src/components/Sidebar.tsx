@@ -14,7 +14,7 @@ import ProfilePanel from "./ui/ProfilePanel";
 import {useAuth} from "../context/AuthContext.tsx"
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const { user, refreshUser } = useAuth();
   const isGuest = !user; 
 

@@ -143,10 +143,10 @@ function InfoFrog() {
               {error}
             </div>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/encyclopedia')}
               className="mt-6 bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-8 rounded-xl transition-colors shadow-lg"
             >
-              Volver al inicio
+              Volver
             </button>
           </div>
         );
@@ -160,10 +160,10 @@ function InfoFrog() {
               subtitle="Especie no encontrada" 
             />
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/encyclopedia')}
               className="mt-6 bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-8 rounded-xl transition-colors shadow-lg"
             >
-              Volver al inicio
+              Volver
             </button>
           </div>
         );
@@ -268,13 +268,13 @@ function InfoFrog() {
             {/* Botón volver */}
             <div className="flex justify-center pb-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/encyclopedia')}
                 className="bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-8 rounded-xl transition-colors shadow-lg flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Volver al inicio
+                Volver
               </button>
             </div>
     

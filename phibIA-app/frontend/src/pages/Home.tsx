@@ -16,6 +16,14 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4Mmx
 function Home() {
   const [listening, setListening] = useState(false);
   const [isImport, setIsImport] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [listeningFile, setListeningFile] = useState(false);
+  const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
+  const [confidence, setConfidence] = useState<number | null>(null);
+  const [commonName, setCommonName] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -25,14 +33,6 @@ function Home() {
 
   const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [listeningFile, setListeningFile] = useState(false);
-  const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
-  const [confidence, setConfidence] = useState<number | null>(null);
-  const [commonName, setCommonName] = useState<string | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
 
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -341,10 +341,10 @@ function Home() {
       <div className={`flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ${isImport ? "blur-xs" : ""}`}>
         <div className="w-full h-full flex flex-col items-center justify-center">
           <TitleWithSubtitle
-            title={hasPrediction ? specieName : "¡Comienza a grabar!"}
+            title={hasPrediction ? commonName || "Nombre común no disponible" : "¡Comienza a grabar!"}
             subtitle={
               hasPrediction
-                ? commonName || "Nombre común no disponible"
+                ?  specieName 
                 : "Acercate al anfibio y graba su canto para detectar su especie"
             }
           />
