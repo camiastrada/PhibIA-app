@@ -1,7 +1,6 @@
 Flask==2.3.3
 Flask-SQLAlchemy==3.0.5
-PyMySQL==1.1.0
-cryptography==41.0.7
+psycopg2-binary==2.9.9
 numpy
 librosa
 scikit-learn

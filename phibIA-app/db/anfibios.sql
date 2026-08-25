@@ -1,54 +1,51 @@
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
 
-create database if not exists anfibios CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-use anfibios;
+DROP TABLE IF EXISTS audios;
+DROP TABLE IF EXISTS imagenes; 
+DROP TABLE IF EXISTS ubicaciones; 
+DROP TABLE IF EXISTS usuarios_especies;
+DROP TABLE IF EXISTS especies;
+DROP TABLE IF EXISTS usuarios;
 
-drop table if exists usuarios;
-drop table if exists especies;
-drop table if exists ubicaciones;
-drop table if exists audios;
-
-create table usuarios(
-    usuario_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE usuarios(
+    usuario_id SERIAL PRIMARY KEY,
     name VARCHAR(20) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL,
-    register_date DATE NOT NULL DEFAULT (CURRENT_DATE),
+    register_date DATE NOT NULL DEFAULT CURRENT_DATE,
     avatar_id INTEGER DEFAULT 0,
-    background_color VARCHAR(10) DEFAULT "#FFFFFF"
+    background_color VARCHAR(10) DEFAULT '#FFFFFF',
+    rol VARCHAR(20) NOT NULL DEFAULT 'usuario'
 );
 
-create table especies(
-    especie_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE especies(
+    especie_id SERIAL PRIMARY KEY,
     nombre_cientifico VARCHAR(40) NOT NULL UNIQUE,
     nombre_comun VARCHAR(100) DEFAULT NULL,
     descripcion VARCHAR(250) DEFAULT NULL,
     imagen VARCHAR(100) DEFAULT NULL,
     ruta_audio VARCHAR(255) DEFAULT NULL
-    /*IMAGEN ?*/
 );
 
-create table usuarios_especies(
+CREATE TABLE usuarios_especies(
     usuario_id INT NOT NULL,
     especie_id INT NOT NULL,
-    fecha_registro DATETIME NOT NULL,
+    fecha_registro TIMESTAMP NOT NULL,
     PRIMARY KEY (usuario_id, especie_id),
     CONSTRAINT fk_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
     CONSTRAINT fk_especie FOREIGN KEY (especie_id) REFERENCES especies(especie_id)
 );
 
-create table ubicaciones(
-    ubicacion_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE ubicaciones(
+    ubicacion_id SERIAL PRIMARY KEY,
     descripcion VARCHAR(100) NOT NULL,
     longitud FLOAT,
     latitud FLOAT
 );
 
-create table audios(
-    audio_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE audios(
+    audio_id SERIAL PRIMARY KEY,
     ruta VARCHAR(100) NOT NULL,
-    fecha_grabacion DATETIME NOT NULL,
+    fecha_grabacion TIMESTAMP NOT NULL,
     especie_id INT NOT NULL,
     usuario_id INT NOT NULL,
     ubicacion_id INT NOT NULL,
@@ -57,3 +54,12 @@ create table audios(
     CONSTRAINT fk_ubicacione_audio FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
 );
 
+CREATE TABLE imagenes(
+    imagen_id SERIAL PRIMARY KEY,
+    ruta VARCHAR(100) NOT NULL,
+    fecha_subida TIMESTAMP NOT NULL,
+    usuario_id INT NOT NULL,
+    ubicacion_id INT NOT NULL,
+    CONSTRAINT fk_usuario_imagen FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
+    CONSTRAINT fk_ubicacione_imagen FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
+);

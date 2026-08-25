@@ -13,6 +13,7 @@ class Usuario(db.Model):
     register_date = db.Column(db.Date, nullable=False, default=date.today)
     avatar_id = db.Column(db.Integer, default=0)
     background_color = db.Column(db.String(10), default="#FFFFFF")
+    rol = db.Column(db.String(20), nullable=False, default='usuario')
 
     # Relaciones
     audios = db.relationship('Audio', back_populates='usuario')

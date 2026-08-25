@@ -1,40 +1,36 @@
 
 services:
   db:
-    image: mysql:8.0
-    container_name: mysql_db
+    image: postgres:16
+    container_name: postgres_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: anfibios
-      MYSQL_USER: phibia_user
-      MYSQL_PASSWORD: user123
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+      POSTGRES_DB: anfibios
+      POSTGRES_USER: phibia_user
+      POSTGRES_PASSWORD: user123
     volumes:
-      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
     ports:
-      - "3307:3306"
+      - "5433:5432"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      test: ["CMD-SHELL", "pg_isready -U phibia_user -d anfibios"]
       interval: 5s
       timeout: 10s
       retries: 10
+      start_period: 60s
 
   frontend:
     build: ./frontend
     container_name: frontend_app
-    # No exponer puerto directamente - solo accesible a través de nginx
     environment:
-      - VITE_API_URL=/api # Las direcciones sin api son front
+      - VITE_API_URL=/api
     depends_on:
       - backend 
 
   backend:
     build: ./backend
     container_name: flask_app
-    # Puerto 5000 solo para debug directo - en producción comentar esta línea
     ports:
       - "5000:5000"
     volumes:
@@ -42,12 +38,12 @@ services:
       - ./db:/db:ro
     environment:
       - FLASK_ENV=development
-      - MYSQL_HOST=db
-      - MYSQL_USER=phibia_user
-      - MYSQL_PASSWORD=user123
-      - MYSQL_DATABASE=anfibios
-      - MYSQL_PORT=3306
-      - JWT_SECRET_KEY= cd0562e2a7cce7ce24d960874ac7bb01349507dffa165f1c9f58a5676cbe9cf1
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=phibia_user
+      - POSTGRES_PASSWORD=user123
+      - POSTGRES_DATABASE=anfibios
+      - POSTGRES_PORT=5432
+      - JWT_SECRET_KEY=cd0562e2a7cce7ce24d960874ac7bb01349507dffa165f1c9f58a5676cbe9cf1
     command: python run.py
     depends_on:
       db:
@@ -56,8 +52,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 60s  # Aumentado para dar tiempo a cargar el modelo CNN 
+      retries: 10
+      start_period: 120s
         
   nginx:
     image: nginx:alpine
@@ -70,5 +66,5 @@ services:
       frontend:
         condition: service_started
       backend:
-        condition: service_healthy  # ← Esperar a que Flask esté listo
+        condition: service_healthy
     restart: unless-stopped
