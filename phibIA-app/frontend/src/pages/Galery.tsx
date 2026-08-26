@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import CardGrid from "../components/CardGrid";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
 
@@ -85,14 +87,50 @@ const fotosDePrueba = [
 ];
 
 function Galery() {
+  const { user } = useAuth();
+  const [filtro, setFiltro] = useState<"todas" | "mias">("todas");
+
+  const fotosAMostrar =
+    filtro === "mias"
+      ? fotosDePrueba.filter((foto) => foto.esMia)
+      : fotosDePrueba;
+
   return (
-    <div className="min-h-screen mt-8 px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-y-auto">
-      <div className="w-full max-w-6xl mx-auto bg-[#004D40]/30 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
-        <div className="text-white">
+    <div className="h-[100dvh] pt-8 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center">
+      <div className="w-full h-full flex flex-col bg-[#004D40]/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
+        <div className="text-white shrink-0">
           <TitleWithSubtitle title="Galería de fotos" subtitle="" />
         </div>
-        <div className="w-full mt-4 overflow-y-auto max-h-[calc(100vh-120px)] px-2 scrollbar-hidden">
-          <CardGrid fotos={fotosDePrueba} />
+
+        {user && (
+          <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start shrink-0">
+            <button
+              onClick={() => setFiltro("todas")}
+              className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+                filtro === "todas"
+                  ? "bg-[#43a047] text-white"
+                  : "bg-white/20 text-white hover:bg-white/30"
+              }`}
+            >
+              Ver todas las fotos
+            </button>
+            <button
+              onClick={() => setFiltro("mias")}
+              className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+                filtro === "mias"
+                  ? "bg-[#43a047] text-white"
+                  : "bg-white/20 text-white hover:bg-white/30"
+              }`}
+            >
+              Ver solo mis fotos
+            </button>
+          </div>
+        )}
+
+        <div className="border-t border-white/20 my-6 shrink-0" />
+
+        <div className="flex-1 min-h-0 overflow-y-auto px-2 scrollbar-hidden">
+          <CardGrid fotos={fotosAMostrar} />
         </div>
       </div>
     </div>
