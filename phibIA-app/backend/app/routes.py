@@ -391,10 +391,14 @@ def init_routes(app):
         return jsonify({'status': 'healthy'}), 200
 
     @app.route('/user/captures', methods=['GET'])
+    
+    
     @jwt_required()
     def get_user_detections():
         """
-        Obtiene todas las detecciones (audios) del usuario autenticado
+        Obtiene las detecciones (audios):
+        - Si es admin: todos los audios del sistema.
+        - Si es usuario común: solo sus propios audios.
         """
         try:
             current_user_id = int(get_jwt_identity())
@@ -405,12 +409,18 @@ def init_routes(app):
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
-        # Obtener todos los audios del usuario con información relacionada
-        audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+        # --- DIFERENCIACIÓN POR ROL ---
+        if user.rol == 'admin':
+            # Admin ve todos los audios ordenados por fecha
+            audios = Audio.query.order_by(Audio.fecha_grabacion.desc()).all()
+        else:
+            # Usuario común solo ve sus propios audios
+            audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+        # -----------------------------
 
         detections = []
         for audio in audios:
-            detections.append({
+            detection_item = {
                 'audio_id': audio.audio_id,
                 'ruta': audio.ruta,
                 'fecha_grabacion': audio.fecha_grabacion.isoformat(),
@@ -425,12 +435,24 @@ def init_routes(app):
                     'id': audio.ubicacion.ubicacion_id,
                     'descripcion': audio.ubicacion.descripcion
                 }
-            })
+            }
+            
+            # Opcional útil: Si eres admin, quizás te sirva saber a qué usuario pertenece cada audio
+            if user.rol == 'admin' and hasattr(audio, 'usuario'):
+                detection_item['usuario'] = {
+                    'id': audio.usuario.usuario_id,
+                    'nombre': audio.usuario.name,
+                    'email': audio.usuario.email
+                }
+
+            detections.append(detection_item)
 
         return jsonify({
             'detections': detections,
             'total': len(detections)
         }), 200
+    
+    
     
     @app.route('/audio/<int:audio_id>', methods=['GET'])
     @jwt_required()

@@ -24,3 +24,43 @@ INSERT INTO usuarios (name, email, password, register_date)
 VALUES ('Invitado', 'invitado@sistema.local', 'no-password', CURRENT_DATE)
 ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name;
 
+INSERT INTO usuarios (name, email, password, register_date, rol)
+VALUES (
+    'Admin',
+    'admin@phibia.com',
+    '$2b$12$c7/Kv4HCg5a8bKrFuGDT4.qpZjFkg.9hZr/cPtZjMOptax7Y7e5Bu',
+    CURRENT_DATE,
+    'admin'
+)
+ON CONFLICT (email) DO UPDATE SET rol = 'admin';
+
+
+
+INSERT INTO ubicaciones (ubicacion_id, descripcion, latitud, longitud)
+VALUES (1, 'Desconocida', 0.0, 0.0)
+ON CONFLICT (ubicacion_id) DO NOTHING;
+
+
+-- Un usuario común de prueba
+INSERT INTO usuarios (name, email, password, register_date, rol)
+VALUES ('Test User', 'test@test.com', '$2b$12$c7/Kv4HCg5a8bKrFuGDT4.qpZjFkg.9hZr/cPtZjMOptax7Y7e5Bu', CURRENT_DATE, 'usuario');
+
+-- Un audio de prueba asociado a ese usuario (usá el especie_id y ubicacion_id que ya existan, por ejemplo 1)
+INSERT INTO audios (ruta, fecha_grabacion, especie_id, usuario_id, ubicacion_id)
+VALUES (
+    'test.wav',
+    now(),
+    1,
+    (SELECT usuario_id FROM usuarios WHERE email = 'test@test.com'),
+    1
+);
+
+-- Un audio de prueba asociado a ese usuario (usá el especie_id y ubicacion_id que ya existan, por ejemplo 1)
+INSERT INTO audios (ruta, fecha_grabacion, especie_id, usuario_id, ubicacion_id)
+VALUES (
+    'test1.wav',
+    now(),
+    1,
+    (SELECT usuario_id FROM usuarios WHERE email = 'admin@phibia.com'),
+    1
+);
