@@ -564,9 +564,16 @@ def init_routes(app):
         except (TypeError, ValueError):
             return jsonify({'message': 'Invalid token subject'}), 422
 
-        # Verificar que el audio existe y pertenece al usuario
-        audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
-        
+        user = db.session.get(Usuario, current_user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 401
+
+        # El admin puede escuchar el audio de cualquier usuario; el resto solo el propio
+        if user.rol == 'admin':
+            audio = Audio.query.filter_by(audio_id=audio_id).first()
+        else:
+            audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
+
         if not audio:
             return jsonify({'error': 'Audio not found or access denied'}), 404
 
