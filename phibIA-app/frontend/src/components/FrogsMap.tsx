@@ -273,7 +273,7 @@ export default function FrogsMap({
             zIndex: 2,
             top: 10,
             left: 10,
-            width: "300px",
+            width: "min(300px, calc(100% - 20px))",
           }}
         >
           <SearchBox

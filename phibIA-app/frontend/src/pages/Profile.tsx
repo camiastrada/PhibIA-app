@@ -28,7 +28,7 @@ function Profile() {
 
   return (
   <>
-    <div className={openAvatarSelector ? "flex md:hidden absolute z-0 bg-black/50 w-screen h-screen top-0" : "hidden"}></div>
+    <div className={openAvatarSelector ? "flex md:hidden z-0 bg-black/50  w-full h-full fixed inset-0 top-0" : "hidden"}></div>
     <div className={openAvatarSelector ? "flex w-full h-full justify-center items-center z-10 shadow-2xl" : "hidden"}>
       <AvatarSelector setOpenAvatarSelector={setOpenAvatarSelector}/>
     </div>
@@ -37,10 +37,10 @@ function Profile() {
        ${openAvatarSelector ? "hidden" : "flex"}`}>
     
       <div className={`flex flex-col w-full lg:w-1/2 items-center justify-center 
-        ${isGuest ? "border-none" : "lg:border-r-2 border-[var(--color-text-main)]/70"}`}>
+        ${isGuest ? "border-none" : "lg:border-r-2 border-(--color-text-main)/70"}`}>
 
-        <div className="rounded-full size-50 relative">
-          <ProfilePanel className="size-50 border-6"/>
+        <div className="rounded-full size-36 md:size-50 relative">
+          <ProfilePanel className="size-36 md:size-50 border-6"/>
           <button 
           type="button" 
           onClick={() => setOpenAvatarSelector(true)}

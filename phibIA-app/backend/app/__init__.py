@@ -56,6 +56,9 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
 
+    from .cloudinary_config import init_cloudinary
+    init_cloudinary()
+
     # Precargar modelo CNN para evitar delay en primera predicción
     print("\n" + "="*60)
     print("🤖 INICIALIZANDO MODELO DE MACHINE LEARNING")

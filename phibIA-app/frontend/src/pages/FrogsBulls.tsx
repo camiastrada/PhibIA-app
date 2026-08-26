@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import "../styles/App.css";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
 import BackIcon from "../assets/uiIcons/backIcon";
+import Toast from "../components/ui/Toast";
 
 export default function FrogsBulls() {
   const [photo, setPhoto] = useState<string | null>(null);
+  const [photoSource, setPhotoSource] = useState<"camera" | "upload" | null>(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -13,7 +15,13 @@ export default function FrogsBulls() {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const showToast = useCallback((message: string, type: "success" | "error") => {
+    setToast({ message, type });
+  }, []);
 
   useEffect(() => {
     if (isCameraOn && videoRef.current) {
@@ -74,8 +82,9 @@ export default function FrogsBulls() {
         setUserLocation(location);
       } catch (error: any) {
         console.error("Error de ubicación:", error.message);
-        alert(
-          `No se pudo obtener la ubicación: ${error.message}. Puedes continuar sin ubicación.`
+        showToast(
+          `Sin ubicación: ${error.message}`,
+          "error"
         );
         setUserLocation(null);
       } finally {
@@ -113,8 +122,9 @@ export default function FrogsBulls() {
       }
     } catch (err) {
       console.error("Error al acceder a la cámara:", err);
-      alert(
-        "No se pudo acceder a la cámara. Por favor, permite los permisos de cámara."
+      showToast(
+        "No se pudo acceder a la cámara. Permite los permisos.",
+        "error"
       );
       setIsGettingLocation(false);
     }
@@ -142,8 +152,36 @@ export default function FrogsBulls() {
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
     setPhoto(dataUrl);
+    setPhotoSource("camera");
 
     stopCamera();
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      showToast("Formato no permitido. Usa JPG o PNG.", "error");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("La imagen no debe superar 10 MB.", "error");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setPhoto(ev.target?.result as string);
+      setPhotoSource("upload");
+    };
+    reader.readAsDataURL(file);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const stopCamera = () => {
@@ -155,6 +193,11 @@ export default function FrogsBulls() {
       if (videoRef.current) videoRef.current.srcObject = null;
     }
     setIsCameraOn(false);
+  };
+
+  const resetPhoto = () => {
+    setPhoto(null);
+    setPhotoSource(null);
   };
 
   const savePhoto = async () => {
@@ -181,31 +224,32 @@ export default function FrogsBulls() {
       if (!res.ok) {
         const errorData = await res.json();
         console.error("Error al guardar la foto:", errorData);
-        alert(
-          `Error al guardar la foto: ${errorData.error || "Error desconocido"}`
+        showToast(
+          `Error: ${errorData.error || "Error desconocido"}`,
+          "error"
         );
       } else {
         const result = await res.json();
-        console.log("✅ Foto guardada:", result);
-        alert("Foto guardada con éxito");
-        setPhoto(null);
+        console.log("Foto guardada:", result);
+        showToast("Foto guardada con éxito", "success");
+        resetPhoto();
         setUserLocation(null);
       }
     } catch (err) {
       console.error("Error al guardar la foto", err);
-      alert("Error al guardar la foto. Intenta nuevamente.");
+      showToast("Error al guardar la foto. Intenta nuevamente.", "error");
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-full max-w-3xl h-auto my-4 md:my-0 max-h-[calc(100vh-8rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
+    <div className="flex flex-col justify-center items-center w-full max-w-3xl h-auto my-4 md:my-0 max-h-[calc(100vh-4rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
       <div className="w-full h-full flex flex-col items-center justify-center">
         <TitleWithSubtitle
-          title={"¡Comienza a capturar!"}
+          title={"¿Descubriste una rana toro?"}
           subtitle={
-            "Acercate a la rana toro y toma una foto para notificar su ubicación"
+            "Tomale una foto para notificar su ubicación"
           }
         />
 
@@ -228,7 +272,7 @@ export default function FrogsBulls() {
                   <p className="text-sm md:text-base px-2">
                     {isGettingLocation
                       ? "Obteniendo ubicación..."
-                      : "Presiona 'Activar cámara' para comenzar"}
+                      : "Activá la cámara o subí una foto desde tu galería"}
                   </p>
                   {isGettingLocation && (
                     <div className="mt-2">
@@ -241,17 +285,33 @@ export default function FrogsBulls() {
 
             <canvas ref={canvasRef} className="hidden" />
 
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+
             <div className="flex flex-wrap gap-2 md:gap-4 mt-2 justify-center">
               {!isCameraOn && (
-                <button
-                  className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={startCamera}
-                  disabled={isGettingLocation}
-                >
-                  {isGettingLocation
-                    ? "Obteniendo ubicación..."
-                    : "Activar Cámara"}
-                </button>
+                <>
+                  <button
+                    className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={startCamera}
+                    disabled={isGettingLocation}
+                  >
+                    {isGettingLocation
+                      ? "Obteniendo ubicación..."
+                      : "Activar Cámara"}
+                  </button>
+                  <button
+                    className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Subir desde galería
+                  </button>
+                </>
               )}
               {isCameraOn && (
                 <>
@@ -283,12 +343,14 @@ export default function FrogsBulls() {
               <button
                 className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
                 onClick={() => {
-                  setPhoto(null);
-                  startCamera();
+                  resetPhoto();
+                  if (photoSource === "camera") {
+                    startCamera();
+                  }
                 }}
               >
                 <BackIcon className="size-4 md:size-5" />
-                Volver a Capturar
+                {photoSource === "camera" ? "Volver a Capturar" : "Elegir otra foto"}
               </button>
               <button
                 className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
@@ -301,6 +363,14 @@ export default function FrogsBulls() {
           </div>
         )}
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

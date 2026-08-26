@@ -11,3 +11,4 @@ flask-cors
 pytest
 tensorflow>=2.13.0
 scipy
+cloudinary

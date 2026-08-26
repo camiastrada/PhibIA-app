@@ -56,7 +56,8 @@ CREATE TABLE audios(
 
 CREATE TABLE imagenes(
     imagen_id SERIAL PRIMARY KEY,
-    ruta VARCHAR(100) NOT NULL,
+    ruta VARCHAR(255) NOT NULL,
+    public_id VARCHAR(255) NOT NULL,
     fecha_subida TIMESTAMP NOT NULL,
     usuario_id INT NOT NULL,
     ubicacion_id INT NOT NULL,

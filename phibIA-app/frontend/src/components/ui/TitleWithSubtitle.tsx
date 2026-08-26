@@ -11,7 +11,7 @@ export default function TitleWithSubtitle({title, subtitle, titleColor, subtitle
             style={{color: titleColor}}>
             {title}
         </h1>
-        <p className="text-md md:text-xl my-4 text-center px-10 font-normal font-sans"
+        <p className="text-md md:text-xl my-4 text-center px-4 md:px-10 font-normal font-sans"
             style={{color: subtitleColor}}>
             {subtitle}
         </p>
