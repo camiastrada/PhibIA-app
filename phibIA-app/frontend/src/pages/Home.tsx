@@ -10,8 +10,10 @@ import MicrophoneIcon from "../assets/uiIcons/microphoneIcon";
 import UploadIcon from "../assets/uiIcons/uploadIcon";
 import InfoIcon from "../assets/uiIcons/infoIcon";
 import BackIcon from "../assets/uiIcons/backIcon";
+import CameraIcon from "../assets/uiIcons/cameraIcon";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
+const AUDIO_ENABLED = false;
 
 function Home() {
   const [listening, setListening] = useState(false);
@@ -375,47 +377,66 @@ function Home() {
           {/* Botones grabar/importar */}
           {!hasPrediction && (
             <div className="flex flex-col justify-around items-center mt-4">
-              <button
-                type="button"
-                disabled = {isImport}
-                onClick={() => {
-                  listening ? stopRecording() : startRecording();
-                  setIsImport(false);
-                }}
-                className={`flex flex-row justify-center ${
-                  listening
-                    ? "bg-transparent text-red-600 animate-pulse"
-                    : isImport
-                    ? "bg-[#43A047] rounded-xl shadow-lg text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                    : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                }
-                ${isImport ? "" : "cursor-pointer"}`}
-              >
-                {listening ? (
-                  <StopRecordIcon className="size-15" />
-                ) : (
-                  <>
-                    <p>Grabar</p>
-                    <MicrophoneIcon className="size-6" />
-                  </>
-                )}
-              </button>
+              {AUDIO_ENABLED && (
+                <>
+                  <button
+                    type="button"
+                    disabled = {isImport}
+                    onClick={() => {
+                      listening ? stopRecording() : startRecording();
+                      setIsImport(false);
+                    }}
+                    className={`flex flex-row justify-center ${
+                      listening
+                        ? "bg-transparent text-red-600 animate-pulse"
+                        : isImport
+                        ? "bg-[#43A047] rounded-xl shadow-lg text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                        : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                    }
+                    ${isImport ? "" : "cursor-pointer"}`}
+                  >
+                    {listening ? (
+                      <StopRecordIcon className="size-15" />
+                    ) : (
+                      <>
+                        <p>Grabar</p>
+                        <MicrophoneIcon className="size-6" />
+                      </>
+                    )}
+                  </button>
 
-              <button
-                type="button"
-                disabled = {isImport}
-                onClick={() => {
-                  setIsImport(true);
-                  setListening(false);
-                  setUserLocation(null);
-                  setPredictedSpecies(null);
-                  setConfidence(null);
-                }}
-                className={`mt-4 text-[#004D40] flex-row justify-center items-center gap-1  ${isImport ? "" : "hover:text-[#02372E] cursor-pointer"}`}
-              >
-                Importar grabación
-                <UploadIcon className="size-4 inline-block" />
-              </button>
+                  <button
+                    type="button"
+                    disabled = {isImport}
+                    onClick={() => {
+                      setIsImport(true);
+                      setListening(false);
+                      setUserLocation(null);
+                      setPredictedSpecies(null);
+                      setConfidence(null);
+                    }}
+                    className={`mt-4 text-[#004D40] flex-row justify-center items-center gap-1  ${isImport ? "" : "hover:text-[#02372E] cursor-pointer"}`}
+                  >
+                    Importar grabación
+                    <UploadIcon className="size-4 inline-block" />
+                  </button>
+                </>
+              )}
+
+              {!AUDIO_ENABLED && (
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-[#004D40] text-sm md:text-base text-center">
+                    Ayúdanos a encontrar a la rana toro
+                  </p>
+                  <Link
+                    to="/add-photo"
+                    className="flex flex-row justify-center items-center gap-2 bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold cursor-pointer"
+                  >
+                    <p>Tomar Foto</p>
+                    <CameraIcon className="size-6" />
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 
