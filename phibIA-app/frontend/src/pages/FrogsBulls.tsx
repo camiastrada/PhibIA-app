@@ -244,12 +244,12 @@ export default function FrogsBulls() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-full max-w-3xl h-auto my-4 md:my-0 max-h-[calc(100vh-8rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
+    <div className="flex flex-col justify-center items-center w-full max-w-3xl h-auto my-4 md:my-0 max-h-[calc(100vh-4rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
       <div className="w-full h-full flex flex-col items-center justify-center">
         <TitleWithSubtitle
-          title={"¡Comienza a capturar!"}
+          title={"¿Descubriste una rana toro?"}
           subtitle={
-            "Acercate a la rana toro y toma una foto para notificar su ubicación"
+            "Tomale una foto para notificar su ubicación"
           }
         />
 

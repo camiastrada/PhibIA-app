@@ -57,14 +57,14 @@ export default function LocationMap() {
   }, []);
 
   return (
-    <div style={{ height: "80vh", width: "80vw", position: "relative" }}>
+    <div style={{ height: "80vh", width: "100%", position: "relative" }}>
       <div
         style={{
           position: "absolute",
           zIndex: 2,
           top: 10,
           left: 10,
-          width: "300px",
+          width: "min(300px, calc(100% - 20px))",
         }}
       >
         <SearchBox

@@ -13,7 +13,7 @@ export default function SidebarLabel({ to, id, label, isOpen, disabled }: Sideba
     <>    
       {disabled ? (
         <div
-          className="p-2 flex flex-row items-center h-15 whitespace-nowrap text-gray-400"
+          className="p-2 flex flex-row items-center h-12 whitespace-nowrap text-gray-400"
         >
           <label
             className={`text-lg ml-3 transition-all duration-300 ${
@@ -27,7 +27,7 @@ export default function SidebarLabel({ to, id, label, isOpen, disabled }: Sideba
         <Link
           to={to}
           id={id}
-          className="sidebarLabel p-2 flex flex-row items-center h-15 whitespace-nowrap"
+          className="sidebarLabel p-2 flex flex-row items-center h-12 whitespace-nowrap"
         >
           <label
             className={`text-lg ml-3 cursor-pointer transition-all duration-300 ${

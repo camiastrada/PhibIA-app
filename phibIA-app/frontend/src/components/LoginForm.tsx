@@ -74,8 +74,8 @@ export default function LoginForm() {
           <div className="bg-gradient-to-b from-black to-transparent absolute inset-0 h-1/3 md:hidden"></div>
           
           <div className="fixed mt-5 md:mt-0 md:relative top-0 md:inset-0 flex flex-col items-center z-10">
-            <h1 className="text-5xl mb-4 text-center text-white font-extrabold">phibIA</h1>   
-            <h2 className="text-lg mb-4 text-center text-white">Reconoce anfibios por su canto</h2>     
+            <h1 className="text-3xl md:text-5xl mb-4 text-center text-white font-extrabold">phibIA</h1>   
+            <h2 className="text-base md:text-lg mb-4 text-center text-white">Reconoce anfibios por su canto</h2>     
             <div className="relative hidden md:flex items-center mt-4 justify-center">
               <Link to="/register" className="absolute text-white font-semibold py-2 px-4 rounded-2xl border-1 border-white hover:border-2 transition-colors cursor-pointer">
                 Registrarse
@@ -84,7 +84,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 h-2/5 md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 z-10 md:rounded-r-xl rounded-t-4xl md:rounded-t-none">
+        <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 max-h-[70vh] md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 z-10 md:rounded-r-xl rounded-t-4xl md:rounded-t-none">
           <div className="flex flex-col items-center w-full">
             <h2 className="text-2xl font-bold mb-4 text-center text-[var(--color-text-main)] font-sans ">Iniciar Sesión</h2>
 
