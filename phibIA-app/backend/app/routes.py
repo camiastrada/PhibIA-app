@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from .models import Usuario, Audio, Especie, Ubicacion
+from .models import Usuario, Audio, Especie, Ubicacion, Imagen
 from datetime import datetime
 from .ml_model import predict_species
 from werkzeug.utils import secure_filename 
@@ -171,45 +171,144 @@ def init_routes(app):
         try:
             if 'image' not in request.files:
                 return jsonify({"error": "No se encontró la imagen"}), 400
-            
+
             file = request.files['image']
-            
+
             if file.filename == '':
                 return jsonify({"error": "Nombre de archivo vacío"}), 400
-            
-            if file and allowed_file(file.filename):
-                # Crear carpeta si no existe
-                os.makedirs(IMAGE_UPLOAD_FOLDER, exist_ok=True)
-                
-                # Crear nombre único para el archivo
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"frog_{timestamp}_{secure_filename(file.filename)}"
-                filepath = os.path.join(IMAGE_UPLOAD_FOLDER, filename)
-                
-                # Guardar el archivo
-                file.save(filepath)
-                
-                # Obtener ubicación si está disponible
-                lat = request.form.get('lat')
-                lng = request.form.get('lng')
-                
-                
-                return jsonify({
-                    "message": "Foto guardada exitosamente",
-                    "filename": filename,
-                    "filepath": filepath,
-                    "absolute_path": os.path.abspath(filepath),
-                    "location": {
-                        "lat": lat,
-                        "lng": lng
-                    } if lat and lng else None
-                }), 200
-            else:
+
+            if not allowed_file(file.filename):
                 return jsonify({"error": "Tipo de archivo no permitido"}), 400
-                
+
+            from .cloudinary_config import upload_image
+            result = upload_image(file)
+
+            usuario_id = None
+            ubicacion_id = None
+
+            try:
+                verify_jwt_in_request(optional=True)
+                user_id = get_jwt_identity()
+                if user_id:
+                    usuario_id = int(user_id)
+            except Exception:
+                pass
+
+            if usuario_id is None:
+                invitado = Usuario.query.filter_by(name='Invitado').first()
+                if invitado:
+                    usuario_id = invitado.usuario_id
+
+            lat = request.form.get('lat')
+            lng = request.form.get('lng')
+
+            if lat and lng:
+                ubicacion = Ubicacion.query.filter_by(latitud=lat, longitud=lng).first()
+                if not ubicacion:
+                    ubicacion = Ubicacion(
+                        descripcion="Ubicación del usuario",
+                        latitud=lat,
+                        longitud=lng
+                    )
+                    db.session.add(ubicacion)
+                    db.session.commit()
+                ubicacion_id = ubicacion.ubicacion_id
+            else:
+                ubicacion_default = Ubicacion.query.filter_by(descripcion="Desconocida").first()
+                if not ubicacion_default:
+                    ubicacion_default = Ubicacion(
+                        descripcion="Desconocida",
+                        latitud=0.0,
+                        longitud=0.0
+                    )
+                    db.session.add(ubicacion_default)
+                    db.session.commit()
+                ubicacion_id = ubicacion_default.ubicacion_id
+
+            imagen = Imagen(
+                ruta=result["url"],
+                public_id=result["public_id"],
+                fecha_subida=datetime.now(),
+                usuario_id=usuario_id,
+                ubicacion_id=ubicacion_id,
+            )
+            db.session.add(imagen)
+            db.session.commit()
+
+            return jsonify({
+                "message": "Foto guardada exitosamente",
+                "imagen_id": imagen.imagen_id,
+                "url": result["url"],
+                "location": {
+                    "lat": lat,
+                    "lng": lng
+                } if lat and lng else None
+            }), 200
+
         except Exception as e:
             print(f"Error al guardar foto: {e}")
             return jsonify({"error": "Error interno del servidor"}), 500
+
+
+    @app.route("/user/photos", methods=["GET"])
+    @jwt_required()
+    def get_user_photos():
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'message': 'Invalid token subject'}), 422
+
+        user = db.session.get(Usuario, current_user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 401
+
+        imagenes = Imagen.query.filter_by(usuario_id=current_user_id).order_by(Imagen.fecha_subida.desc()).all()
+
+        photos = []
+        for img in imagenes:
+            photos.append({
+                'imagen_id': img.imagen_id,
+                'url': img.ruta,
+                'fecha_subida': img.fecha_subida.isoformat(),
+                'ubicacion': {
+                    'id': img.ubicacion.ubicacion_id,
+                    'descripcion': img.ubicacion.descripcion,
+                    'latitud': img.ubicacion.latitud,
+                    'longitud': img.ubicacion.longitud,
+                } if img.ubicacion else None
+            })
+
+        return jsonify({
+            'photos': photos,
+            'total': len(photos)
+        }), 200
+
+
+    @app.route("/photo/<int:photo_id>", methods=["DELETE"])
+    @jwt_required()
+    def delete_photo(photo_id):
+        try:
+            current_user_id = int(get_jwt_identity())
+        except (TypeError, ValueError):
+            return jsonify({'message': 'Invalid token subject'}), 422
+
+        imagen = Imagen.query.filter_by(imagen_id=photo_id, usuario_id=current_user_id).first()
+        if not imagen:
+            return jsonify({'error': 'Photo not found or access denied'}), 404
+
+        try:
+            from .cloudinary_config import delete_image
+            delete_image(imagen.public_id)
+        except Exception as cloud_error:
+            print(f"Error eliminando de Cloudinary: {cloud_error}")
+
+        try:
+            db.session.delete(imagen)
+            db.session.commit()
+            return jsonify({'message': 'Photo deleted successfully'}), 200
+        except Exception as db_error:
+            db.session.rollback()
+            return jsonify({'error': f'Error deleting photo from database: {str(db_error)}'}), 500
 
 
     @app.route("/register", methods=["POST"])

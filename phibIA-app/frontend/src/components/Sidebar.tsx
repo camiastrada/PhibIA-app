@@ -57,8 +57,8 @@ export default function Sidebar() {
           <nav className="flex flex-col gap-6 w-full flex-1 justify-center mb-20">
             <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
             <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon} disabled = {isGuest}/>
-            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} disabled = {isGuest}/>  
-            <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />  
+            <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />  
+            <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} disabled = {isGuest}/>  
           </nav>
           
           {/* Perfil abajo */}
@@ -90,8 +90,8 @@ export default function Sidebar() {
           }`}>
             <SidebarLabel to="/" id="homeLabel" label="Inicio" isOpen={isOpen} />
             <SidebarLabel to="/captures" id="capturesLabel" label="Mis detecciones" isOpen={isOpen} disabled = {isGuest}/>
-            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen} disabled = {isGuest}/>
-            <SidebarLabel to="/map" id="mapLabel" label="Mapa de capturas" isOpen={isOpen} />
+            <SidebarLabel to="/encyclopedia" id="encyclopediaLabel" label="Enciclopedia" isOpen={isOpen}/>
+            <SidebarLabel to="/map" id="mapLabel" label="Mapa de capturas" isOpen={isOpen} disabled = {isGuest}/>
           </nav>
           
           <div className={`flex mb-3 h-12 transition-opacity duration-500 ${

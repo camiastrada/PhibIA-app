@@ -330,7 +330,7 @@ function Home() {
   return (
     <>
       {isImport && (
-        <div className="absolute flex w-auto flex-col justify-center items-center z-10">
+        <div className="absolute flex w-auto flex-col justify-center items-center z-10 max-w-full overflow-hidden">
           <Upload
             handleFileChange={handleFileChange}
             handleImportSubmit={handleImportSubmit}
@@ -390,8 +390,8 @@ function Home() {
                       listening
                         ? "bg-transparent text-red-600 animate-pulse"
                         : isImport
-                        ? "bg-[#43A047] rounded-xl shadow-lg text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                        : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                        ? "bg-[#43A047] rounded-xl shadow-lg text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                        : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
                     }
                     ${isImport ? "" : "cursor-pointer"}`}
                   >
@@ -457,7 +457,7 @@ function Home() {
                   to={`/map?lat=${(userLocation || manualLocation)?.lat}&lng=${
                     (userLocation || manualLocation)?.lng
                   }&especie=${encodeURIComponent(commonName || "")}`} // ✅ USA commonName
-                  className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                  className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
                 >
                   Ver en mapa
                 </Link>
@@ -466,7 +466,7 @@ function Home() {
               <button
                 type="button"
                 onClick={resetState}
-                className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-50 md:w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
               >
                 Volver
                 <BackIcon className="size-5" />
