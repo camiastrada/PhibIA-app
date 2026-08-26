@@ -129,11 +129,11 @@ export default function LoginForm() {
                 <hr className="border-slate-400 px-4 w-full" />
               </div>
 
-              <button type="button" className="w-full bg-(--color-text-main) text-white py-2 rounded-lg hover:bg-(--color-text-hover) active:bg-[#388e3c] transition cursor-pointer" disabled={loading}
+              <button type="button" className="w-full bg-(--color-text-main) text-white py-2 rounded-lg hover:bg-(--color-text-hover) active:bg-[#388e3c] transition cursor-pointer"
               onClick={() => {
                 navigate('/');
-              }}> 
-                {loading ? 'Ingresando...' : 'Ingresar como invitado'}
+              }}>
+                Ingresar como invitado
               </button>            </div>
           </div>
         </form>
