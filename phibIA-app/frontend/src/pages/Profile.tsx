@@ -4,6 +4,7 @@ import ProfilePanel from "../components/ui/ProfilePanel";
 import EditIcon from "../assets/uiIcons/editIcon";
 import LogoutButton from "../components/LogoutButton";
 import LoginButton from "../components/LoginButton";
+import RegisterButton from "../components/RegisterButton";
 import AvatarSelector from "../components/avatars/AvatarSelector";
 import { useAuth } from "../context/AuthContext";
 
@@ -53,7 +54,12 @@ function Profile() {
 
         <p className="text-lg font-medium mt-2 mb-6"> {user?.name || "Invitado"} </p>
 
-        {isGuest ? (<LoginButton/>) : (<LogoutButton />)}
+        {isGuest ? (
+          <div className="flex flex-row flex-wrap justify-center">
+            <LoginButton/>
+            <RegisterButton/>
+          </div>
+        ) : (<LogoutButton />)}
       </div>
 
       <div id="info" className={` flex-col w-1/2 items-center justify-center gap-4
