@@ -2,12 +2,13 @@ from flask import jsonify, request
 from .models import Usuario, Audio, Especie, Ubicacion, Imagen
 from datetime import datetime
 from .ml_model import predict_species
-from werkzeug.utils import secure_filename 
+from werkzeug.utils import secure_filename
 from . import db
 import os
+import re
 from flask_jwt_extended import (
-    create_access_token, 
-    jwt_required, 
+    create_access_token,
+    jwt_required,
     get_jwt_identity,
     unset_jwt_cookies,
     set_access_cookies,
@@ -17,6 +18,15 @@ from flask_jwt_extended import (
 UPLOAD_FOLDER = "app/uploads"
 IMAGE_UPLOAD_FOLDER = "app/uploads/images"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$')
+PASSWORD_REQUIREMENTS_MESSAGE = (
+    "La contraseña debe tener al menos 8 caracteres, "
+    "incluyendo al menos una letra y un número"
+)
+
+def is_valid_password(password):
+    return bool(password) and PASSWORD_REGEX.match(password) is not None
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -320,6 +330,9 @@ def init_routes(app):
 
         if not name or not email or not password:
             return jsonify({"error": "Missing data"}), 400
+
+        if not is_valid_password(password):
+            return jsonify({"error": PASSWORD_REQUIREMENTS_MESSAGE}), 400
 
         if Usuario.query.filter((Usuario.email == email)
         ).first():
