@@ -2,7 +2,7 @@
 import Sidebar from "../components/Sidebar";
 import Bottombar from "../components/Bottombar";
 import { Outlet } from "react-router-dom";
-import Background from "/images/bgMainImage.jpg";
+import Background from "/images/bgMainImage.png";
 
 export default function DashboardLayout() {
   return (
