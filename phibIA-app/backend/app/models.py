@@ -86,6 +86,23 @@ class Audio(db.Model):
     def __repr__(self):
         return f'<Audio {self.audio_id}>'
 
+class Imagen(db.Model):
+    __tablename__ = 'imagenes'
+
+    imagen_id = db.Column(db.Integer, primary_key=True)
+    ruta = db.Column(db.String(255), nullable=False)
+    public_id = db.Column(db.String(255), nullable=False)
+    fecha_subida = db.Column(db.DateTime, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
+    ubicacion_id = db.Column(db.Integer, db.ForeignKey('ubicaciones.ubicacion_id'), nullable=False)
+
+    usuario = db.relationship('Usuario', backref='imagenes')
+    ubicacion = db.relationship('Ubicacion', backref='imagenes')
+
+    def __repr__(self):
+        return f'<Imagen {self.imagen_id}>'
+
+
 class UsuarioEspecie(db.Model):
     __tablename__ = 'usuarios_especies'
 

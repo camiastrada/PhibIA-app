@@ -9,6 +9,7 @@
   background-color: #152C28;
   --color-bg-light: #e8f5e9;
   --color-text-main: #004D40;
+  --color-text-hover: #023b32;
   --color-text-secondary: #43a047;
 }
 
@@ -46,4 +47,19 @@
 /* Oculta scrollbar en Firefox */
 .scrollbar-hidden {
   scrollbar-width: none;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
 }

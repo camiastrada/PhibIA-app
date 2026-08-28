@@ -16,19 +16,19 @@ export default function SidebarIcon({ to, icon: Icon, id, disabled }: SidebarIco
       
       {disabled ? (
         <div
-          className={`p-2 h-15 text-gray-400`}
+          className={`p-2 h-12 text-gray-400`}
           >
-          <Icon className="size-10 inline-block" />
+          <Icon className="size-8 inline-block" />
           </div>
       ) : (
         <Link
           to={to}
           id={id}
-          className={`sidebarIcon p-2 h-15 group inline-block${
+          className={`sidebarIcon p-2 h-12 group inline-block${
             pathname === to ? "md:pl-0 md:border-l-6 md:border-l-[#43a047] md:text-[#43a047]" : ""
           }`}
           >
-          <Icon className="size-10 inline-block" />
+          <Icon className="size-8 inline-block" />
         </Link>
       )}
     </>

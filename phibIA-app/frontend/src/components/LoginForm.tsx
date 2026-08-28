@@ -71,11 +71,11 @@ export default function LoginForm() {
 
         <div className="absolute md:relative z-0 w-full md:w-1/2 h-full md:rounded-l-xl flex flex-col items-center justify-center p-8" style={{ backgroundImage: `url(${LoginImage})`, backgroundSize: 'cover', backgroundPosition: 'top' }}>
           <div className="absolute inset-0 bg-black opacity-40 md:rounded-l-xl"></div>
-          <div className="bg-gradient-to-b from-black to-transparent absolute inset-0 h-1/3 md:hidden"></div>
+          <div className="bg-linear-to-b from-black to-transparent absolute inset-0 h-1/3 md:hidden"></div>
           
           <div className="fixed mt-5 md:mt-0 md:relative top-0 md:inset-0 flex flex-col items-center z-10">
-            <h1 className="text-5xl mb-4 text-center text-white font-extrabold">phibIA</h1>   
-            <h2 className="text-lg mb-4 text-center text-white">Reconoce anfibios por su canto</h2>     
+            <h1 className="text-3xl md:text-5xl mb-4 text-center text-white font-extrabold">phibIA</h1>   
+            <h2 className="text-base md:text-lg mb-4 text-center text-white">Reconoce anfibios por su canto</h2>     
             <div className="relative hidden md:flex items-center mt-4 justify-center">
               <Link to="/register" className="absolute text-white font-semibold py-2 px-4 rounded-2xl border-1 border-white hover:border-2 transition-colors cursor-pointer">
                 Registrarse
@@ -84,9 +84,9 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 h-2/5 md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 z-10 md:rounded-r-xl rounded-t-4xl md:rounded-t-none">
+        <form onSubmit={handleSubmit} className="fixed md:relative bottom-0 p-6 md:p-8 md:h-full w-full md:w-1/2 flex flex-col justify-center items-center bg-white/80 z-10 md:rounded-r-xl rounded-t-4xl md:rounded-t-none">
           <div className="flex flex-col items-center w-full">
-            <h2 className="text-2xl font-bold mb-4 text-center text-[var(--color-text-main)] font-sans ">Iniciar Sesión</h2>
+            <h2 className="text-2xl font-bold mb-4 text-center text-(--color-text-main) font-sans ">Iniciar Sesión</h2>
 
             <div className="w-full max-w-sm">
 
@@ -122,7 +122,19 @@ export default function LoginForm() {
                 <a href="/register" className="text-sm text-blue-500 hover:text-blue-700 active:text-blue-700 mt-3 block md:hidden text-right">Registrarse</a >
                 <a href="" className="text-sm text-slate-500 hover:text-slate-700 active:text-slate-700 mt-3 block text-right">Olvidé mi contraseña</a >
               </div>
-            </div>
+
+              <div className="flex items-center justify-center mb-4 gap-2">
+                <hr className="border-slate-400 px-4 w-full" />
+                <h1 className="text-slate-500">o</h1>
+                <hr className="border-slate-400 px-4 w-full" />
+              </div>
+
+              <button type="button" className="w-full bg-(--color-text-main) text-white py-2 rounded-lg hover:bg-(--color-text-hover) active:bg-[#388e3c] transition cursor-pointer" disabled={loading}
+              onClick={() => {
+                navigate('/');
+              }}> 
+                {loading ? 'Ingresando...' : 'Ingresar como invitado'}
+              </button>            </div>
           </div>
         </form>
     </div>

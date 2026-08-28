@@ -71,10 +71,10 @@ function Encyclopedia() {
             {species.map((sp) => (
               <div
                 key={sp.nombre_cientifico}
-                className="bg-white/90 rounded-2xl shadow-lg p-4 text-[#004D40] rounded-2xl shadow-lg p-4 text-white"
+                className="bg-white/90 rounded-2xl shadow-lg p-4 text-[#004D40]"
               >
                 {/* Foto */}
-                <div className="w-full h-40 rounded-xl overflow-hidden bg-white/20 mb-4 flex items-center justify-center">
+                <div className="w-full h-32 md:h-40 rounded-xl overflow-hidden bg-white/20 mb-3 md:mb-4 flex items-center justify-center">
                   {sp.imagen && !imageErrors[sp.nombre_cientifico] ? (
                     <img
                       src={`${API_URL}/species/${sp.imagen}`}
@@ -103,9 +103,7 @@ function Encyclopedia() {
                 </div>
 
                 {/* Nombres */}
-                <h3 className="text-xl font-bold text-[#004D40]">
-                  {sp.nombre_cientifico}
-                </h3>
+                <h3 className="text-base md:text-xl font-bold text-[#004D40] truncate">{sp.nombre_cientifico}</h3>
                 <p className="text-[#004D40]/80">{sp.nombre_comun}</p>
 
                 {/* Botón */}

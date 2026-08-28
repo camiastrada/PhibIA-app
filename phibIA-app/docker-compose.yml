@@ -44,6 +44,9 @@ services:
       - POSTGRES_DATABASE=anfibios
       - POSTGRES_PORT=5432
       - JWT_SECRET_KEY=cd0562e2a7cce7ce24d960874ac7bb01349507dffa165f1c9f58a5676cbe9cf1
+      - CLOUDINARY_CLOUD_NAME=dksq6fnev
+      - CLOUDINARY_API_KEY=155444477795147
+      - CLOUDINARY_API_SECRET=6hjNEaLoDQSR7uBUBlu-nwkrfek
     command: python run.py
     depends_on:
       db:

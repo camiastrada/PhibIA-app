@@ -185,8 +185,8 @@ function Detections() {
   }
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-y-auto">
-      <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
+    <div className="flex flex-col items-center justify-center px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-y-auto">
+      <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 my-auto">
         <TitleWithSubtitle
           title="Mis Detecciones"
           subtitle={`${detections.length} ${
