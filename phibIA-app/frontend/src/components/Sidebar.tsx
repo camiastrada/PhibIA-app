@@ -9,7 +9,7 @@ import CapturesIcon from "../assets/sidebarIcons/mydetections.tsx";
 import EncyclopediaIcon from "../assets/sidebarIcons/encyclopedia.tsx";
 import MapIcon from "../assets/sidebarIcons/mapIcon.tsx";
 import OcultBar from "../assets/sidebarIcons/ocultBar.tsx";
-import FrogsBullsIcon from "../assets/sidebarIcons/frogsBullsIcon.tsx";
+import GaleryIcon from "../assets/sidebarIcons/galery.tsx";
 import ShowBar from "../assets/sidebarIcons/showBar.tsx";
 import ProfilePanel from "./ui/ProfilePanel";
 import { useAuth } from "../context/AuthContext.tsx";
@@ -68,7 +68,7 @@ export default function Sidebar() {
               disabled={isGuest}
             />
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />
-            <SidebarIcon to="/galery" id="galeryIcon" icon={FrogsBullsIcon} />
+            <SidebarIcon to="/galery" id="galeryIcon" icon={GaleryIcon} />
           </nav>
 
           <div className="h-16 flex items-center justify-center mt-4">
