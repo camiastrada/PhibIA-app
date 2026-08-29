@@ -273,6 +273,7 @@ def init_routes(app):
             }), 200
 
         except Exception as e:
+            db.session.rollback()
             print(f"Error al guardar foto: {e}")
             return jsonify({"error": "Error interno del servidor"}), 500
 
