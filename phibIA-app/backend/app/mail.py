@@ -19,7 +19,7 @@ def send_reset_email(to_email: str, reset_link: str):
 
     msg = MIMEText(body)
     msg["Subject"] = subject
-    msg["From"] = "phibIA <no-responder@phibia.app>"
+    msg["From"] = "phibIA <phibia.support@gmail.com>"
     msg["To"] = to_email
 
     with smtplib.SMTP(BREVO_SMTP_HOST, BREVO_SMTP_PORT) as server:
