@@ -18,6 +18,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const { user, refreshUser } = useAuth();
   const isGuest = !user;
+  const isAdmin = user?.rol === "admin";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -67,18 +68,24 @@ export default function Sidebar() {
               icon={EncyclopediaIcon}
             />
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />
-            <SidebarIcon to="/galery" id="galeryIcon" icon={GaleryIcon} />
+            {isAdmin && (
+              <SidebarIcon to="/galery" id="galeryIcon" icon={GaleryIcon} />
+            )}
           </nav>
-
-          <div className="h-16 flex items-center justify-center mt-4">
-            <Link
-              to="/profile"
-              id="profileIcon"
-              className="size-12 rounded-full outline-2 flex items-center justify-center"
-            >
-              <ProfilePanel className="size-12 border-none" />
-            </Link>
-          </div>
+          
+          {/* Perfil abajo */}
+          <Link
+            to="/profile"
+            id="profileIcon"
+            className="relative size-12 rounded-full outline-2 flex items-center justify-center mt-4"
+          >
+            <ProfilePanel className="size-12 border-none"/>
+            {isGuest && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full size-4 flex items-center justify-center border border-white">
+                !
+              </span>
+            )}
+          </Link>
         </div>
 
         <div
@@ -126,12 +133,14 @@ export default function Sidebar() {
               label="Mapa de capturas"
               isOpen={isOpen}
             />
-            <SidebarLabel
-              to="/galery"
-              id="galeryLabel"
-              label="Galeria"
-              isOpen={isOpen}
-            />
+            {isAdmin && (
+              <SidebarLabel
+                to="/galery"
+                id="galeryLabel"
+                label="Galeria"
+                isOpen={isOpen}
+              />
+            )}
           </nav>
 
           <div

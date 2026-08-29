@@ -2,15 +2,17 @@ import PhotoCard from "./PhotoCard";
 
 interface Photo {
   id: number;
-  url: string;
+  url: string | null;
   titulo: string;
   ubicacion: string;
   usuario: string;
-  esMia: boolean;
 }
 
 interface CardGridProps {
   fotos: Photo[];
+  onConfirmar?: (id: number) => void;
+  onRechazar?: (id: number) => void;
+  reviewingId?: number | null;
 }
 
 function CardGrid(props: CardGridProps) {
@@ -23,7 +25,13 @@ function CardGrid(props: CardGridProps) {
           title={photo.titulo}
           ubicacion={photo.ubicacion}
           usuario={photo.usuario}
-          esMia={photo.esMia}
+          isReviewing={props.reviewingId === photo.id}
+          onConfirmar={
+            props.onConfirmar ? () => props.onConfirmar!(photo.id) : undefined
+          }
+          onRechazar={
+            props.onRechazar ? () => props.onRechazar!(photo.id) : undefined
+          }
         />
       ))}
     </div>

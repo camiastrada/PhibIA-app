@@ -2,12 +2,14 @@ from flask import jsonify, request
 from .models import Usuario, Audio, Especie, Ubicacion, Imagen
 from datetime import datetime
 from .ml_model import predict_species
-from werkzeug.utils import secure_filename 
+from werkzeug.utils import secure_filename
+from .decorators import admin_required
 from . import db
 import os
+import re
 from flask_jwt_extended import (
-    create_access_token, 
-    jwt_required, 
+    create_access_token,
+    jwt_required,
     get_jwt_identity,
     unset_jwt_cookies,
     set_access_cookies,
@@ -17,6 +19,15 @@ from flask_jwt_extended import (
 UPLOAD_FOLDER = "app/uploads"
 IMAGE_UPLOAD_FOLDER = "app/uploads/images"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$')
+PASSWORD_REQUIREMENTS_MESSAGE = (
+    "La contraseña debe tener al menos 8 caracteres, "
+    "incluyendo al menos una letra y un número"
+)
+
+def is_valid_password(password):
+    return bool(password) and PASSWORD_REGEX.match(password) is not None
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -28,11 +39,11 @@ def init_routes(app):
     def home():
         return "App funcionando!"
 
-    @app.route("/ubicaciones", methods=["GET"])  
+    @app.route("/ubicaciones", methods=["GET"])
     def get_ubicaciones():
-        # Obtener ubicaciones con información de especie
+        # Obtener ubicaciones con información de especie (detecciones por audio)
         ubicaciones = db.session.query(
-            Ubicacion, 
+            Ubicacion,
             Especie.nombre_comun,
             Audio.fecha_grabacion
         ).join(
@@ -46,10 +57,25 @@ def init_routes(app):
                 "latitud": u.Ubicacion.latitud,
                 "longitud": u.Ubicacion.longitud,
                 "nombre": u.nombre_comun,
-                "fecha_grabacion": u.fecha_grabacion.isoformat() if u.fecha_grabacion else None
+                "fecha_grabacion": u.fecha_grabacion.isoformat() if u.fecha_grabacion else None,
+                "tipo": "especie"
             }
             for u in ubicaciones
         ]
+
+        # Sumar avistamientos de rana toro confirmados por un admin (fotos)
+        ranas_toro = db.session.query(Imagen).filter_by(estado='confirmada').all()
+        result += [
+            {
+                "latitud": img.ubicacion.latitud,
+                "longitud": img.ubicacion.longitud,
+                "nombre": "Rana toro",
+                "fecha_grabacion": img.fecha_revision.isoformat() if img.fecha_revision else img.fecha_subida.isoformat(),
+                "tipo": "rana_toro"
+            }
+            for img in ranas_toro if img.ubicacion
+        ]
+
         return jsonify(result)
 
 
@@ -201,12 +227,13 @@ def init_routes(app):
 
             lat = request.form.get('lat')
             lng = request.form.get('lng')
+            descripcion = request.form.get('descripcion', 'Ubicación del usuario')
 
             if lat and lng:
                 ubicacion = Ubicacion.query.filter_by(latitud=lat, longitud=lng).first()
                 if not ubicacion:
                     ubicacion = Ubicacion(
-                        descripcion="Ubicación del usuario",
+                        descripcion=descripcion if descripcion else 'Ubicación del usuario',
                         latitud=lat,
                         longitud=lng
                     )
@@ -270,6 +297,8 @@ def init_routes(app):
                 'imagen_id': img.imagen_id,
                 'url': img.ruta,
                 'fecha_subida': img.fecha_subida.isoformat(),
+                'estado': img.estado,
+                'fecha_revision': img.fecha_revision.isoformat() if img.fecha_revision else None,
                 'ubicacion': {
                     'id': img.ubicacion.ubicacion_id,
                     'descripcion': img.ubicacion.descripcion,
@@ -282,6 +311,114 @@ def init_routes(app):
             'photos': photos,
             'total': len(photos)
         }), 200
+
+
+    @app.route("/photos/all", methods=["GET"])
+    @admin_required
+    def get_all_photos():
+        """Cola de revisión: fotos de todos los usuarios que todavía no fueron revisadas."""
+        imagenes = Imagen.query.filter_by(estado='pendiente').order_by(Imagen.fecha_subida.desc()).all()
+
+        photos = []
+        for img in imagenes:
+            photos.append({
+                'imagen_id': img.imagen_id,
+                'url': img.ruta,
+                'fecha_subida': img.fecha_subida.isoformat(),
+                'estado': img.estado,
+                'usuario': {
+                    'id': img.usuario.usuario_id,
+                    'nombre': img.usuario.name,
+                } if img.usuario else None,
+                'ubicacion': {
+                    'id': img.ubicacion.ubicacion_id,
+                    'descripcion': img.ubicacion.descripcion,
+                    'latitud': img.ubicacion.latitud,
+                    'longitud': img.ubicacion.longitud,
+                } if img.ubicacion else None
+            })
+
+        return jsonify({
+            'photos': photos,
+            'total': len(photos)
+        }), 200
+
+
+    @app.route("/photos/rana-toro", methods=["GET"])
+    @admin_required
+    def get_ranas_toro_confirmadas():
+        """Registro de avistamientos de rana toro confirmados (la foto ya fue borrada de la nube)."""
+        imagenes = Imagen.query.filter_by(estado='confirmada').order_by(Imagen.fecha_revision.desc()).all()
+
+        registros = [
+            {
+                'imagen_id': img.imagen_id,
+                'fecha': (img.fecha_revision or img.fecha_subida).isoformat(),
+                'usuario': {
+                    'id': img.usuario.usuario_id,
+                    'nombre': img.usuario.name,
+                } if img.usuario else None,
+                'ubicacion': {
+                    'descripcion': img.ubicacion.descripcion,
+                    'latitud': img.ubicacion.latitud,
+                    'longitud': img.ubicacion.longitud,
+                } if img.ubicacion else None
+            }
+            for img in imagenes
+        ]
+
+        return jsonify({
+            'registros': registros,
+            'total': len(registros)
+        }), 200
+
+
+    @app.route("/photo/<int:photo_id>/review", methods=["PUT"])
+    @admin_required
+    def review_photo(photo_id):
+        """
+        El admin confirma o descarta si una foto muestra una rana toro.
+        En ambos casos la imagen se borra de Cloudinary (ahorro de espacio);
+        el registro en la base queda con el estado final.
+        """
+        current_user_id = int(get_jwt_identity())
+        data = request.get_json() or {}
+
+        if 'es_rana_toro' not in data:
+            return jsonify({'error': 'Falta el campo es_rana_toro'}), 400
+
+        es_rana_toro = bool(data.get('es_rana_toro'))
+
+        imagen = Imagen.query.filter_by(imagen_id=photo_id).first()
+        if not imagen:
+            return jsonify({'error': 'Foto no encontrada'}), 404
+
+        if imagen.estado != 'pendiente':
+            return jsonify({'error': 'Esta foto ya fue revisada'}), 400
+
+        if imagen.public_id:
+            try:
+                from .cloudinary_config import delete_image
+                delete_image(imagen.public_id)
+            except Exception as cloud_error:
+                print(f"Error eliminando de Cloudinary: {cloud_error}")
+
+        imagen.estado = 'confirmada' if es_rana_toro else 'rechazada'
+        imagen.fecha_revision = datetime.now()
+        imagen.revisado_por = current_user_id
+        imagen.ruta = None
+        imagen.public_id = None
+
+        try:
+            db.session.commit()
+            return jsonify({
+                'message': 'Foto revisada correctamente',
+                'imagen_id': imagen.imagen_id,
+                'estado': imagen.estado
+            }), 200
+        except Exception as db_error:
+            db.session.rollback()
+            return jsonify({'error': f'Error al guardar la revisión: {str(db_error)}'}), 500
 
 
     @app.route("/photo/<int:photo_id>", methods=["DELETE"])
@@ -321,6 +458,9 @@ def init_routes(app):
         if not name or not email or not password:
             return jsonify({"error": "Missing data"}), 400
 
+        if not is_valid_password(password):
+            return jsonify({"error": PASSWORD_REQUIREMENTS_MESSAGE}), 400
+
         if Usuario.query.filter((Usuario.email == email)
         ).first():
             return jsonify({"error": "This email is taken"}), 400
@@ -358,12 +498,13 @@ def init_routes(app):
             access_token = create_access_token(identity=user_identity)
             response = jsonify({
                 'message': 'Successful login',
-                'user_info': { 
+                'user_info': {
                     'id': user.usuario_id,
                     'name': user.name,
                     'email': user.email,
                     'avatar_id': user.avatar_id,
-                    'background_color': user.background_color
+                    'background_color': user.background_color,
+                    'rol': user.rol
                 }
             })
             set_access_cookies(response, access_token)
@@ -385,7 +526,8 @@ def init_routes(app):
             "name": user.name,
             "email": user.email,
             "avatar_id": user.avatar_id,
-            "background_color": user.background_color
+            "background_color": user.background_color,
+            "rol": user.rol
         })
     
     @app.route("/update_avatar", methods=["PUT"])
@@ -490,10 +632,14 @@ def init_routes(app):
         return jsonify({'status': 'healthy'}), 200
 
     @app.route('/user/captures', methods=['GET'])
+    
+    
     @jwt_required()
     def get_user_detections():
         """
-        Obtiene todas las detecciones (audios) del usuario autenticado
+        Obtiene las detecciones (audios):
+        - Si es admin: todos los audios del sistema.
+        - Si es usuario común: solo sus propios audios.
         """
         try:
             current_user_id = int(get_jwt_identity())
@@ -504,12 +650,18 @@ def init_routes(app):
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
-        # Obtener todos los audios del usuario con información relacionada
-        audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+        # --- DIFERENCIACIÓN POR ROL ---
+        if user.rol == 'admin':
+            # Admin ve todos los audios ordenados por fecha
+            audios = Audio.query.order_by(Audio.fecha_grabacion.desc()).all()
+        else:
+            # Usuario común solo ve sus propios audios
+            audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+        # -----------------------------
 
         detections = []
         for audio in audios:
-            detections.append({
+            detection_item = {
                 'audio_id': audio.audio_id,
                 'ruta': audio.ruta,
                 'fecha_grabacion': audio.fecha_grabacion.isoformat(),
@@ -524,12 +676,24 @@ def init_routes(app):
                     'id': audio.ubicacion.ubicacion_id,
                     'descripcion': audio.ubicacion.descripcion
                 }
-            })
+            }
+            
+            # Opcional útil: Si eres admin, quizás te sirva saber a qué usuario pertenece cada audio
+            if user.rol == 'admin' and hasattr(audio, 'usuario'):
+                detection_item['usuario'] = {
+                    'id': audio.usuario.usuario_id,
+                    'nombre': audio.usuario.name,
+                    'email': audio.usuario.email
+                }
+
+            detections.append(detection_item)
 
         return jsonify({
             'detections': detections,
             'total': len(detections)
         }), 200
+    
+    
     
     @app.route('/audio/<int:audio_id>', methods=['GET'])
     @jwt_required()
@@ -542,9 +706,16 @@ def init_routes(app):
         except (TypeError, ValueError):
             return jsonify({'message': 'Invalid token subject'}), 422
 
-        # Verificar que el audio existe y pertenece al usuario
-        audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
-        
+        user = db.session.get(Usuario, current_user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 401
+
+        # El admin puede escuchar el audio de cualquier usuario; el resto solo el propio
+        if user.rol == 'admin':
+            audio = Audio.query.filter_by(audio_id=audio_id).first()
+        else:
+            audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
+
         if not audio:
             return jsonify({'error': 'Audio not found or access denied'}), 404
 

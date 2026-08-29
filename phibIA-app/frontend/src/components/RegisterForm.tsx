@@ -10,6 +10,10 @@ interface RegisterFormData {
   password: string;
 }
 
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+const PASSWORD_REQUIREMENTS_MESSAGE =
+  "La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra y un número";
+
 export default function RegisterForm() {
 
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -41,6 +45,10 @@ export default function RegisterForm() {
     }
     if (!formData.user || !formData.email || !formData.password || !confirmPassword) {
       setError("Por favor, completa todos los campos");
+      return;
+    }
+    if (!PASSWORD_REGEX.test(formData.password)) {
+      setError(PASSWORD_REQUIREMENTS_MESSAGE);
       return;
     }
     setError("");
@@ -99,6 +107,10 @@ export default function RegisterForm() {
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
               }/>
+
+              <p className="text-xs text-slate-500 -mt-3 mb-3">
+                Mínimo 8 caracteres, con al menos una letra y un número
+              </p>
 
               <TextField type="password" placeholder="Confirmar contraseña" color="#C0592B" onChange={(e) => setConfirmPassword(e.target.value)} icon={
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6 text-slate-500 md:hidden lg:block">

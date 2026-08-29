@@ -90,14 +90,20 @@ class Imagen(db.Model):
     __tablename__ = 'imagenes'
 
     imagen_id = db.Column(db.Integer, primary_key=True)
-    ruta = db.Column(db.String(255), nullable=False)
-    public_id = db.Column(db.String(255), nullable=False)
+    ruta = db.Column(db.String(255), nullable=True)
+    public_id = db.Column(db.String(255), nullable=True)
     fecha_subida = db.Column(db.DateTime, nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
     ubicacion_id = db.Column(db.Integer, db.ForeignKey('ubicaciones.ubicacion_id'), nullable=False)
 
-    usuario = db.relationship('Usuario', backref='imagenes')
+    # Revisión del admin: pendiente | confirmada (es rana toro) | rechazada (no es rana toro)
+    estado = db.Column(db.String(20), nullable=False, default='pendiente')
+    fecha_revision = db.Column(db.DateTime, nullable=True)
+    revisado_por = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=True)
+
+    usuario = db.relationship('Usuario', backref='imagenes', foreign_keys=[usuario_id])
     ubicacion = db.relationship('Ubicacion', backref='imagenes')
+    revisor = db.relationship('Usuario', foreign_keys=[revisado_por])
 
     def __repr__(self):
         return f'<Imagen {self.imagen_id}>'
