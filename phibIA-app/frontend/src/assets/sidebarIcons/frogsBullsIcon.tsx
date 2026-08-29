@@ -1,12 +1,8 @@
-export default function FrogsBullsIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="../src/assets/frogs1.png"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <circle cx="12" cy="12" r="10" />
-    </svg>
-  );
-}
+import type { ImgHTMLAttributes } from "react";
+import miImagen from "../frog2.png";
+
+const MiIcono = (props: ImgHTMLAttributes<HTMLImageElement>) => (
+  <img src={miImagen} alt="Mi ícono" className="size-6" {...props} />
+);
+
+export default MiIcono;

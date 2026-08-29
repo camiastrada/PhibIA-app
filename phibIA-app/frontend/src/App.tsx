@@ -8,8 +8,9 @@ import FrogsMap from "./pages/Maps";
 import "./styles/App.css";
 import FrogsBulls from "./pages/FrogsBulls";
 import Detections from "./pages/Detections";
-import InfoFrog from './pages/InfoFrog';
-import Encyclopedia from './pages/Encyclopedia';
+import InfoFrog from "./pages/InfoFrog";
+import Encyclopedia from "./pages/Encyclopedia";
+import Galery from "./pages/Galery";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/map" element={<FrogsMap />} />
           <Route path="/encyclopedia" element={<Encyclopedia />} />
           <Route path="/encyclopedia/:specieNumber" element={<InfoFrog />} />
+          <Route path="/galery" element={<Galery />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
