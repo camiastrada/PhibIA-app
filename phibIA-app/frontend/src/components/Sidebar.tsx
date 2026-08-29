@@ -66,7 +66,6 @@ export default function Sidebar() {
               to="/encyclopedia"
               id="encyclopediaIcon"
               icon={EncyclopediaIcon}
-              disabled={isGuest}
             />
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />
             {isAdmin && (
@@ -127,7 +126,6 @@ export default function Sidebar() {
               id="encyclopediaLabel"
               label="Enciclopedia"
               isOpen={isOpen}
-              disabled={isGuest}
             />
             <SidebarLabel
               to="/map"
