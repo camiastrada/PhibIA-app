@@ -184,12 +184,12 @@ function InfoFrog() {
             
             {/* Imagen */}
             <div className="flex justify-center mb-6 w-full">
-              <div className="relative w-full max-w-md h-48 md:h-64 rounded-2xl overflow-hidden shadow-xl">
+              <div className="relative w-full max-w-md h-44 md:h-60 rounded-2xl overflow-hidden shadow-xl">
                 {species.imagen && !imageError ? (
                   <img
                     src={`${API_URL}/species/${species.imagen}`}
                     alt={species.nombre_cientifico}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     onError={() => setImageError(true)}
                   />
                 ) : (
@@ -237,9 +237,10 @@ function InfoFrog() {
                 </svg>
                 Descripción
               </h3>
-              <p className="text-gray-700 leading-relaxed text-justify">
-                {species.descripcion}
-              </p>
+              <div
+                className="text-gray-700 leading-relaxed text-justify [&_b]:text-[#004D40] [&_b]:font-bold"
+                dangerouslySetInnerHTML={{ __html: species.descripcion }}
+              />
             </div>
     
             {/* Cards de información */}
@@ -268,13 +269,13 @@ function InfoFrog() {
             {/* Botón volver */}
             <div className="flex justify-center pb-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate(-1)}
                 className="bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-5 md:px-8 rounded-xl transition-colors shadow-lg flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Volver al inicio
+                Volver atrás
               </button>
             </div>
     
