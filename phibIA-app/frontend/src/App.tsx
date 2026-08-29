@@ -11,6 +11,8 @@ import Detections from "./pages/Detections";
 import InfoFrog from "./pages/InfoFrog";
 import Encyclopedia from "./pages/Encyclopedia";
 import Galery from "./pages/Galery";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

@@ -1,7 +1,8 @@
 
+DROP TABLE IF EXISTS password_reset_tokens;
 DROP TABLE IF EXISTS audios;
-DROP TABLE IF EXISTS imagenes; 
-DROP TABLE IF EXISTS ubicaciones; 
+DROP TABLE IF EXISTS imagenes;
+DROP TABLE IF EXISTS ubicaciones;
 DROP TABLE IF EXISTS usuarios_especies;
 DROP TABLE IF EXISTS especies;
 DROP TABLE IF EXISTS usuarios;
@@ -67,4 +68,14 @@ CREATE TABLE imagenes(
     CONSTRAINT fk_usuario_imagen FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
     CONSTRAINT fk_ubicacione_imagen FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id),
     CONSTRAINT fk_revisor_imagen FOREIGN KEY (revisado_por) REFERENCES usuarios(usuario_id)
+);
+
+CREATE TABLE password_reset_tokens(
+    token_id SERIAL PRIMARY KEY,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    usuario_id INT NOT NULL,
+    expira TIMESTAMP NOT NULL,
+    usado BOOLEAN NOT NULL DEFAULT FALSE,
+    creado TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario_reset_token FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );
