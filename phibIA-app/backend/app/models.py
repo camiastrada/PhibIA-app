@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from flask_sqlalchemy import SQLAlchemy
 from . import db
 import bcrypt;
@@ -107,6 +107,22 @@ class Imagen(db.Model):
 
     def __repr__(self):
         return f'<Imagen {self.imagen_id}>'
+
+
+class PasswordResetToken(db.Model):
+    __tablename__ = 'password_reset_tokens'
+
+    token_id = db.Column(db.Integer, primary_key=True)
+    token_hash = db.Column(db.String(64), nullable=False, unique=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
+    expira = db.Column(db.DateTime, nullable=False)
+    usado = db.Column(db.Boolean, nullable=False, default=False)
+    creado = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    usuario = db.relationship('Usuario', backref='reset_tokens')
+
+    def __repr__(self):
+        return f'<PasswordResetToken usuario={self.usuario_id}>'
 
 
 class UsuarioEspecie(db.Model):

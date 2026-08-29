@@ -120,7 +120,7 @@ export default function LoginForm() {
 
               <div className="flex justify-between md:justify-end mb-4">
                 <a href="/register" className="text-sm text-blue-500 hover:text-blue-700 active:text-blue-700 mt-3 block md:hidden text-right">Registrarse</a >
-                <a href="" className="text-sm text-slate-500 hover:text-slate-700 active:text-slate-700 mt-3 block text-right">Olvidé mi contraseña</a >
+                <Link to="/forgot-password" className="text-sm text-slate-500 hover:text-slate-700 active:text-slate-700 mt-3 block text-right">Olvidé mi contraseña</Link>
               </div>
 
               <div className="flex items-center justify-center mb-4 gap-2">

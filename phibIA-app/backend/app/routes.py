@@ -1,12 +1,14 @@
 from flask import jsonify, request
-from .models import Usuario, Audio, Especie, Ubicacion, Imagen
-from datetime import datetime
+from .models import Usuario, Audio, Especie, Ubicacion, Imagen, PasswordResetToken
+from datetime import datetime, timedelta
 from .ml_model import predict_species
 from werkzeug.utils import secure_filename
 from .decorators import admin_required
 from . import db
 import os
 import re
+import secrets
+import hashlib
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -510,8 +512,78 @@ def init_routes(app):
             set_access_cookies(response, access_token)
             return response, 200
         else:
-            return jsonify({'message': 'Wrong password or email'}), 401        
-        
+            return jsonify({'message': 'Wrong password or email'}), 401
+
+
+    @app.route('/forgot-password', methods=['POST'])
+    def forgot_password():
+        data = request.get_json() or {}
+        email = data.get('email')
+
+        GENERIC_RESPONSE = {
+            'message': 'Si el email está registrado, vas a recibir instrucciones para recuperar tu contraseña'
+        }
+
+        if not email:
+            return jsonify({'error': 'Falta el email'}), 400
+
+        user = Usuario.query.filter_by(email=email).first()
+        if not user:
+            return jsonify(GENERIC_RESPONSE), 200
+
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+
+        reset_token = PasswordResetToken(
+            token_hash=token_hash,
+            usuario_id=user.usuario_id,
+            expira=datetime.now() + timedelta(hours=1)
+        )
+        db.session.add(reset_token)
+        db.session.commit()
+
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost')
+        reset_link = f"{frontend_url}/reset-password?token={token}"
+
+        try:
+            from .mail import send_reset_email
+            send_reset_email(user.email, reset_link)
+        except Exception as mail_error:
+            print(f"Error enviando mail de recuperación: {mail_error}")
+            return jsonify({'error': 'No se pudo enviar el email, intentá de nuevo más tarde'}), 500
+
+        return jsonify(GENERIC_RESPONSE), 200
+
+
+    @app.route('/reset-password', methods=['POST'])
+    def reset_password():
+        data = request.get_json() or {}
+        token = data.get('token')
+        password = data.get('password')
+
+        if not token or not password:
+            return jsonify({'error': 'Faltan datos'}), 400
+
+        if not is_valid_password(password):
+            return jsonify({'error': PASSWORD_REQUIREMENTS_MESSAGE}), 400
+
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        reset_token = PasswordResetToken.query.filter_by(token_hash=token_hash).first()
+
+        if not reset_token or reset_token.usado or reset_token.expira < datetime.now():
+            return jsonify({'error': 'El enlace no es válido o ya venció'}), 400
+
+        user = db.session.get(Usuario, reset_token.usuario_id)
+        if not user:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+
+        user.set_password(password)
+        reset_token.usado = True
+        db.session.commit()
+
+        return jsonify({'message': 'Contraseña actualizada correctamente'}), 200
+
+
     @app.route("/api/user/profile", methods=["GET"])
     @jwt_required()
     def get_user_profile():
