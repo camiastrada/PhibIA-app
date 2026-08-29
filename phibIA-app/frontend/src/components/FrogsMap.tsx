@@ -13,6 +13,7 @@ type UbicacionBackend = {
   longitud: number;
   nombre: string;
   fecha_grabacion?: string;
+  tipo?: "especie" | "rana_toro";
 };
 
 interface Location {
@@ -23,6 +24,7 @@ interface Location {
   recorded_at: string;
   type: "registered" | "user" | "current_detection";
   address?: string;
+  esRanaToro?: boolean;
 }
 
 interface FrogsMapProps {
@@ -127,6 +129,7 @@ export default function FrogsMap({
                 ubicacion.fecha_grabacion || new Date().toISOString(),
               type: "registered" as const,
               address: address,
+              esRanaToro: ubicacion.tipo === "rana_toro",
             };
           })
         );
@@ -196,6 +199,8 @@ export default function FrogsMap({
           ? "Tu ubicación actual"
           : location.type === "current_detection"
           ? `Especie detectada: ${location.species}`
+          : location.esRanaToro
+          ? `🐸 Avistamiento de ${location.species}`
           : location.species}
       </h3>
 
@@ -429,7 +434,7 @@ export default function FrogsMap({
           >
             <div
               style={{
-                background: "#43A047",
+                background: location.esRanaToro ? "#E53935" : "#43A047",
                 borderRadius: "50%",
                 width: "32px",
                 height: "32px",
@@ -443,7 +448,11 @@ export default function FrogsMap({
             >
               <img
                 src={ranaIcon}
-                alt="Especie detectada"
+                alt={
+                  location.esRanaToro
+                    ? "Avistamiento de rana toro"
+                    : "Especie detectada"
+                }
                 style={{
                   width: "18px",
                   height: "18px",

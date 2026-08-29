@@ -6,6 +6,7 @@ interface UserInfo {
   email: string;
   avatar_id: number | null;
   background_color?: string;
+  rol?: string;
 }
 
 interface AuthContextType {

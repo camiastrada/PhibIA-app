@@ -56,11 +56,15 @@ CREATE TABLE audios(
 
 CREATE TABLE imagenes(
     imagen_id SERIAL PRIMARY KEY,
-    ruta VARCHAR(255) NOT NULL,
-    public_id VARCHAR(255) NOT NULL,
+    ruta VARCHAR(255),
+    public_id VARCHAR(255),
     fecha_subida TIMESTAMP NOT NULL,
     usuario_id INT NOT NULL,
     ubicacion_id INT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+    fecha_revision TIMESTAMP,
+    revisado_por INT,
     CONSTRAINT fk_usuario_imagen FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
-    CONSTRAINT fk_ubicacione_imagen FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
+    CONSTRAINT fk_ubicacione_imagen FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id),
+    CONSTRAINT fk_revisor_imagen FOREIGN KEY (revisado_por) REFERENCES usuarios(usuario_id)
 );

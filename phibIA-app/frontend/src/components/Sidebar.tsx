@@ -18,6 +18,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const { user, refreshUser } = useAuth();
   const isGuest = !user;
+  const isAdmin = user?.rol === "admin";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -68,7 +69,9 @@ export default function Sidebar() {
               disabled={isGuest}
             />
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />
-            <SidebarIcon to="/galery" id="galeryIcon" icon={GaleryIcon} />
+            {isAdmin && (
+              <SidebarIcon to="/galery" id="galeryIcon" icon={GaleryIcon} />
+            )}
           </nav>
           
           {/* Perfil abajo */}
@@ -132,12 +135,14 @@ export default function Sidebar() {
               label="Mapa de capturas"
               isOpen={isOpen}
             />
-            <SidebarLabel
-              to="/galery"
-              id="galeryLabel"
-              label="Galeria"
-              isOpen={isOpen}
-            />
+            {isAdmin && (
+              <SidebarLabel
+                to="/galery"
+                id="galeryLabel"
+                label="Galeria"
+                isOpen={isOpen}
+              />
+            )}
           </nav>
 
           <div
