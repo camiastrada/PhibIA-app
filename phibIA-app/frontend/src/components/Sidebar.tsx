@@ -65,7 +65,6 @@ export default function Sidebar() {
               to="/encyclopedia"
               id="encyclopediaIcon"
               icon={EncyclopediaIcon}
-              disabled={isGuest}
             />
             <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} />
             <SidebarIcon to="/galery" id="galeryIcon" icon={GaleryIcon} />
@@ -120,7 +119,6 @@ export default function Sidebar() {
               id="encyclopediaLabel"
               label="Enciclopedia"
               isOpen={isOpen}
-              disabled={isGuest}
             />
             <SidebarLabel
               to="/map"
