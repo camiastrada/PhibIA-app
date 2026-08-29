@@ -227,12 +227,13 @@ def init_routes(app):
 
             lat = request.form.get('lat')
             lng = request.form.get('lng')
+            descripcion = request.form.get('descripcion', 'Ubicación del usuario')
 
             if lat and lng:
                 ubicacion = Ubicacion.query.filter_by(latitud=lat, longitud=lng).first()
                 if not ubicacion:
                     ubicacion = Ubicacion(
-                        descripcion="Ubicación del usuario",
+                        descripcion=descripcion if descripcion else 'Ubicación del usuario',
                         latitud=lat,
                         longitud=lng
                     )
@@ -315,8 +316,8 @@ def init_routes(app):
     @app.route("/photos/all", methods=["GET"])
     @admin_required
     def get_all_photos():
-        """Lista todas las fotos del sistema, para revisión del admin."""
-        imagenes = Imagen.query.order_by(Imagen.fecha_subida.desc()).all()
+        """Cola de revisión: fotos de todos los usuarios que todavía no fueron revisadas."""
+        imagenes = Imagen.query.filter_by(estado='pendiente').order_by(Imagen.fecha_subida.desc()).all()
 
         photos = []
         for img in imagenes:
@@ -325,7 +326,6 @@ def init_routes(app):
                 'url': img.ruta,
                 'fecha_subida': img.fecha_subida.isoformat(),
                 'estado': img.estado,
-                'fecha_revision': img.fecha_revision.isoformat() if img.fecha_revision else None,
                 'usuario': {
                     'id': img.usuario.usuario_id,
                     'nombre': img.usuario.name,
@@ -341,6 +341,35 @@ def init_routes(app):
         return jsonify({
             'photos': photos,
             'total': len(photos)
+        }), 200
+
+
+    @app.route("/photos/rana-toro", methods=["GET"])
+    @admin_required
+    def get_ranas_toro_confirmadas():
+        """Registro de avistamientos de rana toro confirmados (la foto ya fue borrada de la nube)."""
+        imagenes = Imagen.query.filter_by(estado='confirmada').order_by(Imagen.fecha_revision.desc()).all()
+
+        registros = [
+            {
+                'imagen_id': img.imagen_id,
+                'fecha': (img.fecha_revision or img.fecha_subida).isoformat(),
+                'usuario': {
+                    'id': img.usuario.usuario_id,
+                    'nombre': img.usuario.name,
+                } if img.usuario else None,
+                'ubicacion': {
+                    'descripcion': img.ubicacion.descripcion,
+                    'latitud': img.ubicacion.latitud,
+                    'longitud': img.ubicacion.longitud,
+                } if img.ubicacion else None
+            }
+            for img in imagenes
+        ]
+
+        return jsonify({
+            'registros': registros,
+            'total': len(registros)
         }), 200
 
 

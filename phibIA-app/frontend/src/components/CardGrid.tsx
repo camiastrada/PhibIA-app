@@ -1,4 +1,4 @@
-import PhotoCard, { type EstadoFoto } from "./PhotoCard";
+import PhotoCard from "./PhotoCard";
 
 interface Photo {
   id: number;
@@ -6,7 +6,6 @@ interface Photo {
   titulo: string;
   ubicacion: string;
   usuario: string;
-  estado?: EstadoFoto;
 }
 
 interface CardGridProps {
@@ -26,7 +25,6 @@ function CardGrid(props: CardGridProps) {
           title={photo.titulo}
           ubicacion={photo.ubicacion}
           usuario={photo.usuario}
-          estado={photo.estado}
           isReviewing={props.reviewingId === photo.id}
           onConfirmar={
             props.onConfirmar ? () => props.onConfirmar!(photo.id) : undefined

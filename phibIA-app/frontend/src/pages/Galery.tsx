@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import CardGrid from "../components/CardGrid";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
-import type { EstadoFoto } from "../components/PhotoCard";
+
+type Filtro = "todas" | "mias" | "ranaToro";
 
 interface Foto {
   id: number;
@@ -11,24 +12,75 @@ interface Foto {
   titulo: string;
   ubicacion: string;
   usuario: string;
-  estado?: EstadoFoto;
+}
+
+interface RegistroRanaToro {
+  id: number;
+  fecha: string;
+  ubicacion: string;
+  usuario: string;
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
+function formatFecha(iso: string) {
+  return new Date(iso).toLocaleDateString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 function Galery() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [filtro, setFiltro] = useState<"todas" | "mias">("todas");
+  const [filtro, setFiltro] = useState<Filtro>("todas");
   const [fotos, setFotos] = useState<Foto[]>([]);
+  const [registros, setRegistros] = useState<RegistroRanaToro[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reviewingId, setReviewingId] = useState<number | null>(null);
 
-  const fetchFotos = useCallback(async () => {
+  const handleAuthResponse = useCallback(
+    (status: number) => {
+      if (status === 401 || status === 422) {
+        navigate("/login");
+        return true;
+      }
+      if (status === 403) {
+        navigate("/");
+        return true;
+      }
+      return false;
+    },
+    [navigate]
+  );
+
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
+
+      if (filtro === "ranaToro") {
+        const response = await fetch(`${API_URL}/photos/rana-toro`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (handleAuthResponse(response.status)) return;
+        if (!response.ok) throw new Error("Error al cargar el registro");
+
+        const data = await response.json();
+        setRegistros(
+          data.registros.map((r: any) => ({
+            id: r.imagen_id,
+            fecha: r.fecha,
+            ubicacion: r.ubicacion?.descripcion || "Ubicación desconocida",
+            usuario: r.usuario?.nombre || "Desconocido",
+          }))
+        );
+        return;
+      }
 
       const endpoint = filtro === "todas" ? "/photos/all" : "/user/photos";
       const response = await fetch(`${API_URL}${endpoint}`, {
@@ -36,43 +88,34 @@ function Galery() {
         credentials: "include",
       });
 
-      if (response.status === 401 || response.status === 422) {
-        navigate("/login");
-        return;
-      }
-
-      if (response.status === 403) {
-        navigate("/");
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Error al cargar las fotos");
-      }
+      if (handleAuthResponse(response.status)) return;
+      if (!response.ok) throw new Error("Error al cargar las fotos");
 
       const data = await response.json();
-      const fotosMapeadas: Foto[] = data.photos.map((p: any) => ({
-        id: p.imagen_id,
-        url: p.url,
-        titulo: p.usuario?.nombre ? `Foto de ${p.usuario.nombre}` : "Foto",
-        ubicacion: p.ubicacion?.descripcion || "Ubicación desconocida",
-        usuario: p.usuario?.nombre || user?.name || "Yo",
-        estado: p.estado,
-      }));
-
-      setFotos(fotosMapeadas);
+      const pendientes = data.photos.filter(
+        (p: any) => p.estado === "pendiente"
+      );
+      setFotos(
+        pendientes.map((p: any) => ({
+          id: p.imagen_id,
+          url: p.url,
+          titulo: p.usuario?.nombre ? `Foto de ${p.usuario.nombre}` : "Foto",
+          ubicacion: p.ubicacion?.descripcion || "Ubicación desconocida",
+          usuario: p.usuario?.nombre || user?.name || "Yo",
+        }))
+      );
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Error al cargar las fotos"
+        err instanceof Error ? err.message : "Error al cargar la información"
       );
     } finally {
       setIsLoading(false);
     }
-  }, [filtro, navigate, user?.name]);
+  }, [filtro, handleAuthResponse, user?.name]);
 
   useEffect(() => {
-    fetchFotos();
-  }, [fetchFotos]);
+    fetchData();
+  }, [fetchData]);
 
   const reviewPhoto = async (imagenId: number, esRanaToro: boolean) => {
     try {
@@ -125,6 +168,16 @@ function Galery() {
           >
             Ver solo mis fotos
           </button>
+          <button
+            onClick={() => setFiltro("ranaToro")}
+            className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+              filtro === "ranaToro"
+                ? "bg-[#43a047] text-white"
+                : "bg-white/20 text-white hover:bg-white/30"
+            }`}
+          >
+            🐸 Registro de ranas toro
+          </button>
         </div>
 
         <div className="border-t border-white/20 my-6 shrink-0" />
@@ -138,9 +191,37 @@ function Galery() {
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
               {error}
             </div>
+          ) : filtro === "ranaToro" ? (
+            registros.length === 0 ? (
+              <p className="text-white text-center py-12">
+                Todavía no hay avistamientos de rana toro confirmados.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {registros.map((r) => (
+                  <div
+                    key={r.id}
+                    className="bg-white/10 rounded-xl p-4 flex flex-wrap items-center justify-between gap-2 text-white"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">🐸</span>
+                      <div>
+                        <p className="font-semibold">{r.ubicacion}</p>
+                        <p className="text-sm text-white/70">
+                          Reportado por {r.usuario}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-white/90">
+                      {formatFecha(r.fecha)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )
           ) : fotos.length === 0 ? (
             <p className="text-white text-center py-12">
-              No hay fotos para mostrar.
+              No hay fotos pendientes de revisión.
             </p>
           ) : (
             <CardGrid

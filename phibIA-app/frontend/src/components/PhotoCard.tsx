@@ -1,39 +1,18 @@
 import { useState } from "react";
 
-export type EstadoFoto = "pendiente" | "confirmada" | "rechazada";
-
 interface PhotoCardProps {
   image: string | null;
   title: string;
   ubicacion: string;
   usuario: string;
-  fecha?: string;
-  estado?: EstadoFoto;
   onConfirmar?: () => void;
   onRechazar?: () => void;
   isReviewing?: boolean;
 }
 
-const ESTADO_INFO: Record<EstadoFoto, { label: string; className: string }> = {
-  pendiente: {
-    label: "🔍 Analizando foto...",
-    className: "bg-yellow-500/90 text-white",
-  },
-  confirmada: {
-    label: "🎉 ¡Genial! Encontraste una rana toro",
-    className: "bg-[#43A047] text-white",
-  },
-  rechazada: {
-    label: "😕 No era una rana toro",
-    className: "bg-red-500/90 text-white",
-  },
-};
-
 function PhotoCard(props: PhotoCardProps) {
   const [expandida, setExpandida] = useState(false);
-  const estadoInfo = props.estado ? ESTADO_INFO[props.estado] : null;
-  const mostrarAcciones =
-    (props.onConfirmar || props.onRechazar) && props.estado === "pendiente";
+  const mostrarAcciones = props.onConfirmar || props.onRechazar;
 
   return (
     <>
@@ -59,14 +38,6 @@ function PhotoCard(props: PhotoCardProps) {
           <h3 className="text-xl font-bold text-gray-800">{props.title}</h3>
           <p className="text-sm text-gray-500">{props.ubicacion}</p>
           <p className="text-sm text-gray-500">{props.usuario}</p>
-
-          {estadoInfo && (
-            <span
-              className={`inline-block mt-2 px-2 py-1 rounded-lg text-xs font-semibold ${estadoInfo.className}`}
-            >
-              {estadoInfo.label}
-            </span>
-          )}
 
           {mostrarAcciones && (
             <div className="grid grid-cols-2 gap-2 mt-3">
