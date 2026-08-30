@@ -24,20 +24,37 @@ Aplicación para reconocer distintas especies de anfibios de la región(Río Cua
 
 Proyecto con Flask (backend), React (frontend) y MySQL, dockerizado para facilitar la instalación y despliegue.
 
-Para levantar la aplicación con Docker:
+## Configuración de variables de entorno
 
--Para construir imágenes y levantar los servicios:
-   
-   ```docker compose up --build```
+Antes de levantar la aplicación es **obligatorio** crear el archivo `.env` a partir del ejemplo:
 
+```bash
+cd phibIA-app
+cp .env.example .env
+```
 
-   - **db**: levanta MySQL con la base de datos inicial `anfibios`.  
-   - **backend**: levanta Flask en [http://localhost:5000](http://localhost:5000).  
-   - **frontend**: levanta React (Nginx) en [http://localhost:3000](http://localhost:3000).
+Luego completar los valores reales en `.env` (especialmente `JWT_SECRET_KEY`, credenciales de Postgres, Cloudinary y Brevo). El archivo `.env` **no se sube a git** (ver `.gitignore`).
 
+Para generar una clave JWT segura:
 
--Una vez construido, solo para iniciar:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
 
-   ```sudo docker compose up```
+> **Nota de seguridad:** la aplicación **no arranca** si `JWT_SECRET_KEY` no está definida.
+
+## Levantar la aplicación
+
+- Para construir imágenes y levantar los servicios:
+
+   ```docker compose --env-file .env up --build```
+
+- **db**: levanta la base de datos inicial `anfibios`.  
+- **backend**: levanta Flask en [http://localhost:5000](http://localhost:5000).  
+- **frontend**: levanta React (Nginx) en [http://localhost:3000](http://localhost:3000).
+
+- Una vez construido, solo para iniciar:
+
+   ```docker compose --env-file .env up```
 
 

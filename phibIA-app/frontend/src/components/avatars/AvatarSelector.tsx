@@ -5,6 +5,7 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle";
 import AvatarList from "./AvatarList";
 import ProfilePanel from "../ui/ProfilePanel";
 import { useAuth } from "../../context/AuthContext";
+import { getCsrfToken } from "../../utils/csrf";
 
 interface AvatarSelectorProps {
   setOpenAvatarSelector: Dispatch<SetStateAction<boolean>>;
@@ -64,6 +65,7 @@ export default function AvatarSelector({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRF-TOKEN": getCsrfToken(),
           },
           credentials: "include", // Usar cookies HTTP-only
           body: JSON.stringify({ avatar_id: selectedAvatar }),
@@ -89,6 +91,7 @@ export default function AvatarSelector({
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-TOKEN": getCsrfToken(),
         },
         credentials: "include", // Usar cookies HTTP-only
         body: JSON.stringify({ background_color: color }),

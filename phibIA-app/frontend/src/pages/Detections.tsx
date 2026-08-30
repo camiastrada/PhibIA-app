@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import { getCsrfToken } from "../utils/csrf";
 
 interface Detection {
   audio_id: number;
@@ -132,6 +133,7 @@ function Detections() {
       const response = await fetch(`${API_URL}/audio/${audioId}`, {
         method: "DELETE",
         credentials: "include",
+        headers: { "X-CSRF-TOKEN": getCsrfToken() },
       });
 
       if (!response.ok) {

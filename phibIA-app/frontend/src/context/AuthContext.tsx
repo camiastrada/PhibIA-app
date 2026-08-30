@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { getCsrfToken } from '../utils/csrf';
 
 interface UserInfo {
   id: number;
@@ -52,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch(`${BACKEND_URL}/logout`, {
         method: 'POST',
         credentials: 'include', // Incluir cookies HTTP-only
+        headers: { 'X-CSRF-TOKEN': getCsrfToken() },
       });
 
       if (response.ok) {

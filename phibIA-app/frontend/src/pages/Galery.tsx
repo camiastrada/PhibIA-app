@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import CardGrid from "../components/CardGrid";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import { getCsrfToken } from "../utils/csrf";
 
 type Filtro = "todas" | "mias" | "ranaToro";
 
@@ -123,7 +124,7 @@ function Galery() {
       const response = await fetch(`${API_URL}/photo/${imagenId}/review`, {
         method: "PUT",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": getCsrfToken() },
         body: JSON.stringify({ es_rana_toro: esRanaToro }),
       });
 

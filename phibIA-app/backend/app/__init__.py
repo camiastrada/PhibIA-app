@@ -1,7 +1,8 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-import os 
+import os
+from datetime import timedelta
 from flask_jwt_extended import JWTManager
 
 
@@ -22,7 +23,7 @@ def create_app():
     CORS(app, 
          supports_credentials=True,
          origins=allowed_origins,
-         allow_headers=["Content-Type"],
+         allow_headers=["Content-Type", "X-CSRF-TOKEN"],
          expose_headers=["Set-Cookie"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     )
@@ -42,14 +43,22 @@ def create_app():
     }
     
     # JWT con cookies HTTP-only
-    app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY', 'secreto-default')
+    jwt_secret = os.getenv('JWT_SECRET_KEY')
+    if not jwt_secret:
+        raise RuntimeError(
+            "JWT_SECRET_KEY no está definida. Agrega la variable de entorno en el archivo .env "
+            "(ver .env.example). La aplicación no arranca sin una clave JWT segura."
+        )
+    app.config["JWT_SECRET_KEY"] = jwt_secret
     app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
     app.config["JWT_COOKIE_HTTPONLY"] = True
     # En producción usar HTTPS y establecer la variable de entorno JWT_COOKIE_SECURE='True'
     app.config["JWT_COOKIE_SECURE"] = os.getenv('JWT_COOKIE_SECURE', 'False').lower() == 'true'
     app.config["JWT_COOKIE_SAMESITE"] = "Lax"
-    app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-    #app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    # Protección CSRF para las cookies JWT (los headers CORS permitidos ya incluyen los necesarios)
+    app.config["JWT_COOKIE_CSRF_PROTECT"] = True
+    app.config["JWT_CSRF_HEADER_NAME"] = "X-CSRF-TOKEN"
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     app.config["JWT_ACCESS_COOKIE_NAME"] = "access_token_cookie"
     app.config["JWT_COOKIE_PATH"] = "/"
 

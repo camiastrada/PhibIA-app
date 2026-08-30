@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { getCsrfToken } from "../utils/csrf";
 
 import "../styles/App.css";
 import ResultPanel from "../components/ui/ResultPanel";
@@ -210,6 +211,7 @@ function Home() {
           const res = await fetch(`${API_URL}/predict`, {
             method: "POST",
             credentials: "include",
+            headers: { "X-CSRF-TOKEN": getCsrfToken() },
             body: formData,
             signal: abortControllerRef.current.signal,
           });
@@ -305,6 +307,7 @@ function Home() {
       const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
         credentials: "include",
+        headers: { "X-CSRF-TOKEN": getCsrfToken() },
         body: formData,
         signal: abortControllerRef.current.signal,
       });

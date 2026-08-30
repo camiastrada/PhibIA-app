@@ -1,18 +1,22 @@
+import os
 import pytest
 from app import create_app, db
+
 @pytest.fixture()
 def app():
     """Crea la aplicación de prueba"""
+    # La app ahora exige JWT_SECRET_KEY: se provee en el entorno para los tests
+    os.environ['JWT_SECRET_KEY'] = 'test-secret-key'
     app = create_app()
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['JWT_SECRET_KEY'] = 'test-secret-key'
     
     with app.app_context():
         db.create_all()
         yield app
         db.session.remove()
         db.drop_all()
+    os.environ.pop('JWT_SECRET_KEY', None)
 
 
 @pytest.fixture()
@@ -30,6 +34,16 @@ def extract_cookie_value(set_cookie_header: str, name: str) -> str | None:
         if part.startswith(f'{name}='):
             return part.split('=', 1)[1]
     return None
+
+
+def extract_csrf_token(response) -> str:
+    """Extrae el token CSRF de la cookie csrf_access_token de la respuesta de login"""
+    # Flask puede devolver varios headers Set-Cookie (access_token_cookie y csrf_access_token)
+    for set_cookie_header in response.headers.getlist('Set-Cookie'):
+        value = extract_cookie_value(set_cookie_header, 'csrf_access_token')
+        if value:
+            return value
+    return ''
 
 
 # ========== TESTS DE REGISTRO ==========
@@ -211,10 +225,12 @@ def test_logout_success(client):
     # Extraer cookie
     set_cookie = login_res.headers.get('Set-Cookie')
     token_value = extract_cookie_value(set_cookie or '', 'access_token_cookie')
+    csrf_token = extract_csrf_token(login_res)
     
     # Logout
     res = client.post('/logout', headers={
-        'Cookie': f'access_token_cookie={token_value}'
+        'Cookie': f'access_token_cookie={token_value}',
+        'X-CSRF-TOKEN': csrf_token,
     })
     assert res.status_code == 200
     data = res.get_json()
@@ -249,10 +265,12 @@ def test_verify_after_logout(client):
     
     set_cookie = login_res.headers.get('Set-Cookie')
     token_value = extract_cookie_value(set_cookie or '', 'access_token_cookie')
+    csrf_token = extract_csrf_token(login_res)
     
     # Logout
     client.post('/logout', headers={
-        'Cookie': f'access_token_cookie={token_value}'
+        'Cookie': f'access_token_cookie={token_value}',
+        'X-CSRF-TOKEN': csrf_token,
     })
     
     # Intentar verificar token después del logout
@@ -320,7 +338,9 @@ def test_complete_auth_flow(client):
     
     set_cookie = res.headers.get('Set-Cookie')
     token_value = extract_cookie_value(set_cookie or '', 'access_token_cookie')
+    csrf_token = extract_csrf_token(res)
     assert token_value is not None
+    assert csrf_token
     
     # 3. Verificar autenticación
     res = client.get('/verify-token', headers={
@@ -337,7 +357,8 @@ def test_complete_auth_flow(client):
     
     # 5. Logout
     res = client.post('/logout', headers={
-        'Cookie': f'access_token_cookie={token_value}'
+        'Cookie': f'access_token_cookie={token_value}',
+        'X-CSRF-TOKEN': csrf_token,
     })
     assert res.status_code == 200
     
