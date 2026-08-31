@@ -2,7 +2,7 @@ import "../../styles/App.css"
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useEffect, useRef } from "react"
 import TitleWithSubtitle from "../ui/TitleWithSubtitle";
-import Background from "/images/bgMainImage.jpg";
+import Background from "/images/bgMainImage.png";
 import AvatarList from "./AvatarList";
 import ProfilePanel from "../ui/ProfilePanel";
 import { useAuth } from "../../context/AuthContext";
