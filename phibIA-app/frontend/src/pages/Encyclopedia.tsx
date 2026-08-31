@@ -80,7 +80,7 @@ function Encyclopedia() {
                     <img
                       src={`${API_URL}/species/${sp.imagen}`}
                       alt={sp.nombre_cientifico}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       onError={() => {
                         setImageErrors(prev => ({
                           ...prev,
