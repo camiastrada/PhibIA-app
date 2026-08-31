@@ -4,6 +4,31 @@ import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
 import BackIcon from "../assets/uiIcons/backIcon";
 import Toast from "../components/ui/Toast";
 
+const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
+
+async function getLocationDescription(lng: number, lat: number): Promise<string> {
+  try {
+    const response = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&language=es`
+    );
+
+    if (!response.ok) return "Ubicación del usuario";
+
+    const data = await response.json();
+    const features = data.features || [];
+    if (features.length === 0) return "Ubicación del usuario";
+
+    const place = features.find(
+      (f: any) => f.place_type.includes("place") || f.place_type.includes("locality")
+    );
+
+    return place?.text || features[0]?.text || "Ubicación del usuario";
+  } catch (error) {
+    console.error("Error al obtener descripción de ubicación:", error);
+    return "Ubicación del usuario";
+  }
+}
+
 export default function FrogsBulls() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [photoSource, setPhotoSource] = useState<"camera" | "upload" | null>(null);
@@ -213,6 +238,11 @@ export default function FrogsBulls() {
       if (userLocation) {
         formData.append("lat", userLocation.lat.toString());
         formData.append("lng", userLocation.lng.toString());
+        const descripcion = await getLocationDescription(
+          userLocation.lng,
+          userLocation.lat
+        );
+        formData.append("descripcion", descripcion);
       }
 
       const API_URL = import.meta.env.VITE_API_URL ?? "/api";

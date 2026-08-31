@@ -57,8 +57,8 @@ function Encyclopedia() {
   }
 
   return (
-    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-hidden">
-      <div className="w-full h-full max-w-6xl mx-auto bg-[#004D40]/30 backdrop-blur-sm rounded-3xl shadow-2xl p-4 md:p-8 flex flex-col">
+    <div className="min-h-screen mt-8 px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-y-auto">
+      <div className="w-full max-w-6xl mx-auto bg-[#004D40]/30 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
         <div className="text-white">
           <TitleWithSubtitle
             title="Enciclopedia de Especies"
@@ -66,9 +66,8 @@ function Encyclopedia() {
           />
         </div>
 
-        <div className="w-full overflow-y-auto flex-1 px-1 md:px-2 pr-2 md:pr-4 scrollbar-hidden">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mt-4 md:mt-8">
+        <div className="w-full overflow-y-auto max-h-[calc(100vh-120px)] px-2 scrollbar-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
             {species.map((sp) => (
               <div
                 key={sp.nombre_cientifico}
@@ -80,11 +79,11 @@ function Encyclopedia() {
                     <img
                       src={`${API_URL}/species/${sp.imagen}`}
                       alt={sp.nombre_cientifico}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       onError={() => {
-                        setImageErrors(prev => ({
+                        setImageErrors((prev) => ({
                           ...prev,
-                          [sp.nombre_cientifico]: true
+                          [sp.nombre_cientifico]: true,
                         }));
                       }}
                     />

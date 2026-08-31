@@ -1,7 +1,8 @@
 
+DROP TABLE IF EXISTS password_reset_tokens;
 DROP TABLE IF EXISTS audios;
-DROP TABLE IF EXISTS imagenes; 
-DROP TABLE IF EXISTS ubicaciones; 
+DROP TABLE IF EXISTS imagenes;
+DROP TABLE IF EXISTS ubicaciones;
 DROP TABLE IF EXISTS usuarios_especies;
 DROP TABLE IF EXISTS especies;
 DROP TABLE IF EXISTS usuarios;
@@ -21,7 +22,7 @@ CREATE TABLE especies(
     especie_id SERIAL PRIMARY KEY,
     nombre_cientifico VARCHAR(40) NOT NULL UNIQUE,
     nombre_comun VARCHAR(100) DEFAULT NULL,
-    descripcion VARCHAR(250) DEFAULT NULL,
+    descripcion VARCHAR(2500) DEFAULT NULL,
     imagen VARCHAR(100) DEFAULT NULL,
     ruta_audio VARCHAR(255) DEFAULT NULL
 );
@@ -56,11 +57,25 @@ CREATE TABLE audios(
 
 CREATE TABLE imagenes(
     imagen_id SERIAL PRIMARY KEY,
-    ruta VARCHAR(255) NOT NULL,
-    public_id VARCHAR(255) NOT NULL,
+    ruta VARCHAR(255),
+    public_id VARCHAR(255),
     fecha_subida TIMESTAMP NOT NULL,
     usuario_id INT NOT NULL,
     ubicacion_id INT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+    fecha_revision TIMESTAMP,
+    revisado_por INT,
     CONSTRAINT fk_usuario_imagen FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id),
-    CONSTRAINT fk_ubicacione_imagen FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
+    CONSTRAINT fk_ubicacione_imagen FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id),
+    CONSTRAINT fk_revisor_imagen FOREIGN KEY (revisado_por) REFERENCES usuarios(usuario_id)
+);
+
+CREATE TABLE password_reset_tokens(
+    token_id SERIAL PRIMARY KEY,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    usuario_id INT NOT NULL,
+    expira TIMESTAMP NOT NULL,
+    usado BOOLEAN NOT NULL DEFAULT FALSE,
+    creado TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario_reset_token FOREIGN KEY (usuario_id) REFERENCES usuarios(usuario_id)
 );

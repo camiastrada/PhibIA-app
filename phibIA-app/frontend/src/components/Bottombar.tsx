@@ -17,7 +17,7 @@ export default function Bottombar(){
                 <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} disabled={isGuest} />
                 <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
                 <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />
-                <SidebarIcon to="/profile" id="profileIcon" icon={ProfileIcon} />
+                <SidebarIcon to="/profile" id="profileIcon" icon={ProfileIcon} showBadge={isGuest} />
             </nav>
         </div>
     )

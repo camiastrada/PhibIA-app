@@ -47,6 +47,9 @@ services:
       - CLOUDINARY_CLOUD_NAME=dksq6fnev
       - CLOUDINARY_API_KEY=155444477795147
       - CLOUDINARY_API_SECRET=6hjNEaLoDQSR7uBUBlu-nwkrfek
+      - BREVO_SMTP_LOGIN=${BREVO_SMTP_LOGIN}
+      - BREVO_SMTP_KEY=${BREVO_SMTP_KEY}
+      - FRONTEND_URL=${FRONTEND_URL}
     command: python run.py
     depends_on:
       db:

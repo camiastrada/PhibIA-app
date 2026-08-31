@@ -1,26 +1,29 @@
-import "../../styles/App.css"
+import "../../styles/App.css";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 import TitleWithSubtitle from "../ui/TitleWithSubtitle";
 import Background from "/images/bgMainImage.png";
 import AvatarList from "./AvatarList";
 import ProfilePanel from "../ui/ProfilePanel";
 import { useAuth } from "../../context/AuthContext";
 
-
-interface AvatarSelectorProps{
+interface AvatarSelectorProps {
   setOpenAvatarSelector: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function AvatarSelector(
-  {setOpenAvatarSelector} : AvatarSelectorProps
-) {
-  const { user, updateAvatar, refreshUser } = useAuth(); 
-  const [selectedAvatar, setSelectedAvatar] = useState<number>(user?.avatar_id ?? 0);
-  const [selectedColor, setSelectedColor] = useState<string>(user?.background_color ?? "#000000");
+export default function AvatarSelector({
+  setOpenAvatarSelector,
+}: AvatarSelectorProps) {
+  const { user, updateAvatar, refreshUser } = useAuth();
+  const [selectedAvatar, setSelectedAvatar] = useState<number>(
+    user?.avatar_id ?? 0,
+  );
+  const [selectedColor, setSelectedColor] = useState<string>(
+    user?.background_color ?? "#000000",
+  );
   const [showProfilePanel, setShowProfilePanel] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
+  const BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
   //detecta el ancho del contenedor
   useEffect(() => {
@@ -68,7 +71,8 @@ export default function AvatarSelector(
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Error al actualizar avatar");
+        if (!response.ok)
+          throw new Error(data.error || "Error al actualizar avatar");
 
         updateAvatar(selectedAvatar);
       } catch (error) {
@@ -80,7 +84,6 @@ export default function AvatarSelector(
   }, [selectedAvatar]);
 
   const handleColorChange = async (color: string) => {
-    
     setSelectedColor(color);
     try {
       const response = await fetch(`${BACKEND_URL}/update_background`, {
@@ -93,11 +96,11 @@ export default function AvatarSelector(
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Error al actualizar color");
+      if (!response.ok)
+        throw new Error(data.error || "Error al actualizar color");
 
       // Refrescar el usuario para obtener los datos actualizados
       await refreshUser();
-
     } catch (error) {
       console.error("Error al actualizar el color:", error);
       alert("Error al actualizar el color");
@@ -105,15 +108,15 @@ export default function AvatarSelector(
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="flex flex-col w-full h-full  rounded-3xl items-center justify-center shadow-xl"
       style={{ backgroundColor: selectedColor }} // Aplicar el color seleccionado como fondo
     >
-      <div 
+      <div
         className="relative w-full p-6 rounded-t-3xl flex justify-center items-center"
         style={{
-          backgroundImage: `url(${Background})`,
+          backgroundImage: "url('/images/bgMainImage.png')",
           backgroundSize: "cover",
           backgroundPosition: "top",
         }}
@@ -125,13 +128,17 @@ export default function AvatarSelector(
 
       <div className="space-y-4 bg-white w-full flex-1 flex justify-center items-center rounded-b-3xl gap-4 px-8">
         <div className="flex flex-col w-full gap-3 m-3 items-center justify-center">
-          <h2 className="text-xl font-bold mb-3 whitespace-nowrap text-center">Elegí tu anfibio preferido</h2>
+          <h2 className="text-xl font-bold mb-3 whitespace-nowrap text-center">
+            Elegí tu anfibio preferido
+          </h2>
           <AvatarList
             selectedId={selectedAvatar}
             onSelect={(id) => setSelectedAvatar(id)}
           />
-          <div className={`flex-row items-center justify-center gap-3 p-3
-            ${showProfilePanel ? "hidden" : "flex"}`}>
+          <div
+            className={`flex-row items-center justify-center gap-3 p-3
+            ${showProfilePanel ? "hidden" : "flex"}`}
+          >
             <label className="font-medium mb-1">Color:</label>
             <input
               type="color"

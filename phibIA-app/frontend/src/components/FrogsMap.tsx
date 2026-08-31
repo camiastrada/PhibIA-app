@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Map, { Marker, Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { SearchBox } from "@mapbox/search-js-react";
@@ -13,6 +13,7 @@ type UbicacionBackend = {
   longitud: number;
   nombre: string;
   fecha_grabacion?: string;
+  tipo?: "especie" | "rana_toro";
 };
 
 interface Location {
@@ -23,6 +24,7 @@ interface Location {
   recorded_at: string;
   type: "registered" | "user" | "current_detection";
   address?: string;
+  esRanaToro?: boolean;
 }
 
 interface FrogsMapProps {
@@ -127,6 +129,7 @@ export default function FrogsMap({
                 ubicacion.fecha_grabacion || new Date().toISOString(),
               type: "registered" as const,
               address: address,
+              esRanaToro: ubicacion.tipo === "rana_toro",
             };
           })
         );
@@ -169,7 +172,7 @@ export default function FrogsMap({
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 60000,
+        maximumAge: 0,
       }
     );
 
@@ -196,6 +199,8 @@ export default function FrogsMap({
           ? "Tu ubicación actual"
           : location.type === "current_detection"
           ? `Especie detectada: ${location.species}`
+          : location.esRanaToro
+          ? `🐸 Avistamiento de ${location.species}`
           : location.species}
       </h3>
 
@@ -203,6 +208,12 @@ export default function FrogsMap({
         <strong>Dirección:</strong>
         <br />
         {location.address || userAddress || "Ubicación desconocida"}
+      </p>
+
+      <p style={{ margin: "6px 0", fontSize: "12px", color: "#666" }}>
+        <strong>Coordenadas:</strong>
+        <br />
+        {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
       </p>
 
       <p style={{ margin: "6px 0", fontSize: "12px", color: "#666" }}>
@@ -216,6 +227,43 @@ export default function FrogsMap({
       </p>
     </div>
   );
+
+  // Si varios marcadores caen en la misma ubicación, separarlos un poco
+  const OVERLAP_OFFSET = 0.00015;
+  const displayedLocations = useMemo(() => {
+    const groups = new globalThis.Map<string, Location[]>();
+    const result: Location[] = [];
+    filteredLocations.forEach((location) => {
+      if (typeof location.lat !== "number" || typeof location.lng !== "number") {
+        result.push(location);
+        return;
+      }
+      const key = `${location.lat.toFixed(5)},${location.lng.toFixed(5)}`;
+      const group = groups.get(key);
+      if (group) {
+        group.push(location);
+      } else {
+        groups.set(key, [location]);
+      }
+    });
+
+    groups.forEach((group) => {
+      if (group.length === 1) {
+        result.push(group[0]);
+        return;
+      }
+      const angleStep = (2 * Math.PI) / group.length;
+      group.forEach((location, index) => {
+        const angle = angleStep * index;
+        result.push({
+          ...location,
+          lat: location.lat + OVERLAP_OFFSET * Math.sin(angle),
+          lng: location.lng + OVERLAP_OFFSET * Math.cos(angle),
+        });
+      });
+    });
+    return result;
+  }, [filteredLocations]);
 
   // Determinar la ubicación inicial del mapa
   const getInitialViewState = () => {
@@ -337,34 +385,61 @@ export default function FrogsMap({
               });
             }}
           >
-            <div
-              style={{
-                background: "#43A047", // ✅ MISMO COLOR VERDE
-                borderRadius: "50%",
-                width: "32px",
-                height: "32px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                border: "2px solid white",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
-              }}
-            >
-              <img
-                src={ranaIcon}
-                alt={
-                  especieParaMostrar
-                    ? `Especie detectada: ${especieParaMostrar}`
-                    : "Tu ubicación"
-                }
+            {especieParaMostrar ? (
+              <div
                 style={{
-                  width: "18px",
-                  height: "18px",
-                  filter: "brightness(0) invert(1)",
+                  background: "#43A047", // ✅ MISMO COLOR VERDE
+                  borderRadius: "50%",
+                  width: "22px",
+                  height: "22px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: "2px solid white",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
                 }}
-              />
-            </div>
+              >
+                <img
+                  src={ranaIcon}
+                  alt={`Especie detectada: ${especieParaMostrar}`}
+                  style={{
+                    width: "13px",
+                    height: "13px",
+                    filter: "brightness(0) invert(1)",
+                  }}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: "white",
+                  borderRadius: "50%",
+                  width: "22px",
+                  height: "22px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: "2px solid #111827",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="#111827"
+                  aria-label="Tu ubicación"
+                  style={{ width: "14px", height: "14px" }}
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                  />
+                </svg>
+              </div>
+            )}
           </Marker>
         )}
 
@@ -392,8 +467,8 @@ export default function FrogsMap({
               style={{
                 background: "#43A047",
                 borderRadius: "50%",
-                width: "32px",
-                height: "32px",
+                width: "22px",
+                height: "22px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -406,8 +481,8 @@ export default function FrogsMap({
                 src={ranaIcon}
                 alt="Ubicación de grabación"
                 style={{
-                  width: "18px",
-                  height: "18px",
+                  width: "13px",
+                  height: "13px",
                   filter: "brightness(0) invert(1)",
                 }}
               />
@@ -416,7 +491,7 @@ export default function FrogsMap({
         )}
 
         {/* Marcadores de TODAS las ubicaciones */}
-        {filteredLocations.map((location) => (
+        {displayedLocations.map((location) => (
           <Marker
             key={location.id}
             longitude={location.lng}
@@ -429,10 +504,10 @@ export default function FrogsMap({
           >
             <div
               style={{
-                background: "#43A047",
+                background: location.esRanaToro ? "#E53935" : "#43A047",
                 borderRadius: "50%",
-                width: "32px",
-                height: "32px",
+                width: "22px",
+                height: "22px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -443,10 +518,14 @@ export default function FrogsMap({
             >
               <img
                 src={ranaIcon}
-                alt="Especie detectada"
+                alt={
+                  location.esRanaToro
+                    ? "Avistamiento de rana toro"
+                    : "Especie detectada"
+                }
                 style={{
-                  width: "18px",
-                  height: "18px",
+                  width: "13px",
+                  height: "13px",
                   filter: "brightness(0) invert(1)",
                 }}
               />

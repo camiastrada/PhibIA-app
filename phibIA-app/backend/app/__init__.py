@@ -36,6 +36,10 @@ def create_app():
         f"{os.getenv('POSTGRES_DATABASE')}"
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,
+        'pool_recycle': 280,
+    }
     
     # JWT con cookies HTTP-only
     app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY', 'secreto-default')
