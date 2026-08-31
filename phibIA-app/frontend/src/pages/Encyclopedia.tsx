@@ -104,8 +104,8 @@ function Encyclopedia() {
                 </div>
 
                 {/* Nombres */}
-                <h3 className="text-base md:text-xl font-bold text-[#004D40] truncate">{sp.nombre_cientifico}</h3>
-                <p className="text-[#004D40]/80">{sp.nombre_comun}</p>
+                <h3 className="text-base md:text-xl font-bold text-[#004D40] truncate">{sp.nombre_comun}</h3>
+                <p className="text-[#004D40]/80">{sp.nombre_cientifico}</p>
 
                 {/* Botón */}
                 <button

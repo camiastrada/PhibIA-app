@@ -1,6 +1,5 @@
 import TitleWithSubtitle from "./ui/TitleWithSubtitle";
 import { type FormEvent, type ChangeEvent, type Dispatch, type SetStateAction, useState } from "react";
-import Background from "/images/bgMainImage.png";
 import ExitIcon from "../assets/uiIcons/exitIcon"
 import FrogsMap from "./FrogsMap";
 import MapPin from "../assets/uiIcons/ubicationPinIcon";
