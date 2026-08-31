@@ -338,7 +338,7 @@ function Home() {
           />
         </div>
       )}
-      <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-hidden">
+      <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center">
         <div className={`flex flex-row justify-center items-center w-full h-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ${isImport ? "blur-xs" : ""}`}>
 
           {/*apartado de grabar audios*/}
