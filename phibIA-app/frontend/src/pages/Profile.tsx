@@ -104,11 +104,11 @@ function Profile() {
 
   return (
   <>
-    <div className={openAvatarSelector ? "flex md:hidden z-0 bg-black/50  w-full h-full fixed inset-0 top-0" : "hidden"}></div>
+    <div className={openAvatarSelector ? "flex z-[5] bg-black/50  w-full h-full fixed inset-0 top-0" : "hidden"}></div>
     <div className={openAvatarSelector ? "flex w-full h-full justify-center items-center z-10 shadow-2xl" : "hidden"}>
       <AvatarSelector setOpenAvatarSelector={setOpenAvatarSelector}/>
     </div>
-    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center">
+    <div className={`flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center ${openAvatarSelector ? "hidden" : ""}`}>
       <div className={`flex-col lg:flex-row justify-center items-center w-full h-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ${openAvatarSelector ? "hidden" : "flex"}`}>
       
         <div className={`flex flex-col w-full lg:w-1/2 items-center justify-center 
