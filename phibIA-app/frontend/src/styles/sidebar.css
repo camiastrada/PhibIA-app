@@ -5,6 +5,7 @@
   body:has(#capturesIcon:hover) #capturesLabel,
   body:has(#encyclopediaIcon:hover) #encyclopediaLabel,
   body:has(#mapIcon:hover) #mapLabel,
+  body:has(#galeryIcon:hover) #galeryLabel,
   body:has(#profileIcon:hover) #profileLabel,
   .sidebarLabel:hover {
     background-color: #152c2880;
@@ -14,6 +15,7 @@
   body:has(#capturesLabel:hover) #capturesIcon,
   body:has(#encyclopediaLabel:hover) #encyclopediaIcon,
   body:has(#mapLabel:hover) #mapIcon,
+  body:has(#galeryLabel:hover) #galeryIcon,
   .sidebarIcon:hover {
 
     border-left-width: 6px;
