@@ -282,7 +282,10 @@ export default function FrogsBulls() {
     <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center">
       {showMiniMap && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl p-4 w-80 h-80 md:w-96 md:h-96 flex flex-col">
+          <div className="bg-white rounded-2xl p-4 w-80 h-[22rem] md:w-96 md:h-[26rem] flex flex-col">
+            <p className="text-center text-sm md:text-base font-semibold text-[#004D40] mb-2">
+              Marcá dónde tomaste esta foto
+            </p>
             <FrogsMap
               onSelectLocation={(location) => {
                 setUserLocation({ lat: location.lat, lng: location.lng });
