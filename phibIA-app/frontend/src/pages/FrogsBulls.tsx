@@ -66,6 +66,16 @@ export default function FrogsBulls() {
     }
   }, [isCameraOn]);
 
+  // Cleanup: apaga la cámara si el componente se desmonta mientras está prendida
+  useEffect(() => {
+    return () => {
+      const stream = videoRef.current?.srcObject as MediaStream | null;
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
