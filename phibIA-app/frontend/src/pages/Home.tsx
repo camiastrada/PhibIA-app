@@ -31,7 +31,6 @@ function Home() {
   const [predictedSpecies, setPredictedSpecies] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [commonName, setCommonName] = useState<string | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -135,7 +134,6 @@ function Home() {
     setPredictedSpecies(null);
     setConfidence(null);
     setCommonName(null);
-    setDescription(null);
     setError(null);
     setUserLocation(null);
     setManualLocation(null);
@@ -220,7 +218,6 @@ function Home() {
             setPredictedSpecies(data?.prediccion ?? "No detectada");
             setConfidence(data?.confianza ?? null);
             setCommonName(data?.especie_info?.nombre_comun ?? null);
-            setDescription(data?.especie_info?.descripcion ?? null);
           }
         } catch (err: any) {
           if (err.name !== "AbortError") setError(err?.message || String(err));
@@ -312,7 +309,6 @@ function Home() {
         setPredictedSpecies(data.prediccion);
         setConfidence(data.confianza ?? null);
         setCommonName(data?.especie_info?.nombre_comun ?? null);
-        setDescription(data?.especie_info?.descripcion ?? null);
         setError(null);
       } else setError(data.error || "Error en la predicción");
     } catch (err: any) {
@@ -369,10 +365,6 @@ function Home() {
                 specie={specieNumber}
                 confidence={confidence}
               />
-            )}
-
-            {description && (
-              <p className="mt-2 text-center text-gray-700 px-4">{description}</p>
             )}
 
             {/* Botones grabar/importar */}

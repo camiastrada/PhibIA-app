@@ -8,6 +8,9 @@ import ranaIcon from "../assets/frog2.png";
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
 
+const PIN_CURSOR =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'%3E%3Cpath fill='%2343A047' stroke='white' stroke-width='1' d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z'/%3E%3C/svg%3E\") 14 28, pointer";
+
 type UbicacionBackend = {
   latitud: number;
   longitud: number;
@@ -352,6 +355,7 @@ export default function FrogsMap({
         initialViewState={getInitialViewState()}
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
+        cursor={onSelectLocation ? PIN_CURSOR : undefined}
         onLoad={() => setMapLoaded(true)}
         onClick={async (e) => {
           if (!onSelectLocation) return;
