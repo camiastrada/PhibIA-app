@@ -26,3 +26,19 @@ def upload_image(file):
 
 def delete_image(public_id):
     return cloudinary.uploader.destroy(public_id)
+
+
+def upload_audio(file):
+    result = cloudinary.uploader.upload(
+        file,
+        folder="phibia/audios",
+        resource_type="video",
+    )
+    return {
+        "url": result["secure_url"],
+        "public_id": result["public_id"],
+    }
+
+
+def delete_audio(public_id):
+    return cloudinary.uploader.destroy(public_id, resource_type="video")

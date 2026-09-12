@@ -112,9 +112,17 @@ function Detections() {
           throw new Error("Error al cargar el audio");
         }
 
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          // Audio almacenado en Cloudinary: reproducir la URL directa
+          const data = await response.json();
+          setAudioUrl(data.url);
+        } else {
+          // Audio local (retrocompatibilidad): cargarlo como blob
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          setAudioUrl(url);
+        }
         setPlayingAudio(audioId);
       } catch (err) {
         console.error("Error al reproducir audio:", err);

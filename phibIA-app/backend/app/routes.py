@@ -156,11 +156,22 @@ def init_routes(app):
 
             especie = Especie.query.filter_by(especie_id=especie_id).first()
             if not especie:
+                for local_path in [file_path, file_path.replace('.webm', '.wav')]:
+                    try:
+                        if os.path.exists(local_path):
+                            os.remove(local_path)
+                    except:
+                        pass
                 return jsonify({"error": f"Especie con ID {especie_id} no encontrada"}), 404
+
+            # Subir audio a Cloudinary
+            from .cloudinary_config import upload_audio
+            cloud_result = upload_audio(file_path)
 
             # Guardar audio
             nuevo_audio = Audio(
-                ruta=file_path,
+                ruta=cloud_result["url"],
+                public_id=cloud_result["public_id"],
                 fecha_grabacion=datetime.now(),
                 especie_id=especie_id,
                 usuario_id=current_user_id,
@@ -168,6 +179,14 @@ def init_routes(app):
             )
             db.session.add(nuevo_audio)
             db.session.commit()
+
+            # Limpiar archivo local (original y posible .wav temporal de la conversión)
+            for local_path in [file_path, file_path.replace('.webm', '.wav')]:
+                try:
+                    if os.path.exists(local_path):
+                        os.remove(local_path)
+                except Exception as cleanup_error:
+                    print(f"Error limpiando archivo temporal {local_path}: {cleanup_error}")
 
             return jsonify({
                 "prediccion": especie_predicha,
@@ -187,10 +206,14 @@ def init_routes(app):
             })
 
         except Exception as e:
-            try:
-                os.remove(file_path)
-            except:
-                pass
+            db.session.rollback()
+            if 'file_path' in locals() and file_path:
+                for local_path in [file_path, file_path.replace('.webm', '.wav')]:
+                    try:
+                        if os.path.exists(local_path):
+                            os.remove(local_path)
+                    except:
+                        pass
             print(f"Error en predict: {str(e)}")
             return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
         
@@ -792,6 +815,10 @@ def init_routes(app):
         if not audio:
             return jsonify({'error': 'Audio not found or access denied'}), 404
 
+        # Si el audio está en Cloudinary, devolver la URL directa para reproducción
+        if audio.public_id or (audio.ruta and audio.ruta.startswith('http')):
+            return jsonify({'url': audio.ruta}), 200
+
         # Construir la ruta correcta del archivo
         # Si la ruta ya es absoluta y comienza con /, usarla directamente
         # Si no, construirla desde el directorio actual
@@ -837,17 +864,29 @@ def init_routes(app):
         if not audio:
             return jsonify({'error': 'Audio not found or access denied'}), 404
 
-        # Intentar eliminar el archivo físico
-        file_path = audio.ruta
-        if not os.path.isabs(file_path):
-            file_path = os.path.join(os.getcwd(), file_path)
-        
-        try:
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                print(f"Archivo de audio eliminado: {file_path}")
-        except Exception as file_error:
-            print(f"Error al eliminar archivo físico: {file_error}")
+        # Si el audio está en Cloudinary, eliminarlo de la nube
+        if audio.public_id:
+            try:
+                from .cloudinary_config import delete_audio
+                delete_audio(audio.public_id)
+            except Exception as cloud_error:
+                print(f"Error eliminando de Cloudinary: {cloud_error}")
+
+        # Intentar eliminar el archivo físico (solo audios locales viejos)
+        if audio.ruta and audio.ruta.startswith('http'):
+            file_path = audio.ruta
+            print(f"Audio almacenado en Cloudinary, no se elimina archivo local: {file_path}")
+        else:
+            file_path = audio.ruta
+            if not os.path.isabs(file_path):
+                file_path = os.path.join(os.getcwd(), file_path)
+
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    print(f"Archivo de audio eliminado: {file_path}")
+            except Exception as file_error:
+                print(f"Error al eliminar archivo físico: {file_error}")
         
         # Eliminar el registro de la base de datos
         try:
