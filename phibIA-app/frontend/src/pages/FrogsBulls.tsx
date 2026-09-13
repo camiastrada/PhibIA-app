@@ -289,7 +289,7 @@ export default function FrogsBulls() {
   };
 
   return (
-    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center">
+    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-hidden flex justify-center items-center">
       {showMiniMap && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl p-4 w-80 h-[22rem] md:w-96 md:h-[26rem] flex flex-col">
@@ -314,7 +314,8 @@ export default function FrogsBulls() {
         </div>
       )}
       <div className="flex flex-col justify-center items-center w-full h-full max-w-6xl my-4 md:my-0 max-h-[calc(100vh-4rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
-        <div className="w-full h-full flex flex-col items-center justify-center">
+        <div className="w-full h-full flex flex-col items-center">
+          <div className="m-auto w-full flex flex-col items-center">
           <TitleWithSubtitle
             title={"¿Descubriste una rana toro?"}
             subtitle={
@@ -405,7 +406,7 @@ export default function FrogsBulls() {
               <img
                 src={photo}
                 alt="Rana Toro"
-                className="rounded-lg border-4 border-[#43A047] shadow-lg w-full max-w-sm"
+                className="rounded-lg border-4 border-[#43A047] shadow-lg w-auto max-w-full max-h-[40vh] md:max-h-[45vh] object-contain"
               />
 
               <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
@@ -442,6 +443,7 @@ export default function FrogsBulls() {
               )}
             </div>
           )}
+          </div>
         </div>
 
         {toast && (
