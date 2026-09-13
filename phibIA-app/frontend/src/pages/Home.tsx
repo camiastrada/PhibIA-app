@@ -174,10 +174,6 @@ function Home() {
       };
 
       recorder.onstop = async () => {
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((t) => t.stop());
-          streamRef.current = null;
-        }
         setListening(false);
 
         try {
@@ -245,20 +241,20 @@ function Home() {
 
   const stopRecording = () => {
     const recorder = mediaRecorderRef.current;
-    if (!recorder) {
-      if (streamRef.current)
-        streamRef.current.getTracks().forEach((t) => t.stop());
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
-      setListening(false);
-      return;
     }
-    if (recorder.state === "recording") recorder.stop();
-    else {
-      if (streamRef.current)
-        streamRef.current.getTracks().forEach((t) => t.stop());
+
+    setListening(false);
+
+    if (recorder && recorder.state === "recording") {
+      recorder.stop(); // esto sigue disparando onstop para procesar el audio
+    } else {
       mediaRecorderRef.current = null;
-      setListening(false);
     }
+
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
