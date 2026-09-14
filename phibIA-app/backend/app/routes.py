@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from .ml_model import predict_species
 from werkzeug.utils import secure_filename, safe_join
 from .decorators import admin_required
-from . import db
+from . import db, limiter
 import os
 import re
 import secrets
@@ -21,6 +21,7 @@ from flask_jwt_extended import (
 UPLOAD_FOLDER = "app/uploads"
 IMAGE_UPLOAD_FOLDER = "app/uploads/images"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_AUDIO_EXTENSIONS = {'wav', 'webm', 'mp3', 'ogg', 'flac', 'm4a'}
 
 PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$')
 PASSWORD_REQUIREMENTS_MESSAGE = (
@@ -31,9 +32,9 @@ PASSWORD_REQUIREMENTS_MESSAGE = (
 def is_valid_password(password):
     return bool(password) and PASSWORD_REGEX.match(password) is not None
 
-def allowed_file(filename):
+def allowed_file(filename, allowed_extensions=ALLOWED_EXTENSIONS):
     return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
 def init_routes(app):
@@ -82,6 +83,7 @@ def init_routes(app):
 
 
     @app.route("/predict", methods=["POST"])
+    @limiter.limit("20 per minute")
     def predict():
         try:
             current_user_id = None
@@ -114,8 +116,12 @@ def init_routes(app):
             if file.filename == "":
                 return jsonify({"error": "Nombre de archivo vacío"}), 400
 
+            if not allowed_file(file.filename, ALLOWED_AUDIO_EXTENSIONS):
+                return jsonify({"error": "Tipo de archivo de audio no permitido"}), 400
+
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-            file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
 
             print(f"Archivo recibido y guardado en: {file_path}")
@@ -475,6 +481,7 @@ def init_routes(app):
 
 
     @app.route("/register", methods=["POST"])
+    @limiter.limit("5 per minute")
     def register():
         data = request.get_json()
         name = data.get("nombre_usuario")
@@ -503,6 +510,7 @@ def init_routes(app):
 
 
     @app.route('/login', methods=['POST'])
+    @limiter.limit("5 per minute")
     def login():
         data = request.get_json()
         
@@ -540,6 +548,7 @@ def init_routes(app):
 
 
     @app.route('/forgot-password', methods=['POST'])
+    @limiter.limit("5 per minute")
     def forgot_password():
         data = request.get_json() or {}
         email = data.get('email')
