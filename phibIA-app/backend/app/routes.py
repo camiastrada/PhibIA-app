@@ -221,7 +221,7 @@ def init_routes(app):
                     except:
                         pass
             print(f"Error en predict: {str(e)}")
-            return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+            return jsonify({"error": "No se pudo procesar el audio, intentá de nuevo"}), 500
         
     @app.route("/save-photo", methods=["POST"])
     def save_photo():
@@ -506,7 +506,9 @@ def init_routes(app):
             db.session.commit()
             return jsonify({'message': 'Registration completed'}), 201
         except Exception as e:
-            return jsonify({'message': 'Error in database', 'error': str(e)}), 500
+            db.session.rollback()
+            print(f"Error en register: {str(e)}")
+            return jsonify({'message': 'Error al registrar el usuario'}), 500
 
 
     @app.route('/login', methods=['POST'])
