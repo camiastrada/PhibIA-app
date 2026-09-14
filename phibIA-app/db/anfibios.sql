@@ -45,7 +45,8 @@ CREATE TABLE ubicaciones(
 
 CREATE TABLE audios(
     audio_id SERIAL PRIMARY KEY,
-    ruta VARCHAR(100) NOT NULL,
+    ruta VARCHAR(255) NOT NULL,
+    public_id VARCHAR(255),
     fecha_grabacion TIMESTAMP NOT NULL,
     especie_id INT NOT NULL,
     usuario_id INT NOT NULL,

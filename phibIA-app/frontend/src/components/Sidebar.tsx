@@ -39,7 +39,7 @@ export default function Sidebar() {
           isOpen ? "w-80" : "w-20"
         }`}
       >
-        <div className="w-20 flex flex-col items-center py-4 rounded-r-2xl bg-[#004D40]">
+        <div className="w-20 flex flex-col items-center py-2 rounded-r-2xl bg-[#004D40]">
           <div className="h-16 flex items-center justify-center mb-8">
             <button
               type="button"
@@ -74,18 +74,20 @@ export default function Sidebar() {
           </nav>
           
           {/* Perfil abajo */}
-          <Link
-            to="/profile"
-            id="profileIcon"
-            className="relative size-12 rounded-full outline-2 flex items-center justify-center mt-4"
-          >
-            <ProfilePanel className="size-12 border-none"/>
-            {isGuest && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full size-4 flex items-center justify-center border border-white">
-                !
-              </span>
-            )}
-          </Link>
+          <div className="h-16 flex items-center mt-4">
+            <Link
+              to="/profile"
+              id="profileIcon"
+              className="relative size-12 rounded-full outline-2 flex items-center justify-center"
+            >
+              <ProfilePanel className="size-12 border-none"/>
+              {isGuest && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full size-4 flex items-center justify-center border border-white">
+                  !
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
 
         <div

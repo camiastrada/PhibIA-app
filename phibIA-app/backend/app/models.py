@@ -70,7 +70,8 @@ class Audio(db.Model):
     __tablename__ = 'audios'
 
     audio_id = db.Column(db.Integer, primary_key=True)
-    ruta = db.Column(db.String(100), nullable=False)
+    ruta = db.Column(db.String(255), nullable=False)
+    public_id = db.Column(db.String(255), nullable=True)
     fecha_grabacion = db.Column(db.DateTime, nullable=False)
     
     # Claves foráneas

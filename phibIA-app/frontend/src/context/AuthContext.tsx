@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.ok) {
         setUser(null); // Limpiar el estado del usuario
-        window.location.href = "/"; // Redirigir a la página de inicio
+        window.location.href = "/login"; // Redirigir a la página de inicio
       } else {
         console.error('Error al cerrar sesión:', await response.text());
       }

@@ -142,7 +142,7 @@ function Galery() {
   };
 
   return (
-    <div className="h-[100dvh] pt-8 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center">
+    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-hidden">
       <div className="w-full h-full flex flex-col bg-[#004D40]/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
         <div className="text-white shrink-0">
           <TitleWithSubtitle title="Galería de fotos" subtitle="" />

@@ -171,114 +171,116 @@ function InfoFrog() {
     
       // Renderizado principal - ESTRUCTURA SIMPLE
       return (
-        <div className="flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4">
-          
-          {/* Título */}
-          <TitleWithSubtitle
-            title={species.nombre_comun}
-            subtitle={species.nombre_cientifico || "Nombre no disponible"}
-          />
-    
-          {/* Contenedor scrolleable */}
-          <div className="w-full overflow-y-auto max-h-[calc(100vh-300px)] px-2">
+        <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center">
+          <div className="flex flex-col justify-center items-center w-full md:w-4/5 h-auto min-h-3/5 md:min-h-4/5 bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ">
             
-            {/* Imagen */}
-            <div className="flex justify-center mb-6 w-full">
-              <div className="relative w-full max-w-md h-44 md:h-60 rounded-2xl overflow-hidden shadow-xl">
-                {species.imagen && !imageError ? (
-                  <img
-                    src={`${API_URL}/species/${species.imagen}`}
-                    alt={species.nombre_cientifico}
-                    className="w-full h-full object-contain"
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-teal-400 to-emerald-500 flex flex-col items-center justify-center">
-                    <svg className="w-24 h-24 md:w-32 md:h-32 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 3a7 7 0 100 14 7 7 0 000-14zm0 2a5 5 0 110 10 5 5 0 010-10z"/>
-                    </svg>
-                    <span className="text-white text-sm mt-4">Imagen no disponible</span>
-                  </div>
-                )}
-              </div>
-            </div>
-    
-            {/* Botón de audio */}
-            {species.audio && (
-              <div className="flex justify-center mb-6">
-                <button 
-                  onClick={handlePlayAudio}
-                  className="flex items-center gap-3 bg-[#43A047] hover:bg-[#357a38] text-white rounded-xl px-6 py-3 shadow-lg transition-all hover:scale-105 active:scale-95 font-semibold"
-                >
-                  {isPlayingAudio ? (
-                    <>
-                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                      </svg>
-                      <span>Pausar canto</span>
-                    </>
+            {/* Título */}
+            <TitleWithSubtitle
+              title={species.nombre_comun}
+              subtitle={species.nombre_cientifico || "Nombre no disponible"}
+            />
+      
+            {/* Contenedor scrolleable */}
+            <div className="w-full overflow-y-auto max-h-[calc(100vh-300px)] px-2">
+              
+              {/* Imagen */}
+              <div className="flex justify-center mb-6 w-full">
+                <div className="relative w-full max-w-md h-44 md:h-60 rounded-2xl overflow-hidden shadow-xl">
+                  {species.imagen && !imageError ? (
+                    <img
+                      src={`${API_URL}/species/${species.imagen}`}
+                      alt={species.nombre_cientifico}
+                      className="w-full h-full object-contain"
+                      onError={() => setImageError(true)}
+                    />
                   ) : (
-                    <>
-                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
+                    <div className="w-full h-full bg-gradient-to-br from-teal-400 to-emerald-500 flex flex-col items-center justify-center">
+                      <svg className="w-24 h-24 md:w-32 md:h-32 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 3a7 7 0 100 14 7 7 0 000-14zm0 2a5 5 0 110 10 5 5 0 010-10z"/>
                       </svg>
-                      <span>Escuchar canto</span>
-                    </>
+                      <span className="text-white text-sm mt-4">Imagen no disponible</span>
+                    </div>
                   )}
+                </div>
+              </div>
+      
+              {/* Botón de audio */}
+              {species.audio && (
+                <div className="flex justify-center mb-6">
+                  <button 
+                    onClick={handlePlayAudio}
+                    className="flex items-center gap-3 bg-[#43A047] hover:bg-[#357a38] text-white rounded-xl px-6 py-3 shadow-lg transition-all hover:scale-105 active:scale-95 font-semibold"
+                  >
+                    {isPlayingAudio ? (
+                      <>
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                        </svg>
+                        <span>Pausar canto</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                        <span>Escuchar canto</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+      
+              {/* Descripción */}
+              <div className="w-full max-w-2xl mx-auto bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-6 shadow-inner mb-6">
+                <h3 className="text-lg font-bold text-[#004D40] mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Descripción
+                </h3>
+                <div
+                  className="text-gray-700 leading-relaxed text-justify [&_b]:text-[#004D40] [&_b]:font-bold"
+                  dangerouslySetInnerHTML={{ __html: species.descripcion }}
+                />
+              </div>
+      
+              {/* Cards de información */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mx-auto mb-6">
+                <div className="bg-white rounded-xl p-4 shadow-md border-2 border-teal-100">
+                  <h4 className="font-semibold text-[#004D40] mb-2 flex items-center gap-2 text-sm">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Nombre científico
+                  </h4>
+                  <p className="text-gray-700 italic text-sm">{species.nombre_cientifico}</p>
+                </div>
+      
+                <div className="bg-white rounded-xl p-4 shadow-md border-2 border-emerald-100">
+                  <h4 className="font-semibold text-[#004D40] mb-2 flex items-center gap-2 text-sm">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    Nombre común
+                  </h4>
+                  <p className="text-gray-700 text-sm">{species.nombre_comun || "No disponible"}</p>
+                </div>
+              </div>
+      
+              {/* Botón volver */}
+              <div className="flex justify-center pb-4">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-5 md:px-8 rounded-xl transition-colors shadow-lg flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Volver atrás
                 </button>
               </div>
-            )}
-    
-            {/* Descripción */}
-            <div className="w-full max-w-2xl mx-auto bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-6 shadow-inner mb-6">
-              <h3 className="text-lg font-bold text-[#004D40] mb-3 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Descripción
-              </h3>
-              <div
-                className="text-gray-700 leading-relaxed text-justify [&_b]:text-[#004D40] [&_b]:font-bold"
-                dangerouslySetInnerHTML={{ __html: species.descripcion }}
-              />
+      
             </div>
-    
-            {/* Cards de información */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mx-auto mb-6">
-              <div className="bg-white rounded-xl p-4 shadow-md border-2 border-teal-100">
-                <h4 className="font-semibold text-[#004D40] mb-2 flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Nombre científico
-                </h4>
-                <p className="text-gray-700 italic text-sm">{species.nombre_cientifico}</p>
-              </div>
-    
-              <div className="bg-white rounded-xl p-4 shadow-md border-2 border-emerald-100">
-                <h4 className="font-semibold text-[#004D40] mb-2 flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                  </svg>
-                  Nombre común
-                </h4>
-                <p className="text-gray-700 text-sm">{species.nombre_comun || "No disponible"}</p>
-              </div>
-            </div>
-    
-            {/* Botón volver */}
-            <div className="flex justify-center pb-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-5 md:px-8 rounded-xl transition-colors shadow-lg flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Volver atrás
-              </button>
-            </div>
-    
           </div>
         </div>
       );

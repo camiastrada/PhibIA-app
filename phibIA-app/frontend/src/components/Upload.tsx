@@ -1,12 +1,6 @@
 import TitleWithSubtitle from "./ui/TitleWithSubtitle";
-import {
-  type FormEvent,
-  type ChangeEvent,
-  type Dispatch,
-  type SetStateAction,
-  useState,
-} from "react";
-import ExitIcon from "../assets/uiIcons/exitIcon";
+import { type FormEvent, type ChangeEvent, type Dispatch, type SetStateAction, useState } from "react";
+import ExitIcon from "../assets/uiIcons/exitIcon"
 import FrogsMap from "./FrogsMap";
 import MapPin from "../assets/uiIcons/ubicationPinIcon";
 
@@ -53,14 +47,7 @@ export default function Upload({
         </div>
       )}
       <div className="flex flex-col max-w-9/10 md:min-w-full md:h-3/5 rounded-3xl items-center justify-center shadow-xl">
-        <div
-          className="relative w-full p-6 rounded-t-3xl flex justify-center items-center"
-          style={{
-            backgroundImage: "url('/images/bgMainImage.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "top",
-          }}
-        >
+        <div className="relative w-full p-6 rounded-t-3xl flex justify-center items-center bg-[#004D40]">
           <div className="">
             <TitleWithSubtitle title="Importar audio" titleColor="white" />
           </div>

@@ -110,58 +110,59 @@ export default function AvatarSelector({
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col w-full h-full  rounded-3xl items-center justify-center shadow-xl"
-      style={{ backgroundColor: selectedColor }} // Aplicar el color seleccionado como fondo
-    >
+    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-y-auto flex justify-center items-center">
       <div
-        className="relative w-full p-6 rounded-t-3xl flex justify-center items-center"
-        style={{
-          backgroundImage: "url('/images/bgMainImage.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "top",
-        }}
+        ref={containerRef}
+        className="flex flex-col w-full h-full  rounded-3xl items-center justify-center shadow-xl"
+        style={{ backgroundColor: selectedColor }} // Aplicar el color seleccionado como fondo
       >
-        <div className="">
-          <TitleWithSubtitle title="Crea tu avatar" titleColor="white" />
-        </div>
-      </div>
-
-      <div className="space-y-4 bg-white w-full flex-1 flex justify-center items-center rounded-b-3xl gap-4 px-8">
-        <div className="flex flex-col w-full gap-3 m-3 items-center justify-center">
-          <h2 className="text-xl font-bold mb-3 whitespace-nowrap text-center">
-            Elegí tu anfibio preferido
-          </h2>
-          <AvatarList
-            selectedId={selectedAvatar}
-            onSelect={(id) => setSelectedAvatar(id)}
-          />
-          <div
-            className={`flex-row items-center justify-center gap-3 p-3
-            ${showProfilePanel ? "hidden" : "flex"}`}
-          >
-            <label className="font-medium mb-1">Color:</label>
-            <input
-              type="color"
-              value={selectedColor}
-              onChange={(e) => handleColorChange(e.target.value)}
-              className="color-circle size-8 rounded-full cursor-pointer border border-slate-400 shadow-xl hover:scale-102 transition-transform duration-150"
-              style={{
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                backgroundColor: selectedColor,
-              }}
-            />
+        <div
+          className="relative w-full p-6 rounded-t-3xl flex justify-center items-center"
+          style={{
+            backgroundImage: "url('/images/bgMainImage.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "top",
+          }}
+        >
+          <div className="">
+            <TitleWithSubtitle title="Crea tu avatar" titleColor="white" />
           </div>
-          <button
-            type="button"
-            onClick={() => setOpenAvatarSelector(false)}
-            className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full px-6 py-3 text-lg font-semibold items-center justify-center"
-          >
-            Confirmar
-          </button>
         </div>
+
+        <div className="space-y-4 bg-white w-full flex-1 flex justify-center items-center rounded-b-3xl gap-4 px-8">
+          <div className="flex flex-col w-full h-full gap-3 m-3 items-center justify-center">
+            <h2 className="text-xl font-bold mb-3 whitespace-nowrap text-center">
+              Elegí tu anfibio preferido
+            </h2>
+            <AvatarList
+              selectedId={selectedAvatar}
+              onSelect={(id) => setSelectedAvatar(id)}
+            />
+            <div
+              className={`flex-row items-center justify-center gap-3 p-3
+              ${showProfilePanel ? "hidden" : "flex"}`}
+            >
+              <label className="font-medium mb-1">Color:</label>
+              <input
+                type="color"
+                value={selectedColor}
+                onChange={(e) => handleColorChange(e.target.value)}
+                className="color-circle size-8 rounded-full cursor-pointer border border-slate-400 shadow-xl hover:scale-102 transition-transform duration-150"
+                style={{
+                  WebkitAppearance: "none",
+                  MozAppearance: "none",
+                  backgroundColor: selectedColor,
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setOpenAvatarSelector(false)}
+              className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full px-6 py-3 text-lg font-semibold items-center justify-center"
+            >
+              Confirmar
+            </button>
+          </div>
 
         {showProfilePanel && (
           <div className="flex flex-col">
@@ -181,8 +182,9 @@ export default function AvatarSelector({
               />
             </div>
           </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
-  );
+    );
 }
