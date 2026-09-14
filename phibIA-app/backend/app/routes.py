@@ -2,7 +2,7 @@ from flask import jsonify, request
 from .models import Usuario, Audio, Especie, Ubicacion, Imagen, PasswordResetToken
 from datetime import datetime, timedelta
 from .ml_model import predict_species
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename, safe_join
 from .decorators import admin_required
 from . import db
 import os
@@ -914,8 +914,10 @@ def init_routes(app):
         else:
             base_path = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), 'db')
         
-        file_path = os.path.join(base_path, image_path)
-        
+        file_path = safe_join(base_path, image_path)
+        if file_path is None:
+            return jsonify({'error': 'Ruta inválida'}), 400
+
         print(f"Base path: {base_path}")
         print(f"Intentando servir imagen: {file_path}")
         print(f"¿Existe el archivo?: {os.path.exists(file_path)}")
