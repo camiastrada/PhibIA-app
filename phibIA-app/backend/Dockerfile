@@ -26,6 +26,12 @@ COPY . .
 # Definir variable de entorno para Flask
 ENV FLASK_APP=app.py
 
+# Correr como usuario sin privilegios (uid 1000, coincide con el usuario
+# del host en desarrollo para que el volumen montado siga siendo escribible)
+RUN useradd --uid 1000 --create-home appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
 # Exponer el puerto
 EXPOSE 5000
 

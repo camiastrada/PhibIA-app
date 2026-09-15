@@ -2,12 +2,14 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import os
-from datetime import timedelta
 from flask_jwt_extended import JWTManager
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 
 jwt = JWTManager()
 db = SQLAlchemy()
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app():
@@ -68,6 +70,7 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
+    limiter.init_app(app)
 
     from .cloudinary_config import init_cloudinary
     init_cloudinary()

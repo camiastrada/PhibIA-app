@@ -1,0 +1,17 @@
+# Secretos - nunca deben terminar dentro de la imagen
+.env
+.env.*
+
+__pycache__/
+*.pyc
+
+# Archivos temporales de audio subidos
+app/uploads/*.wav
+app/uploads/*.webm
+
+tests/
+.pytest_cache/
+
+# Control de versiones
+.git
+.gitignore

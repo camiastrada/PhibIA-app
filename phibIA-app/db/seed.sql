@@ -171,6 +171,10 @@ INSERT INTO ubicaciones (ubicacion_id, descripcion, latitud, longitud)
 VALUES (1, 'Desconocida', 0.0, 0.0)
 ON CONFLICT (ubicacion_id) DO NOTHING;
 
+-- Resincronizar la secuencia: los INSERT con ubicacion_id explícito (arriba)
+-- no la avanzan, así que sin esto el próximo INSERT autogenerado choca con el id=1.
+SELECT setval(pg_get_serial_sequence('ubicaciones', 'ubicacion_id'), COALESCE((SELECT MAX(ubicacion_id) FROM ubicaciones), 1));
+
 
 -- Un usuario común de prueba
 INSERT INTO usuarios (name, email, password, register_date, rol)
