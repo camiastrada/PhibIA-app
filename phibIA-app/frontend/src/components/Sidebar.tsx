@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "/images/whiteLogo.png";
+import Logo from "/images/whiteLogo.webp";
 import "../styles/sidebar.css";
 import SidebarIcon from "./SidebarIcon.tsx";
 import SidebarLabel from "./SidebarLabel.tsx";

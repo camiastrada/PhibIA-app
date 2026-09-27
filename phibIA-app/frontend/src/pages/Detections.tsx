@@ -165,7 +165,7 @@ function Detections() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center">
+      <div className="h-screen flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
           <TitleWithSubtitle
             title="Mis Detecciones"
@@ -181,7 +181,7 @@ function Detections() {
 
   if (error) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center">
+      <div className="h-screen flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
           <TitleWithSubtitle title="Mis Detecciones" subtitle="Error al cargar" />
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
@@ -193,7 +193,7 @@ function Detections() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-y-auto">
+    <div className="flex flex-col items-center justify-center px-4 py-8 overflow-y-auto">
       <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 my-auto">
         <TitleWithSubtitle
           title="Mis Detecciones"

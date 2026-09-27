@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Map, { Marker, Popup } from "react-map-gl";
 import { SearchBox } from "@mapbox/search-js-react";
 import "mapbox-gl/dist/mapbox-gl.css";
-import frogIcon from "../assets/frog1.png";
+import frogIcon from "../assets/frog1.webp";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";

@@ -3,7 +3,7 @@ import Map, { Marker, Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { SearchBox } from "@mapbox/search-js-react";
 import { useSearchParams } from "react-router-dom";
-import ranaIcon from "../assets/frog2.png";
+import ranaIcon from "../assets/frog2.webp";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";

@@ -116,7 +116,7 @@ export default function AvatarSelector({
         <div
           className="relative w-full p-6 rounded-t-3xl flex justify-center items-center"
           style={{
-            backgroundImage: "url('/images/bgMainImage.png')",
+            backgroundImage: "url('/images/bgMainImage.webp')",
             backgroundSize: "cover",
             backgroundPosition: "top",
           }}

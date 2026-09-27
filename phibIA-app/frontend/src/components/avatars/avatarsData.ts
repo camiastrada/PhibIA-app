@@ -1,14 +1,14 @@
-import avatar1 from "../../assets/profileIcons/profileIcon1.png";
-import avatar2 from "../../assets/profileIcons/profileIcon2.png";
-import avatar3 from "../../assets/profileIcons/profileIcon3.png";
-import avatar4 from "../../assets/profileIcons/profileIcon4.png";
-import avatar5 from "../../assets/profileIcons/profileIcon5.png";
-import avatar6 from "../../assets/profileIcons/profileIcon6.png";
-import avatar7 from "../../assets/profileIcons/profileIcon7.png";
-import avatar8 from "../../assets/profileIcons/profileIcon8.png";
-import avatar9 from "../../assets/profileIcons/profileIcon9.png";
-import avatar10 from "../../assets/profileIcons/profileIcon10.png";
-import avatar11 from "../../assets/profileIcons/profileIcon11.png";
+import avatar1 from "../../assets/profileIcons/profileIcon1.webp";
+import avatar2 from "../../assets/profileIcons/profileIcon2.webp";
+import avatar3 from "../../assets/profileIcons/profileIcon3.webp";
+import avatar4 from "../../assets/profileIcons/profileIcon4.webp";
+import avatar5 from "../../assets/profileIcons/profileIcon5.webp";
+import avatar6 from "../../assets/profileIcons/profileIcon6.webp";
+import avatar7 from "../../assets/profileIcons/profileIcon7.webp";
+import avatar8 from "../../assets/profileIcons/profileIcon8.webp";
+import avatar9 from "../../assets/profileIcons/profileIcon9.webp";
+import avatar10 from "../../assets/profileIcons/profileIcon10.webp";
+import avatar11 from "../../assets/profileIcons/profileIcon11.webp";
 
 export interface AvatarData {
   id: number;

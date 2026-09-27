@@ -1,6 +1,6 @@
 import { useState,  type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-const RegisterImage = "/images/registerImage.jpg";
+const RegisterImage = "/images/registerImage.webp";
 import TextField from "./TextField.tsx";
 import { Link } from "react-router-dom";
 

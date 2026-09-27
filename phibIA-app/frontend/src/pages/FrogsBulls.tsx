@@ -289,7 +289,7 @@ export default function FrogsBulls() {
   };
 
   return (
-    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[url('/images/backgrounds/background.png')] bg-cover bg-center overflow-hidden flex justify-center items-center">
+    <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 overflow-hidden flex justify-center items-center">
       {showMiniMap && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl p-4 w-80 h-[22rem] md:w-96 md:h-[26rem] flex flex-col">

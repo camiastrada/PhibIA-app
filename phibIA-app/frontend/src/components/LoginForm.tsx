@@ -1,7 +1,7 @@
 import { useState,  type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-const LoginImage = "/images/loginImage.jpg";
+const LoginImage = "/images/loginImage.webp";
 import TextField from "./TextField.tsx";
 import { Link } from 'react-router-dom';
 

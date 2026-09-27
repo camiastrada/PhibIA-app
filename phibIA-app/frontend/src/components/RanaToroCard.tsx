@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "../styles/App.css";
 
-import RanaToroImg from "../assets/species/ranaToro.jpg";
+import RanaToroImg from "../assets/species/ranaToro.webp";
 import CameraIcon from "../assets/uiIcons/cameraIcon";
 
 function RanaToroCard() {

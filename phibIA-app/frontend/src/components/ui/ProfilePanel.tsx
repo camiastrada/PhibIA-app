@@ -1,5 +1,5 @@
 import { useAuth } from "../../context/AuthContext";
-import GuestAvatar from "../../assets/profileIcons/guestIcon.png";
+import GuestAvatar from "../../assets/profileIcons/guestIcon.webp";
 import { avatarsData } from "../avatars/avatarsData";
 
 interface UserAvatarProps {
