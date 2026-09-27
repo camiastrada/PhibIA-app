@@ -46,19 +46,20 @@ export default function Upload({
           </div>
         </div>
       )}
-      <div className="flex flex-col max-w-9/10 md:min-w-full md:h-3/5 rounded-3xl items-center justify-center shadow-xl">
-        <div className="relative w-full p-6 rounded-t-3xl flex justify-center items-center bg-[#004D40]">
+      <div className="flex flex-col max-w-9/10 md:min-w-full md:h-2/5 rounded-3xl items-center justify-center shadow-xl">
+        <div className="relative w-full p-6 rounded-t-3xl flex flex-col justify-center items-center bg-[#004D40]">
+          <button
+            type="button"
+            onClick={() => setIsImport(false)}
+            className="self-end text-white cursor-pointer"
+          >
+            <ExitIcon className="size-6" />
+          </button>
+
           <div className="">
             <TitleWithSubtitle title="Importar audio" titleColor="white" />
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsImport(false)}
-            className="absolute top-4 right-4 text-white cursor-pointer"
-          >
-            <ExitIcon className="size-6" />
-          </button>
         </div>
 
         <form

@@ -321,7 +321,7 @@ function Home() {
   return (
     <>
       {isImport && (
-        <div className="absolute flex w-auto flex-col justify-center items-center z-10 max-w-full overflow-hidden">
+        <div className="absolute flex w-auto h-full flex-col justify-center items-center z-10 max-w-full overflow-hidden">
           <Upload
             handleFileChange={handleFileChange}
             handleImportSubmit={handleImportSubmit}
