@@ -757,14 +757,9 @@ def init_routes(app):
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
-        # --- DIFERENCIACIÓN POR ROL ---
-        if user.rol == 'admin':
-            # Admin ve todos los audios ordenados por fecha
-            audios = Audio.query.order_by(Audio.fecha_grabacion.desc()).all()
-        else:
-            # Usuario común solo ve sus propios audios
-            audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
-        # -----------------------------
+        
+        audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+        
 
         detections = []
         for audio in audios:
@@ -784,14 +779,6 @@ def init_routes(app):
                     'descripcion': audio.ubicacion.descripcion
                 }
             }
-            
-            # Opcional útil: Si eres admin, quizás te sirva saber a qué usuario pertenece cada audio
-            if user.rol == 'admin' and hasattr(audio, 'usuario'):
-                detection_item['usuario'] = {
-                    'id': audio.usuario.usuario_id,
-                    'nombre': audio.usuario.name,
-                    'email': audio.usuario.email
-                }
 
             detections.append(detection_item)
 
@@ -817,11 +804,8 @@ def init_routes(app):
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
-        # El admin puede escuchar el audio de cualquier usuario; el resto solo el propio
-        if user.rol == 'admin':
-            audio = Audio.query.filter_by(audio_id=audio_id).first()
-        else:
-            audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
+   
+        audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
 
         if not audio:
             return jsonify({'error': 'Audio not found or access denied'}), 404
