@@ -5,18 +5,21 @@ interface Reporte {
   fecha_subida: string;
   usuario: string;
   ubicacion: string;
+  latitud: number | null;
+  longitud: number | null;
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
 function formatearFecha(iso: string) {
-  return new Date(iso).toLocaleDateString("es-AR", {
+  return new Date(iso).toLocaleString("es-AR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
-
 function GaleryUsers() {
   const [reportes, setReportes] = useState<Reporte[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,13 +78,24 @@ function GaleryUsers() {
                   <span className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-[#7CB342]" />
 
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span
-                      className="text-[#F2E9DC] text-xl md:text-2xl leading-tight"
-                      style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-                    >
-                      {r.ubicacion}
-                    </span>
-
+                    <div>
+                      <span
+                        className="text-[#F2E9DC] text-xl md:text-2xl leading-tight"
+                        style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+                      >
+                        {r.ubicacion}
+                      </span>
+                      {r.latitud !== null && r.longitud !== null && (
+                        <a
+                          href={`https://www.google.com/maps?q=${r.latitud},${r.longitud}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-[#7CB342] hover:underline"
+                        >
+                          📍 {r.latitud.toFixed(5)}, {r.longitud.toFixed(5)}
+                        </a>
+                      )}
+                    </div>
                     <span className="text-[#9FB8AD] text-sm">
                       {formatearFecha(r.fecha_subida)}
                     </span>
