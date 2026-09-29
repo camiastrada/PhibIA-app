@@ -5,6 +5,7 @@ import TitleWithSubtitle from "../ui/TitleWithSubtitle";
 import AvatarList from "./AvatarList";
 import ProfilePanel from "../ui/ProfilePanel";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
 
 interface AvatarSelectorProps {
   setOpenAvatarSelector: Dispatch<SetStateAction<boolean>>;
@@ -22,7 +23,6 @@ export default function AvatarSelector({
   );
   const [showProfilePanel, setShowProfilePanel] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const BACKEND_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
   //detecta el ancho del contenedor
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function AvatarSelector({
 
     const changeIcon = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/update_avatar`, {
+        const response = await fetch(`${API_URL}/update_avatar`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function AvatarSelector({
   const handleColorChange = async (color: string) => {
     setSelectedColor(color);
     try {
-      const response = await fetch(`${BACKEND_URL}/update_background`, {
+      const response = await fetch(`${API_URL}/update_background`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

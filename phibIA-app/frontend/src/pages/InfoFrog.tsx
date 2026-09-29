@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TitleWithSubtitle from '../components/ui/TitleWithSubtitle';
+import { API_URL } from '../config/api';
 
 // Componente Modal de Especie
 interface SpeciesInfo {
@@ -21,8 +22,6 @@ function InfoFrog() {
     const [isPlayingAudio, setIsPlayingAudio] = useState(false);
     const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
     const [imageError, setImageError] = useState(false);
-
-    const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
     useEffect(() => {
         fetchSpeciesInfo();

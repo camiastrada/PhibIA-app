@@ -15,7 +15,15 @@ COPY . .
 # 4️⃣ (Opcional pero útil) Asegurarse de que esbuild esté limpio
 RUN npm rebuild esbuild
 
-# 5️⃣ Compilar la app
+# 5️⃣ Configurar la base de la API ANTES de compilar.
+# Vite reemplaza import.meta.env.VITE_* en tiempo de build, no en runtime:
+# definir la variable sólo como `environment:` en docker-compose NO tiene
+# efecto sobre el bundle. Tiene que ser un ARG/ENV disponible en este paso.
+# Es el prefijo de la API (relativo), nunca el origen del backend.
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=${VITE_API_URL}
+
+# 6️⃣ Compilar la app
 RUN npm run build
 
 # Etapa de producción

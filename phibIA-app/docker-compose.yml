@@ -21,10 +21,12 @@ services:
       start_period: 60s
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # Vite la inyecta en tiempo de build; tiene que venir por acá.
+        VITE_API_URL: /api
     container_name: frontend_app
-    environment:
-      - VITE_API_URL=/api
     depends_on:
       - backend 
 

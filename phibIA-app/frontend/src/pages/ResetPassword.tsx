@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import TextField from "../components/TextField.tsx";
+import { API_URL } from "../config/api";
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 const PASSWORD_REQUIREMENTS_MESSAGE =
@@ -16,8 +17,6 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

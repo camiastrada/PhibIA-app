@@ -7,6 +7,7 @@ import LoginButton from "../components/LoginButton";
 import RegisterButton from "../components/RegisterButton";
 import AvatarSelector from "../components/avatars/AvatarSelector";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config/api";
 
 interface Detection {
   audio_id: number;
@@ -33,8 +34,6 @@ function Profile() {
   const [distinctSpecies, setDistinctSpecies] = useState(0);
   const [totalSpecies, setTotalSpecies] = useState(0);
   const [mostCaptured, setMostCaptured] = useState<{ nombre_comun: string; nombre_cientifico: string } | null>(null);
-
-  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -100,7 +99,7 @@ function Profile() {
     };
 
     fetchStats();
-  }, [isGuest, API_URL]);
+  }, [isGuest]);
 
   return (
   <>

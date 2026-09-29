@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import { API_URL } from "../config/api";
 
 interface SpeciesInfo {
   nombre_cientifico: string;
@@ -17,8 +18,6 @@ function Encyclopedia() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-
-  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   useEffect(() => {
     fetchSpecies();

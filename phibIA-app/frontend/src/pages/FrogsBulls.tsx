@@ -5,6 +5,7 @@ import BackIcon from "../assets/uiIcons/backIcon";
 import Toast from "../components/ui/Toast";
 import FrogsMap from "../components/FrogsMap";
 import MapPin from "../assets/uiIcons/ubicationPinIcon";
+import { API_URL } from "../config/api";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
 
@@ -260,7 +261,6 @@ export default function FrogsBulls() {
         formData.append("descripcion", descripcion);
       }
 
-      const API_URL = import.meta.env.VITE_API_URL ?? "/api";
       const res = await fetch(`${API_URL}/save-photo`, {
         method: "POST",
         body: formData,

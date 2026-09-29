@@ -619,7 +619,7 @@ def init_routes(app):
         return jsonify({'message': 'Contraseña actualizada correctamente'}), 200
 
 
-    @app.route("/api/user/profile", methods=["GET"])
+    @app.route("/user/profile", methods=["GET"])
     @jwt_required()
     def get_user_profile():
         user_id = get_jwt_identity() 

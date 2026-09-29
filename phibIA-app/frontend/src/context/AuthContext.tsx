@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { API_URL } from '../config/api';
 
 interface UserInfo {
   id: number;
@@ -22,26 +23,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
-  const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
   // Función para obtener datos del usuario desde el servidor
   const refreshUser = useCallback(async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/user/profile`, {
+      const response = await fetch(`${API_URL}/user/profile`, {
         credentials: 'include'
       });
-      
+
       if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        setUser(null);
+        setUser(await response.json());
+        return;
       }
+
+      // 401/422 = no hay sesión válida, el usuario es un invitado real.
+      if (response.status === 401 || response.status === 422) {
+        setUser(null);
+        return;
+      }
+
+      // Cualquier otro status es un fallo del servidor, no una sesión expirada.
+      console.error(
+        `Error al obtener perfil: ${response.status} ${response.statusText}`
+      );
     } catch (error) {
-      console.error('Error al obtener perfil:', error);
-      setUser(null);
+      // Error de red: la request no llegó al backend. No se marca como
+      // invitado porque eso enmascara la causa (backend caído, API_URL mal
+      // configurado, túnel sin conexión) y hace muy difícil diagnosticarla.
+      console.error('Error de red al obtener perfil:', error);
     }
-  }, [BACKEND_URL]);
+  }, []);
 
   const login = (userInfo: UserInfo) => {
     setUser(userInfo);
@@ -49,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const logout = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/logout`, {
+      const response = await fetch(`${API_URL}/logout`, {
         method: 'POST',
         credentials: 'include', // Incluir cookies HTTP-only
       });

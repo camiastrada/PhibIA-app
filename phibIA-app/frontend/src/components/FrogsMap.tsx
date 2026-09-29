@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { SearchBox } from "@mapbox/search-js-react";
 import { useSearchParams } from "react-router-dom";
 import ranaIcon from "../assets/frog2.webp";
+import { API_URL } from "../config/api";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
@@ -106,7 +107,6 @@ export default function FrogsMap({
   // ✅ Cargar TODAS las ubicaciones (sin filtro)
   const fetchLocations = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL ?? "/api";
       const url = `${API_URL}/ubicaciones`;
 
       const response = await fetch(url);

@@ -11,6 +11,7 @@ import UploadIcon from "../assets/uiIcons/uploadIcon";
 import InfoIcon from "../assets/uiIcons/infoIcon";
 import BackIcon from "../assets/uiIcons/backIcon";
 import RanaToroCard from "../components/RanaToroCard";
+import { API_URL } from "../config/api";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
 
@@ -23,8 +24,6 @@ function Home() {
   const chunksRef = useRef<Blob[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
   const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
-
-  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [listeningFile, setListeningFile] = useState(false);

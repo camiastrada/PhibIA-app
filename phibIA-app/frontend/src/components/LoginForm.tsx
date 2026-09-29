@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 const LoginImage = "/images/loginImage.webp";
 import TextField from "./TextField.tsx";
 import { Link } from 'react-router-dom';
+import { API_URL } from "../config/api";
 
 interface LoginFormData {
   email: string;
@@ -21,7 +22,6 @@ export default function LoginForm() {
 
   const navigate = useNavigate();
   const auth = useAuth();
-  const API_URL = import.meta.env.VITE_API_URL ?? '/api';
   const handleChange = (
     e: ChangeEvent<HTMLInputElement>
   ): void => {
