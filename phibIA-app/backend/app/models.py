@@ -97,6 +97,9 @@ class Imagen(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
     ubicacion_id = db.Column(db.Integer, db.ForeignKey('ubicaciones.ubicacion_id'), nullable=False)
 
+    latitud = db.Column(db.Float, nullable=True) 
+    longitud = db.Column(db.Float, nullable=True)
+
     # Revisión del admin: pendiente | confirmada (es rana toro) | rechazada (no es rana toro)
     estado = db.Column(db.String(20), nullable=False, default='pendiente')
     fecha_revision = db.Column(db.DateTime, nullable=True)
