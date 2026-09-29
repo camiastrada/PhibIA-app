@@ -20,6 +20,7 @@ function formatearFecha(iso: string) {
     minute: "2-digit",
   });
 }
+
 function GaleryUsers() {
   const [reportes, setReportes] = useState<Reporte[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,34 +70,36 @@ function GaleryUsers() {
               </p>
             </div>
           ) : (
-            <ol className="flex flex-col">
+            <ol className="flex flex-col text-left">
               {reportes.map((r, i) => (
                 <li
                   key={r.imagen_id}
-                  className="relative border-l-2 border-[#7CB342]/40 pl-6 pb-7 last:pb-0"
+                  className="relative border-l-2 border-[#7CB342]/40 pl-6 pb-7 last:pb-0 text-left"
                 >
                   <span className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-[#7CB342]" />
 
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <div>
+                  <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+                    <div className="flex flex-col items-start">
                       <span
                         className="text-[#F2E9DC] text-xl md:text-2xl leading-tight"
                         style={{ fontFamily: "'Fraunces', Georgia, serif" }}
                       >
                         {r.ubicacion}
                       </span>
-                      {r.latitud !== null && r.longitud !== null && (
+
+                      {r.latitud != null && r.longitud != null && (
                         <a
                           href={`https://www.google.com/maps?q=${r.latitud},${r.longitud}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-[#7CB342] hover:underline"
+                          className="text-xs text-[#7CB342] hover:underline mt-0.5"
                         >
-                          📍 {r.latitud.toFixed(5)}, {r.longitud.toFixed(5)}
+                          📍 Ver en el mapa
                         </a>
                       )}
                     </div>
-                    <span className="text-[#9FB8AD] text-sm">
+
+                    <span className="text-[#9FB8AD] text-sm pt-1.5">
                       {formatearFecha(r.fecha_subida)}
                     </span>
                   </div>
