@@ -286,9 +286,10 @@ def init_routes(app):
             imagen = Imagen(
                 ruta=result["url"],
                 public_id=result["public_id"],
-                fecha_subida=datetime.now(),
                 usuario_id=usuario_id,
                 ubicacion_id=ubicacion_id,
+                latitud=float(lat) if lat else None,
+                longitud=float(lng) if lng else None,
             )
             db.session.add(imagen)
             db.session.commit()
@@ -434,12 +435,28 @@ def init_routes(app):
                 delete_image(imagen.public_id)
             except Exception as cloud_error:
                 print(f"Error eliminando de Cloudinary: {cloud_error}")
+    
+            imagen.estado = 'confirmada' if es_rana_toro else 'rechazada'
+            imagen.fecha_revision = datetime.now()
+            imagen.revisado_por = current_user_id
+            imagen.ruta = None
+            imagen.public_id = None
 
-        imagen.estado = 'confirmada' if es_rana_toro else 'rechazada'
-        imagen.fecha_revision = datetime.now()
-        imagen.revisado_por = current_user_id
-        imagen.ruta = None
-        imagen.public_id = None
+        # Solo borrar de Cloudinary si fue rechazada (no es rana toro)
+        #if not es_rana_toro and imagen.public_id:
+        #    try:
+        #        from .cloudinary_config import delete_image
+        #        delete_image(imagen.public_id)
+        #    except Exception as cloud_error:
+        #        print(f"Error eliminando de Cloudinary: {cloud_error}")
+#
+        #imagen.estado = 'confirmada' if es_rana_toro else 'rechazada'
+        #imagen.fecha_revision = datetime.now()
+        #imagen.revisado_por = current_user_id
+#
+        #if not es_rana_toro:
+        #    imagen.ruta = None
+        #    imagen.public_id = None
 
         try:
             db.session.commit()
