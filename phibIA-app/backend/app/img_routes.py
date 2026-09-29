@@ -1,7 +1,14 @@
 from flask import Blueprint, jsonify
 from .models import Imagen
+from datetime import timezone
 
 imagenes_bp = Blueprint("reportes", __name__)
+
+
+def fecha_iso_utc(fecha):
+    if not fecha:
+        return None
+    return fecha.replace(tzinfo=timezone.utc).isoformat()
 
 
 @imagenes_bp.route("/reportes/publicas", methods=["GET"])
@@ -19,7 +26,7 @@ def obtener_imagenes_publicas():
     for imagen in imagenes:
         resultado.append({
             "imagen_id": imagen.imagen_id,
-            "fecha_subida": imagen.fecha_subida.isoformat() if imagen.fecha_subida else None,
+            "fecha_subida": fecha_iso_utc(imagen.fecha_subida),
             "usuario": imagen.usuario.name,
             "ubicacion": imagen.ubicacion.descripcion,
             "latitud": imagen.latitud,        
