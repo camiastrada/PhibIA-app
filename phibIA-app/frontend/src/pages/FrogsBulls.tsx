@@ -6,34 +6,46 @@ import Toast from "../components/ui/Toast";
 import FrogsMap from "../components/FrogsMap";
 import MapPin from "../assets/uiIcons/ubicationPinIcon";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
+const MAPBOX_TOKEN =
+  "pk.eyJ1IjoiYWdvc3JvZHJpZ3VleiIsImEiOiJjbWhjeWRmcHcwZ2Y4MmxwdHRxa2x2Zm15In0.9cwGVix-S-zFHfXSs1DgBw";
 
-async function getLocationDescription(lng: number, lat: number): Promise<string> {
+async function getLocationDescription(
+  lng: number,
+  lat: number,
+): Promise<string> {
+  const fallback = "Ubicación del usuario";
   try {
     const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&language=es`
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&language=es`,
     );
-
-    if (!response.ok) return "Ubicación del usuario";
+    if (!response.ok) return fallback;
 
     const data = await response.json();
     const features = data.features || [];
-    if (features.length === 0) return "Ubicación del usuario";
+    if (features.length === 0) return fallback;
 
-    const place = features.find(
-      (f: any) => f.place_type.includes("place") || f.place_type.includes("locality")
-    );
+    const f = features[0];
+    const ciudad = features.find((x: any) =>
+      x.place_type.includes("place"),
+    )?.text;
 
-    return place?.text || features[0]?.text || "Ubicación del usuario";
+    const calle = f.place_type.includes("address")
+      ? `${f.text}${f.address ? " " + f.address : ""}`
+      : f.text;
+
+    const nombre = [...new Set([calle, ciudad].filter(Boolean))].join(", ");
+    return (nombre || fallback).slice(0, 100);
   } catch (error) {
     console.error("Error al obtener descripción de ubicación:", error);
-    return "Ubicación del usuario";
+    return fallback;
   }
 }
 
 export default function FrogsBulls() {
   const [photo, setPhoto] = useState<string | null>(null);
-  const [photoSource, setPhotoSource] = useState<"camera" | "upload" | null>(null);
+  const [photoSource, setPhotoSource] = useState<"camera" | "upload" | null>(
+    null,
+  );
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -45,11 +57,17 @@ export default function FrogsBulls() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
-  const showToast = useCallback((message: string, type: "success" | "error") => {
-    setToast({ message, type });
-  }, []);
+  const showToast = useCallback(
+    (message: string, type: "success" | "error") => {
+      setToast({ message, type });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (isCameraOn && videoRef.current) {
@@ -107,7 +125,7 @@ export default function FrogsBulls() {
           }
           reject(new Error(errorMsg));
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
       );
     });
   };
@@ -120,10 +138,7 @@ export default function FrogsBulls() {
         setUserLocation(location);
       } catch (error: any) {
         console.error("Error de ubicación:", error.message);
-        showToast(
-          `Sin ubicación: ${error.message}`,
-          "error"
-        );
+        showToast(`Sin ubicación: ${error.message}`, "error");
         setUserLocation(null);
       } finally {
         setIsGettingLocation(false);
@@ -162,7 +177,7 @@ export default function FrogsBulls() {
       console.error("Error al acceder a la cámara:", err);
       showToast(
         "No se pudo acceder a la cámara. Permite los permisos.",
-        "error"
+        "error",
       );
       setIsGettingLocation(false);
     }
@@ -255,7 +270,7 @@ export default function FrogsBulls() {
         formData.append("lng", userLocation.lng.toString());
         const descripcion = await getLocationDescription(
           userLocation.lng,
-          userLocation.lat
+          userLocation.lat,
         );
         formData.append("descripcion", descripcion);
       }
@@ -269,10 +284,7 @@ export default function FrogsBulls() {
       if (!res.ok) {
         const errorData = await res.json();
         console.error("Error al guardar la foto:", errorData);
-        showToast(
-          `Error: ${errorData.error || "Error desconocido"}`,
-          "error"
-        );
+        showToast(`Error: ${errorData.error || "Error desconocido"}`, "error");
       } else {
         const result = await res.json();
         console.log("Foto guardada:", result);
@@ -316,133 +328,135 @@ export default function FrogsBulls() {
       <div className="flex flex-col justify-center items-center w-full h-full max-w-6xl my-4 md:my-0 max-h-[calc(100vh-4rem)] md:max-h-[85vh] overflow-y-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-3 md:p-5">
         <div className="w-full h-full flex flex-col items-center">
           <div className="m-auto w-full flex flex-col items-center">
-          <TitleWithSubtitle
-            title={"¿Descubriste una rana toro?"}
-            subtitle={
-              "Tomale una foto para notificar su ubicación"
-            }
-          />
+            <TitleWithSubtitle
+              title={"¿Descubriste una rana toro?"}
+              subtitle={"Tomale una foto para notificar su ubicación"}
+            />
 
-          {!photo ? (
-            <div className="flex flex-col items-center gap-3 mt-3">
-              <div className={`relative ${isCameraOn ? "block" : "hidden"}`}>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="border-4 border-white-500 rounded-lg w-72 h-52 md:w-80 md:h-60 bg-white object-cover"
-                />
-              </div>
-
-              {!isCameraOn && (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg w-72 h-52 md:w-80 md:h-60 flex items-center justify-center bg-gray-100">
-                  <div className="text-center text-gray-500">
-                    <div className="text-4xl mb-2"></div>
-                    <p className="text-sm md:text-base px-2">
-                      {isGettingLocation
-                        ? "Obteniendo ubicación..."
-                        : "Activá la cámara o subí una foto desde tu galería"}
-                    </p>
-                    {isGettingLocation && (
-                      <div className="mt-2">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500 mx-auto"></div>
-                      </div>
-                    )}
-                  </div>
+            {!photo ? (
+              <div className="flex flex-col items-center gap-3 mt-3">
+                <div className={`relative ${isCameraOn ? "block" : "hidden"}`}>
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="border-4 border-white-500 rounded-lg w-72 h-52 md:w-80 md:h-60 bg-white object-cover"
+                  />
                 </div>
-              )}
 
-              <canvas ref={canvasRef} className="hidden" />
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/jpg,image/png"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-
-              <div className="flex flex-wrap gap-2 md:gap-4 mt-2 justify-center">
                 {!isCameraOn && (
-                  <>
-                    <button
-                      className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={startCamera}
-                      disabled={isGettingLocation}
-                    >
-                      {isGettingLocation
-                        ? "Obteniendo ubicación..."
-                        : "Activar Cámara"}
-                    </button>
-                    <button
-                      className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      Subir desde galería
-                    </button>
-                  </>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg w-72 h-52 md:w-80 md:h-60 flex items-center justify-center bg-gray-100">
+                    <div className="text-center text-gray-500">
+                      <div className="text-4xl mb-2"></div>
+                      <p className="text-sm md:text-base px-2">
+                        {isGettingLocation
+                          ? "Obteniendo ubicación..."
+                          : "Activá la cámara o subí una foto desde tu galería"}
+                      </p>
+                      {isGettingLocation && (
+                        <div className="mt-2">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500 mx-auto"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
-                {isCameraOn && (
-                  <>
-                    <button
-                      className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
-                      onClick={takePhoto}
-                    >
-                      Tomar Foto
-                    </button>
-                    <button
-                      className="bg-gray-500 hover:bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
-                      onClick={stopCamera}
-                    >
-                      Detener
-                    </button>
-                  </>
+
+                <canvas ref={canvasRef} className="hidden" />
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+
+                <div className="flex flex-wrap gap-2 md:gap-4 mt-2 justify-center">
+                  {!isCameraOn && (
+                    <>
+                      <button
+                        className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={startCamera}
+                        disabled={isGettingLocation}
+                      >
+                        {isGettingLocation
+                          ? "Obteniendo ubicación..."
+                          : "Activar Cámara"}
+                      </button>
+                      <button
+                        className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        Subir desde galería
+                      </button>
+                    </>
+                  )}
+                  {isCameraOn && (
+                    <>
+                      <button
+                        className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
+                        onClick={takePhoto}
+                      >
+                        Tomar Foto
+                      </button>
+                      <button
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold text-base md:text-lg"
+                        onClick={stopCamera}
+                      >
+                        Detener
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center mt-3 gap-3">
+                <img
+                  src={photo}
+                  alt="Rana Toro"
+                  className="rounded-lg border-4 border-[#43A047] shadow-lg w-auto max-w-full max-h-[40vh] md:max-h-[45vh] object-contain"
+                />
+
+                <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
+                  <button
+                    className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
+                    onClick={() => {
+                      resetPhoto();
+                      if (photoSource === "camera") {
+                        startCamera();
+                      }
+                    }}
+                  >
+                    <BackIcon className="size-4 md:size-5" />
+                    {photoSource === "camera"
+                      ? "Volver a Capturar"
+                      : "Elegir otra foto"}
+                  </button>
+                  <button
+                    className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
+                    onClick={savePhoto}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Guardando..." : "Guardar Foto"}
+                  </button>
+                </div>
+
+                {photoSource === "upload" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowMiniMap(true)}
+                    className="cursor-pointer hover:brightness-110 text-(--color-text-main) text-sm md:text-base font-semibold flex justify-center items-center gap-1"
+                  >
+                    {userLocation
+                      ? "Cambiar ubicación"
+                      : "Seleccionar ubicación"}
+                    <MapPin />
+                  </button>
                 )}
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center mt-3 gap-3">
-              <img
-                src={photo}
-                alt="Rana Toro"
-                className="rounded-lg border-4 border-[#43A047] shadow-lg w-auto max-w-full max-h-[40vh] md:max-h-[45vh] object-contain"
-              />
-
-              <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
-                <button
-                  className="bg-[#43A047] hover:bg-[#357a38] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
-                  onClick={() => {
-                    resetPhoto();
-                    if (photoSource === "camera") {
-                      startCamera();
-                    }
-                  }}
-                >
-                  <BackIcon className="size-4 md:size-5" />
-                  {photoSource === "camera" ? "Volver a Capturar" : "Elegir otra foto"}
-                </button>
-                <button
-                  className="bg-[#1976D2] hover:bg-[#1565C0] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 font-semibold text-sm md:text-base"
-                  onClick={savePhoto}
-                  disabled={isSaving}
-                >
-                  {isSaving ? "Guardando..." : "Guardar Foto"}
-                </button>
-              </div>
-
-              {photoSource === "upload" && (
-                <button
-                  type="button"
-                  onClick={() => setShowMiniMap(true)}
-                  className="cursor-pointer hover:brightness-110 text-(--color-text-main) text-sm md:text-base font-semibold flex justify-center items-center gap-1"
-                >
-                  {userLocation ? "Cambiar ubicación" : "Seleccionar ubicación"}
-                  <MapPin />
-                </button>
-              )}
-            </div>
-          )}
+            )}
           </div>
         </div>
 
