@@ -40,10 +40,10 @@ function RanaToroCard() {
       <Link
         to="/add-photo"
         aria-label="Ayudanos a encontrar a la rana toro"
-        className="absolute -bottom-1 -right-1 z-30 md:hidden"
+        className="absolute -top-1 -right-1 z-30 md:hidden"
       >
         <span className="absolute inset-0 rounded-full bg-[#E5B96B]/50 animate-ping-soft" />
-        <span className="relative block size-16 rounded-full overflow-hidden border-4 border-[#E5B96B] bg-[#F4DFB8] shadow-xl ">
+        <span className="relative block size-24 rounded-full overflow-hidden border-4 border-[#E5B96B] bg-[#F4DFB8] shadow-xl ">
           <img
             src={RanaToroImg}
             alt="Rana Toro"

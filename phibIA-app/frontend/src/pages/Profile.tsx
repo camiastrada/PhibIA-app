@@ -135,7 +135,7 @@ function Profile() {
           ) : (<LogoutButton />)}
         </div>
 
-        <div className={`flex-1 w-full lg:w-auto justify-center items-center ${isGuest ? "hidden" : "flex"}`}>
+        <div className={`flex m-5 w-full lg:w-auto justify-center items-center ${isGuest ? "hidden" : "flex"}`}>
           <div id="info" className="flex-none flex-col flex w-full lg:w-auto items-start justify-center gap-4 px-2 mt-6 lg:mt-0" >
             <div className="flex justify-start items-center gap-2 flex-wrap">
               <p className="font-medium text-[var(--color-text-main)]">Nº de detecciones:</p>
