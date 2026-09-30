@@ -318,7 +318,7 @@ function Home() {
   };
 
   return (
-    <>
+    <div className="relative w-full h-full">
       {isImport && (
         <div className="absolute flex w-auto h-full flex-col justify-center items-center z-10 max-w-full overflow-hidden">
           <Upload
@@ -329,130 +329,135 @@ function Home() {
           />
         </div>
       )}
-      <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center overflow-hidden flex justify-center items-center">
+      <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[...] bg-cover bg-center flex justify-center items-center">
         <div className={`flex flex-row justify-center items-center w-full h-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl p-4 ${isImport ? "blur-xs" : ""}`}>
 
           {/*apartado de grabar audios*/}
-          <div className="w-full h-full flex flex-col items-center justify-center">
-            <TitleWithSubtitle
-              title={hasPrediction ? specieName : "¡Comienza a grabar!"}
-              subtitle={
-                hasPrediction
-                  ? commonName || "Nombre común no disponible"
-                  : "Acercate al anfibio y graba su canto para detectar su especie"
-              }
-            />
-
-            {isProcessing ? (
-              <div className="flex flex-col items-center justify-center gap-6 my-12">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
-                <p className="text-lg text-[#004D40] font-semibold">
-                  Analizando audio...
-                </p>
-                <p className="text-sm text-gray-600">
-                  Esto puede tomar unos segundos
-                </p>
-              </div>
-            ) : (
-              <ResultPanel
-                listening={listening}
-                prediction={hasPrediction || listeningFile}
-                specie={specieNumber}
-                confidence={confidence}
+          <div className="w-full md:w-3/5 h-full min-h-0 overflow-y-auto flex flex-col items-center">
+            {/* my-auto centra el contenido cuando entra y colapsa a 0 cuando
+                excede la caja, para que el scroll nunca recorte el inicio.
+                Con justify-center + overflow, el tope quedaria inalcanzable. */}
+            <div className="my-auto w-full flex flex-col items-center">
+              <TitleWithSubtitle
+                title={hasPrediction ? specieName : "¡Comienza a grabar!"}
+                subtitle={
+                  hasPrediction
+                    ? commonName || "Nombre común no disponible"
+                    : "Acercate al anfibio y graba su canto para detectar su especie"
+                }
               />
-            )}
 
-            {/* Botones grabar/importar */}
-            {!hasPrediction && (
-              <div className="flex flex-col justify-around items-center mt-4">
-                  <button
-                    type="button"
-                    disabled = {isImport}
-                    onClick={() => {
-                      listening ? stopRecording() : startRecording();
-                      setIsImport(false);
-                    }}
-                    className={`flex flex-row justify-center ${
-                      listening
-                        ? "bg-transparent text-red-600 animate-pulse"
-                        : isImport
-                        ? "bg-[#43A047] rounded-xl shadow-lg text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                        : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                    }
-                    ${isImport ? "" : "cursor-pointer"}`}
-                  >
-                    {listening ? (
-                      <StopRecordIcon className="size-15" />
-                    ) : (
-                      <>
-                        <p>Grabar</p>
-                        <MicrophoneIcon className="size-6" />
-                      </>
-                    )}
-                  </button>
+              {isProcessing ? (
+                <div className="flex flex-col items-center justify-center gap-6 my-12">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
+                  <p className="text-lg text-[#004D40] font-semibold">
+                    Analizando audio...
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Esto puede tomar unos segundos
+                  </p>
+                </div>
+              ) : (
+                <ResultPanel
+                  listening={listening}
+                  prediction={hasPrediction || listeningFile}
+                  specie={specieNumber}
+                  confidence={confidence}
+                />
+              )}
 
-                  <button
-                    type="button"
-                    disabled = {isImport}
-                    onClick={() => {
-                      setIsImport(true);
-                      setListening(false);
-                      setUserLocation(null);
-                      setPredictedSpecies(null);
-                      setConfidence(null);
-                    }}
-                    className={`mt-4 text-[#004D40] flex-row justify-center items-center gap-1  ${isImport ? "" : "hover:text-[#02372E] cursor-pointer"}`}
-                  >
-                    Importar grabación
-                    <UploadIcon className="size-4 inline-block" />
-                  </button>
-              </div>
-            )}
+              {/* Botones grabar/importar */}
+              {!hasPrediction && (
+                <div className="flex flex-col justify-around items-center mt-4">
+                    <button
+                      type="button"
+                      disabled = {isImport}
+                      onClick={() => {
+                        listening ? stopRecording() : startRecording();
+                        setIsImport(false);
+                      }}
+                      className={`flex flex-row justify-center ${
+                        listening
+                          ? "bg-transparent text-red-600 animate-pulse"
+                          : isImport
+                          ? "bg-[#43A047] rounded-xl shadow-lg text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                          : "bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                      }
+                      ${isImport ? "" : "cursor-pointer"}`}
+                    >
+                      {listening ? (
+                        <StopRecordIcon className="size-15" />
+                      ) : (
+                        <>
+                          <p>Grabar</p>
+                          <MicrophoneIcon className="size-6" />
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled = {isImport}
+                      onClick={() => {
+                        setIsImport(true);
+                        setListening(false);
+                        setUserLocation(null);
+                        setPredictedSpecies(null);
+                        setConfidence(null);
+                      }}
+                      className={`mt-4 text-[#004D40] flex-row justify-center items-center gap-1  ${isImport ? "" : "hover:text-[#02372E] cursor-pointer"}`}
+                    >
+                      Importar grabación
+                      <UploadIcon className="size-4 inline-block" />
+                    </button>
+                </div>
+              )}
 
             
 
-            {hasPrediction && (
-              <div className="flex flex-col items-center gap-4 mt-4">
-                <Link
-                  to={"/encyclopedia/" + specieName}
-                  className="text-[#004D40] hover:text-[#02372E] flex gap-1"
-                >
-                  <InfoIcon />
-                  Ver información detallada
-                </Link>
-
-                {(userLocation || manualLocation) && (
+              {hasPrediction && (
+                <div className="flex flex-col items-center gap-4 mt-4">
                   <Link
-                    to={`/map?lat=${(userLocation || manualLocation)?.lat}&lng=${
-                      (userLocation || manualLocation)?.lng
-                    }&especie=${encodeURIComponent(commonName || "")}`} // ✅ USA commonName
-                    className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                    to={"/encyclopedia/" + specieName}
+                    className="text-[#004D40] hover:text-[#02372E] flex gap-1"
                   >
-                    Ver en mapa
+                    <InfoIcon />
+                    Ver información detallada
                   </Link>
-                )}
 
-                <button
-                  type="button"
-                  onClick={resetState}
-                  className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
-                >
-                  Volver
-                  <BackIcon className="size-5" />
-                </button>
-              </div>
-            )}
+                  {(userLocation || manualLocation) && (
+                    <Link
+                      to={`/map?lat=${(userLocation || manualLocation)?.lat}&lng=${
+                        (userLocation || manualLocation)?.lng
+                      }&especie=${encodeURIComponent(commonName || "")}`} // ✅ USA commonName
+                      className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#1565C0] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                    >
+                      Ver en mapa
+                    </Link>
+                  )}
 
-            {error && (
-              <p className="mt-4 text-red-600 text-center">Error: {error}</p>
-            )}
+                  <button
+                    type="button"
+                    onClick={resetState}
+                    className="flex bg-[#43A047] rounded-xl shadow-lg hover:shadow-xl hover:bg-[#357a38] text-white w-full max-w-50 md:max-w-60 px-6 py-3 text-lg font-semibold items-center justify-center gap-1"
+                  >
+                    Volver
+                    <BackIcon className="size-5" />
+                  </button>
+                </div>
+              )}
+
+              {error && (
+                <p className="mt-4 text-red-600 text-center">Error: {error}</p>
+              )}
+            </div>
           </div>
 
           {/* apartado de la rana toro */}
           <RanaToroCard />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

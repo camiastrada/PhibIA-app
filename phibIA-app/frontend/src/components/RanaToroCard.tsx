@@ -8,7 +8,7 @@ function RanaToroCard() {
   return (
     <>
       {/* Versión desktop: tarjeta en la columna derecha */}
-      <div className="w-3/5 h-full hidden md:flex flex-col items-center justify-center">
+      <div className="w-2/5 h-full hidden md:flex flex-col items-center justify-center">
         <div className="relative flex flex-col items-center gap-3 rounded-2xl p-5 w-full max-w-xs bg-gradient-to-br from-[#FDF3E0] to-[#F4DFB8] border-2 border-[#E5B96B] shadow-lg">
           <div className="flex flex-col items-center gap-1">
             <h2 className="text-2xl font-bold text-[#004D40]">
@@ -40,7 +40,7 @@ function RanaToroCard() {
       <Link
         to="/add-photo"
         aria-label="Ayudanos a encontrar a la rana toro"
-        className="absolute -top-1 -right-1 z-30 md:hidden"
+        className="absolute top-2 right-2 z-30 md:hidden"
       >
         <span className="absolute inset-0 rounded-full bg-[#E5B96B]/50 animate-ping-soft" />
         <span className="relative block size-24 rounded-full overflow-hidden border-4 border-[#E5B96B] bg-[#F4DFB8] shadow-xl ">

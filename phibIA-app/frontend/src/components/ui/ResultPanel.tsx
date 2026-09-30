@@ -82,7 +82,7 @@ export default function ResultPanel({listening, prediction , specie, confidence}
         >
           <div
             id="panel"
-            className="bg-[#004D40] rounded-full size-40 md:size-60 flex justify-center items-center"
+            className="relative bg-[#004D40] rounded-full size-40 md:size-60 flex justify-center items-center"
           >
             {listening || prediction || thinking ? (
                 <div className="flex justify-center items-center">
