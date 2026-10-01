@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from . import db
 import bcrypt;
@@ -87,15 +87,21 @@ class Audio(db.Model):
     def __repr__(self):
         return f'<Audio {self.audio_id}>'
 
+def ahora_utc():
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
 class Imagen(db.Model):
     __tablename__ = 'imagenes'
 
     imagen_id = db.Column(db.Integer, primary_key=True)
     ruta = db.Column(db.String(255), nullable=True)
     public_id = db.Column(db.String(255), nullable=True)
-    fecha_subida = db.Column(db.DateTime, nullable=False)
+    fecha_subida = db.Column(db.DateTime, nullable=False, default=ahora_utc)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.usuario_id'), nullable=False)
     ubicacion_id = db.Column(db.Integer, db.ForeignKey('ubicaciones.ubicacion_id'), nullable=False)
+
+    latitud = db.Column(db.Float, nullable=True) 
+    longitud = db.Column(db.Float, nullable=True)
 
     # Revisión del admin: pendiente | confirmada (es rana toro) | rechazada (no es rana toro)
     estado = db.Column(db.String(20), nullable=False, default='pendiente')

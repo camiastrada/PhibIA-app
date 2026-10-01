@@ -7,6 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 
+
 jwt = JWTManager()
 db = SQLAlchemy()
 limiter = Limiter(key_func=get_remote_address)
@@ -77,6 +78,10 @@ def create_app():
 
     from .routes import init_routes
     init_routes(app)
+
+    from .img_routes import imagenes_bp
+    app.register_blueprint(imagenes_bp)
+
 
     # Manejar 413 Request Entity Too Large y devolver JSON legible
     try:
