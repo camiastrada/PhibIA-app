@@ -11,7 +11,7 @@ Muy alta</br>
 Se reproducen en diversos ambientes acuáticos, incluyendo frecuentemente cuerpos de agua efímeros o temporales en áreas urbanas y periurbanas.</br>
 <b>Comportamiento: </b>
 Terrestres. Hábito diurno y nocturno. Pulso reproductivo explosivo al comienzo de la temporada (septiembre-octubre). Huevos colocados en largos cordones gelatinosos oscuros.
-', 'photo/RhinellaArenarum.png'),
+', 'photo/RhinellaArenarum.webp'),
 ('Odontophrynus asper', 'Escuercito', '<b>Tamaño: </b>
 4-7 cm</br>
 <b>Rasgos distintivos: </b>
@@ -22,7 +22,7 @@ Media</br>
 Pastizales y lagunas temporales de áreas urbanas, periurbanas y agrícolas.</br>
 <b>Comportamiento: </b>
 Terrestre, con hábitos fosoriales. Actividad crepuscular y nocturna. Huevos negros colocados sueltos en el fondo de los cuerpos de agua.
-', 'photo/OdontophrynusAsper.png'),
+', 'photo/OdontophrynusAsper.webp'),
 ('Boana pulchella', 'Ranita trepadora, Ranita del zarzal', '<b>Tamaño: </b>
 4-5 cm</br>
 <b>Rasgos distintivos: </b>
@@ -33,7 +33,7 @@ Media-alta</br>
 Humedales con vegetación arraigada emergente como bañados, lagunas y bosques ribereños.</br>
 <b>Comportamiento: </b>
 Hábitos acuáticos, trepadores y arborícolas. Actividad vocal generalmente nocturna. Durante el día pueden ser observadas asoleándose en vegetación o rocas. Los huevos son depositados en el agua, en masas gelatinosas adheridas a las plantas sumergidas.
-', 'photo/BoanaPulchella.png'),
+', 'photo/BoanaPulchella.webp'),
 ('Ceratophrys cranwelli', 'Escuerzo', '<b>Tamaño: </b>
 10-13 cm</br>
 <b>Rasgos distintivos: </b>
@@ -44,7 +44,7 @@ Media-Baja</br>
 Pastizal, áreas rurales inundables, banquinas. </br>
 <b>Comportamiento: </b>
 Hábitos terrestres, fosoriales, nocturnos. Activo después de precipitaciones intensas. Pueden encontrarse semienterrados en la orilla de los cuerpos de agua.
-', 'photo/CeratophrysCranwelli.png'),
+', 'photo/CeratophrysCranwelli.webp'),
 ('Leptodactylus gracilis', 'Ranita rayada', '<b>Tamaño: </b>
 4-6 cm</br>
 <b>Rasgos distintivos: </b>
@@ -55,7 +55,7 @@ Muy alta.</br>
 Amplia variedad de ambientes (pastizales, áreas inundables, banquinas, bordes de charcas, zanjas). Frecuentemente asociada a cultivos y áreas urbanizadas donde suele ser muy abundante.</br>
 <b>Comportamiento: </b>
 Terrestre (cavícola) y saltadora. Hábito diurno y nocturno. Los machos vocalizan desde cuevas, que ellos mismos construyen, en las orillas de los cuerpos de agua. Los huevos son depositados dentro de las mismas en nidos de espuma.
-', 'photo/LeptodactylusGracilis.png'),
+', 'photo/LeptodactylusGracilis.webp'),
 ('Leptodactylus latinasus', 'Ranita piadora, Ranita de las cunetas', '<b>Tamaño: </b>
 3-4 cm</br>
 <b>Rasgos distintivos: </b>
@@ -66,7 +66,7 @@ Muy alta</br>
 Amplia variedad de ambientes (pastizales, áreas inundables, banquinas, bordes de charcas, zanjas). Frecuentemente asociada a cultivos y áreas urbanizadas donde suele ser muy abundante.</br>
 <b>Comportamiento: </b>
 Terrestre (cavícola) y saltadora. Los machos construyen cuevas cercanas a cuerpos de agua y vocalizan desde la entrada o sobre la tierra en áreas próximas a las cuevas. La oviposición ocurre en nidos de espuma dentro de las cuevas.
-', 'photo/LeptodactylusLatinasus.png'),
+', 'photo/LeptodactylusLatinasus.webp'),
 ('Leptodactylus luctator', 'Rana criolla', '<b>Tamaño: </b>
 12-14 cm</br>
 <b>Rasgos distintivos: </b>
@@ -77,7 +77,7 @@ Media</br>
 Cuerpos de agua temporales y permanentes, en ambientes naturales, urbanos y agrícolas.</br>
 <b>Comportamiento: </b>
 Terrestre y saltadora. Hábito diurno y nocturno. Huevos de color negro depositados en nidos de espuma flotante (a veces comunales) de gran tamaño adherido a la vegetación. Cuidado parental prolongado.
-', 'photo/LeptodactylusLuctator.png'),
+', 'photo/LeptodactylusLuctator.webp'),
 ('Leptodactylus mystacinus', 'Ranita de bigotes', '<b>Tamaño: </b>
 5-6 cm</br>
 <b>Rasgos distintivos: </b>
@@ -88,7 +88,7 @@ Media</br>
 Lugares con vegetación de gramíneas o pajonales, no siempre asociado a cuerpos de agua. Suele refugiarse en cuevas, bajo troncos o piedras.</br>
 <b>Comportamiento: </b>
 Hábitos principalmente nocturnos. Los machos construyen cuevas desde donde realizan el llamado nupcial. Los huevos son de color blanquecino y se depositan en nidos de espuma dentro de las cuevas.
-', 'photo/LeptodactylusMystacinus.png'),
+', 'photo/LeptodactylusMystacinus.webp'),
 ('Pleurodema tucumanum', 'Ranita de flancos manchados', '<b>Tamaño:</b>
 4 cm</br>
 <b>Rasgos distintivos: </b>
@@ -99,7 +99,7 @@ Media</br>
 Cuerpos de agua temporales (charcos, lagunas, zanjas) en ambientes naturales, periurbanos y rurales.</br>
 <b>Comportamiento: </b>
 Hábito principalmente nocturno. Terrestres, fosoriales. Huevos depositados en nidos de espuma flotantes.
-', 'photo/PleurodemaTucumanum.png'),
+', 'photo/PleurodemaTucumanum.webp'),
 ('Scinax nasicus', 'Ranita hocicuda manchada; Ranita hocicuda trepadora', '<b>Tamaño: </b>
 3-4 cm</br>
 <b>Rasgos distintivos: </b>
@@ -110,7 +110,7 @@ Baja</br>
 Ambientes naturales abiertos como pastizales y bañados. También en sitios húmedos periurbanos.</br>
 <b>Comportamiento: </b>
 Hábito nocturno. Trepadora y arborícola. Frecuentemente vocalizando desde ramas de árboles y arbustos bajos o sobre la vegetación ribereña. Huevos depositados en masas adheridas a plantas acuáticas o dispersos en el fondo del cuerpo de agua.
-', 'photo/ScinaxNasicus.png'),
+', 'photo/ScinaxNasicus.webp'),
 ('Physalaemus biligonigerus', 'Ranita llorona', '<b>Tamaño: </b>
 3-4 cm</br>
 <b>Rasgos distintivos: </b>
@@ -121,7 +121,7 @@ Media-Alta</br>
 Pastizales y llanuras inundables. Muy frecuentemente activos en ambientes urbanos, periurbanos y rurales.</br>
 <b>Comportamiento: </b>
 Hábito principalmente nocturno. Vocalizan generalmente flotando en el agua. Los huevos son depositados en nidos de espuma de forma esférica y pequeño tamaño, que flotan en la superficie.
-', 'photo/PhysalaemusBiligonigerus.png'),
+', 'photo/PhysalaemusBiligonigerus.webp'),
 ('Aquarana catesbeiana', 'Rana toro', '<b>Características morfológicas: </b>
 Es una especie de gran tamaño que puede alcanzar un tamaño de 10 – 20 centímetros y un
 peso entre los 60 -1000 gramos. El color dorsal varía de verde claro u oliva a café verdoso,
@@ -142,7 +142,7 @@ arroyos serranos.</br>
 <b>¿Cómo son sus huevos y renacuajos? </b>
 Los huevos son depositados por las hembras en el cuerpo de agua en forma de un nido de
 espuma. Los renacuajos son grandes llegando a medir entre 15 y 18 centímetros. Son de
-forma globosa con una cola de gran tamaño presentan un color grisáceo con puntos negros.', 'photo/AquaranaCatesbeiana.png')
+forma globosa con una cola de gran tamaño presentan un color grisáceo con puntos negros.', 'photo/AquaranaCatesbeiana.webp')
 ON CONFLICT (nombre_cientifico) DO NOTHING;
 
 -- Ubicación por defecto
