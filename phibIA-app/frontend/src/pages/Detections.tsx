@@ -300,7 +300,7 @@ function Detections() {
 
         {activeTab === "audios" ? (
         <div
-          className="mt-6 max-h-[60vh] overflow-y-auto detections-container"
+          className="mt-6 max-h-[60vh] overflow-y-auto scrollbar-hidden detections-container"
         >
           {detections.length === 0 ? (
             <div className="text-center py-12">
@@ -531,7 +531,7 @@ function Detections() {
           )}
         </div>
         ) : (
-        <div className="mt-6 max-h-[60vh] overflow-y-auto detections-container">
+        <div className="mt-6 max-h-[60vh] overflow-y-auto scrollbar-hidden detections-container">
           {isLoadingFotos ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
@@ -587,6 +587,7 @@ function Detections() {
                 ubicacion:
                   foto.ubicacion?.descripcion || "Ubicación desconocida",
                 usuario: estadoLabel(foto.estado),
+                estado: foto.estado,
               }))}
             />
           )}
