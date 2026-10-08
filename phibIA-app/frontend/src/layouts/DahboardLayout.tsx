@@ -18,9 +18,9 @@ export default function DashboardLayout() {
       <div className="flex h-full scrollbar-hidden">
         {/* Sidebar solo en desktop */}
         <Sidebar />
-        <main className="flex-1 flex justify-center items-stretch overflow-y-auto overflow-x-hidden scrollbar-hidden">
+        <main className="flex-1 min-h-0 flex justify-center items-stretch overflow-y-auto overflow-x-hidden scrollbar-hidden">
           {/* Contenido de la página */}
-          <div className="w-full h-full flex justify-center p-5 pb-16 md:pb-0 scrollbar-hidden">
+          <div className="w-full h-full min-h-0 flex justify-center p-5 pb-16 md:pb-0 scrollbar-hidden">
             <Outlet />
           </div>
         </main>

@@ -233,7 +233,7 @@ function Detections() {
   if (isLoading) {
     return (
       <div className="h-screen flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+        <div className="w-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-8">
           <TitleWithSubtitle
             title="Mis Detecciones"
             subtitle="Cargando tus grabaciones..."
@@ -249,7 +249,7 @@ function Detections() {
   if (error) {
     return (
       <div className="h-screen flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+        <div className="w-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-8">
           <TitleWithSubtitle title="Mis Detecciones" subtitle="Error al cargar" />
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
             {error}
@@ -261,23 +261,14 @@ function Detections() {
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-8 overflow-y-auto">
-      <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 my-auto">
-        <TitleWithSubtitle
-          title="Mis Detecciones"
-          subtitle={
-            activeTab === "audios"
-              ? `${detections.length} ${
-                  detections.length === 1 ? "grabación" : "grabaciones"
-                }`
-              : `${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}`
-          }
-        />
+      <div className="w-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-6 md:p-8 my-auto">
+        <TitleWithSubtitle title="Mis Detecciones" subtitle="" />
 
         {!isAdmin && (
         <div className="flex gap-3 mt-4 justify-center">
           <button
             onClick={() => handleTabChange("audios")}
-            className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
               activeTab === "audios"
                 ? "bg-[#43A047] text-white"
                 : "bg-gray-100 text-[#004D40] hover:bg-gray-200"
@@ -287,7 +278,7 @@ function Detections() {
           </button>
           <button
             onClick={() => handleTabChange("fotos")}
-            className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
               activeTab === "fotos"
                 ? "bg-[#43A047] text-white"
                 : "bg-gray-100 text-[#004D40] hover:bg-gray-200"

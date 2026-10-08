@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 interface PhotoCardProps {
   image: string | null;
@@ -83,33 +84,40 @@ function PhotoCard(props: PhotoCardProps) {
         </div>
       </div>
 
-      {/* Lightbox: se renderiza aparte, tapando toda la pantalla */}
-      {expandida && props.image && (
-        <div
-          onClick={() => setExpandida(false)}
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-        >
+      {/* Lightbox: se renderiza en un portal a document.body para que el
+          fixed inset-0 cubra toda la pantalla, aunque algún ancestro tenga
+          backdrop-blur (que crea su propio containing block para fixed). */}
+      {expandida &&
+        props.image &&
+        createPortal(
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-xl overflow-hidden max-w-2xl w-full shadow-2xl"
+            onClick={() => setExpandida(false)}
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           >
-            <img
-              src={props.image}
-              alt={props.title}
-              className="w-full max-h-[70vh] object-contain bg-black"
-            />
-            <div className="p-4">
-              <h3 className="text-xl font-bold text-gray-800">{props.title}</h3>
-              <p className="text-sm text-gray-600 mt-2">
-                <strong>Ubicación:</strong> {props.ubicacion}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Usuario:</strong> {props.usuario}
-              </p>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-xl overflow-hidden max-w-2xl w-full shadow-2xl"
+            >
+              <img
+                src={props.image}
+                alt={props.title}
+                className="w-full max-h-[70vh] object-contain bg-black"
+              />
+              <div className="p-4">
+                <h3 className="text-xl font-bold text-gray-800">
+                  {props.title}
+                </h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong>Ubicación:</strong> {props.ubicacion}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Usuario:</strong> {props.usuario}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }
