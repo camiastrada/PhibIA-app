@@ -916,10 +916,7 @@ def init_routes(app):
         Sirve las imágenes de las especies desde la carpeta db/photo
         """
         from flask import send_file
-       
-        print(f"=== GET SPECIES IMAGE ===")
-        print(f"image_path recibido: '{image_path}'")
-        
+
         # db/photo: en Docker está montado en /db; en local se resuelve desde la
         # ubicación de este archivo (backend/app/routes.py -> <raiz>/db), porque
         # depender de os.getcwd() da la ruta equivocada según dónde se lance Flask.
@@ -937,29 +934,10 @@ def init_routes(app):
         if file_path is None:
             return jsonify({'error': 'Ruta inválida'}), 400
 
-        print(f"Base path: {base_path}")
-        print(f"Intentando servir imagen: {file_path}")
-        print(f"¿Existe el archivo?: {os.path.exists(file_path)}")
-        
         # Verificar que el archivo existe
         if not os.path.exists(file_path):
-            print(f"Error: Imagen no encontrada en {file_path}")
-            
-            # Listar directorios disponibles para debugging
-            print(f"Contenido de {base_path}:")
-            if os.path.exists(base_path):
-                print(os.listdir(base_path))
-                
-            photo_dir = os.path.join(base_path, 'photo')
-            if os.path.exists(photo_dir):
-                print(f"Archivos en {photo_dir}:")
-                print(os.listdir(photo_dir))
-            else:
-                print(f"Directorio {photo_dir} no existe")
-                
             return jsonify({'error': 'Image not found', 'path': file_path}), 404
 
-        print(f"✓ Sirviendo imagen desde: {file_path}")
         # El MIME se deduce de la extensión: nginx manda X-Content-Type-Options: nosniff
         # en /api/, así que servir webp como image/png hace que el navegador lo rechace.
         mimetype, _ = mimetypes.guess_type(file_path)
