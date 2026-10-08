@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import { API_URL } from "../config/api";
 
 interface Detection {
   audio_id: number;
@@ -27,8 +28,6 @@ function Detections() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const navigate = useNavigate();
-
-  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   useEffect(() => {
     fetchDetections();

@@ -16,7 +16,7 @@ export default function Bottombar(){
         <div className="fixed h-12 w-full bg-[#152C28]/80 text-white flex flex-row bottom-0 shadow-lg z-10 items-center md:hidden">
             <nav className="flex flex-row gap-2 w-full justify-center">
                 <SidebarIcon to="/captures" id="capturesIcon" icon={CapturesIcon} disabled={isGuest} />
-                <SidebarIcon to="/map" id="mapIcon" icon={MapIcon} disabled={isGuest} />
+                <SidebarIcon to="/map" id="mapIcon" icon={MapIcon}/>
                 <SidebarIcon to="/" id="homeIcon" icon={HomeIcon} />
                 <SidebarIcon to="/encyclopedia" id="encyclopediaIcon" icon={EncyclopediaIcon} />
                 {isAdmin && (

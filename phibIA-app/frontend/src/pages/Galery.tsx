@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import CardGrid from "../components/CardGrid";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import { API_URL } from "../config/api";
 
 type Filtro = "todas" | "mias" | "ranaToro";
 
@@ -20,8 +21,6 @@ interface RegistroRanaToro {
   ubicacion: string;
   usuario: string;
 }
-
-const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
 function formatFecha(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", {

@@ -9,6 +9,7 @@ import os
 import re
 import secrets
 import hashlib
+import mimetypes
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -20,7 +21,7 @@ from flask_jwt_extended import (
 
 UPLOAD_FOLDER = "app/uploads"
 IMAGE_UPLOAD_FOLDER = "app/uploads/images"
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 ALLOWED_AUDIO_EXTENSIONS = {'wav', 'webm', 'mp3', 'ogg', 'flac', 'm4a'}
 
 PASSWORD_REGEX = re.compile(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$')
@@ -636,7 +637,7 @@ def init_routes(app):
         return jsonify({'message': 'Contraseña actualizada correctamente'}), 200
 
 
-    @app.route("/api/user/profile", methods=["GET"])
+    @app.route("/user/profile", methods=["GET"])
     @jwt_required()
     def get_user_profile():
         user_id = get_jwt_identity() 
@@ -774,14 +775,9 @@ def init_routes(app):
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
-        # --- DIFERENCIACIÓN POR ROL ---
-        if user.rol == 'admin':
-            # Admin ve todos los audios ordenados por fecha
-            audios = Audio.query.order_by(Audio.fecha_grabacion.desc()).all()
-        else:
-            # Usuario común solo ve sus propios audios
-            audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
-        # -----------------------------
+        
+        audios = Audio.query.filter_by(usuario_id=current_user_id).order_by(Audio.fecha_grabacion.desc()).all()
+        
 
         detections = []
         for audio in audios:
@@ -801,14 +797,6 @@ def init_routes(app):
                     'descripcion': audio.ubicacion.descripcion
                 }
             }
-            
-            # Opcional útil: Si eres admin, quizás te sirva saber a qué usuario pertenece cada audio
-            if user.rol == 'admin' and hasattr(audio, 'usuario'):
-                detection_item['usuario'] = {
-                    'id': audio.usuario.usuario_id,
-                    'nombre': audio.usuario.name,
-                    'email': audio.usuario.email
-                }
 
             detections.append(detection_item)
 
@@ -834,11 +822,8 @@ def init_routes(app):
         if not user:
             return jsonify({'message': 'User not found'}), 401
 
-        # El admin puede escuchar el audio de cualquier usuario; el resto solo el propio
-        if user.rol == 'admin':
-            audio = Audio.query.filter_by(audio_id=audio_id).first()
-        else:
-            audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
+   
+        audio = Audio.query.filter_by(audio_id=audio_id, usuario_id=current_user_id).first()
 
         if not audio:
             return jsonify({'error': 'Audio not found or access denied'}), 404
@@ -935,12 +920,18 @@ def init_routes(app):
         print(f"=== GET SPECIES IMAGE ===")
         print(f"image_path recibido: '{image_path}'")
         
-        # En Docker, la carpeta db está montada en /db
-        # En desarrollo local, está en ../db
-        if os.path.exists('/db'):
-            base_path = '/db'
-        else:
-            base_path = os.path.join(os.path.dirname(os.path.dirname(os.getcwd())), 'db')
+        # db/photo: en Docker está montado en /db; en local se resuelve desde la
+        # ubicación de este archivo (backend/app/routes.py -> <raiz>/db), porque
+        # depender de os.getcwd() da la ruta equivocada según dónde se lance Flask.
+        candidates = [
+            '/db',
+            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'db'),
+            os.path.join(os.getcwd(), 'db'),
+        ]
+        base_path = next(
+            (c for c in candidates if os.path.isdir(os.path.join(c, 'photo'))),
+            candidates[0]
+        )
         
         file_path = safe_join(base_path, image_path)
         if file_path is None:
@@ -969,7 +960,10 @@ def init_routes(app):
             return jsonify({'error': 'Image not found', 'path': file_path}), 404
 
         print(f"✓ Sirviendo imagen desde: {file_path}")
-        return send_file(file_path, mimetype='image/png')
+        # El MIME se deduce de la extensión: nginx manda X-Content-Type-Options: nosniff
+        # en /api/, así que servir webp como image/png hace que el navegador lo rechace.
+        mimetype, _ = mimetypes.guess_type(file_path)
+        return send_file(file_path, mimetype=mimetype or 'application/octet-stream')
 
     @app.route('/informacion/especies', methods=['GET'])
     def obtener_especies():

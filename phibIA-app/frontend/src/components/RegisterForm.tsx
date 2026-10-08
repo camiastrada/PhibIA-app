@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 const RegisterImage = "/images/registerImage.webp";
 import TextField from "./TextField.tsx";
 import { Link } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 interface RegisterFormData {
   user: string;
@@ -27,7 +28,6 @@ export default function RegisterForm() {
   const[error, setError] = useState("");
 
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL ?? '/api';
   const [loading, setLoading] = useState(false);
 
   const handleChange = (

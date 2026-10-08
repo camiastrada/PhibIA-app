@@ -7,6 +7,7 @@ import LoginButton from "../components/LoginButton";
 import RegisterButton from "../components/RegisterButton";
 import AvatarSelector from "../components/avatars/AvatarSelector";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config/api";
 
 interface Detection {
   audio_id: number;
@@ -33,8 +34,6 @@ function Profile() {
   const [distinctSpecies, setDistinctSpecies] = useState(0);
   const [totalSpecies, setTotalSpecies] = useState(0);
   const [mostCaptured, setMostCaptured] = useState<{ nombre_comun: string; nombre_cientifico: string } | null>(null);
-
-  const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -100,7 +99,7 @@ function Profile() {
     };
 
     fetchStats();
-  }, [isGuest, API_URL]);
+  }, [isGuest]);
 
   return (
   <>
@@ -136,8 +135,8 @@ function Profile() {
           ) : (<LogoutButton />)}
         </div>
 
-        <div className={`flex-1 w-full lg:w-auto justify-center items-center ${isGuest ? "hidden" : "flex"}`}>
-          <div id="info" className="flex-none flex-col flex w-full lg:w-auto items-start justify-center gap-4 px-2 mt-6 lg:mt-0" >
+        <div className={`flex m-5 w-full lg:w-auto justify-center items-center ${isGuest ? "hidden" : "flex"}`}>
+          <div id="info" className="flex-none flex-col flex w-full lg:w-auto items-center lg:items-start justify-center gap-4 px-2 mt-6 lg:mt-0" >
             <div className="flex justify-start items-center gap-2 flex-wrap">
               <p className="font-medium text-[var(--color-text-main)]">Nº de detecciones:</p>
               <p className="text-[var(--color-text-main)]">{totalDetections}</p>
@@ -147,9 +146,7 @@ function Profile() {
               {mostCaptured ? (
                 <div className="flex flex-row justify-start items-center gap-1 flex-wrap">
                   <p className="text-[var(--color-text-main)]">{mostCaptured.nombre_comun}</p>
-                  <p className="text-[var(--color-text-main)]/70 italic text-sm">
-                    ({mostCaptured.nombre_cientifico})
-                  </p>
+                  
                 </div>
               ) : (
                 <p className="text-[var(--color-text-main)]">—</p>
