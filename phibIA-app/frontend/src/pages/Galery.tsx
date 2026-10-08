@@ -175,7 +175,7 @@ function Galery() {
                 : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
-            🐸 Registro de ranas toro
+            Registro de ranas toro
           </button>
         </div>
 
@@ -203,7 +203,6 @@ function Galery() {
                     className="bg-white/10 rounded-xl p-4 flex flex-wrap items-center justify-between gap-2 text-white"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">🐸</span>
                       <div>
                         <p className="font-semibold">{r.ubicacion}</p>
                         <p className="text-sm text-white/70">

@@ -46,14 +46,14 @@ function PhotoCard(props: PhotoCardProps) {
                 disabled={props.isReviewing}
                 className="bg-[#43A047] hover:bg-[#357a38] disabled:opacity-50 text-white text-xs font-semibold py-2 px-2 rounded-lg transition-colors cursor-pointer"
               >
-                ✅ Es rana toro
+                Es rana toro
               </button>
               <button
                 onClick={props.onRechazar}
                 disabled={props.isReviewing}
                 className="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-semibold py-2 px-2 rounded-lg transition-colors cursor-pointer"
               >
-                ❌ No lo es
+                No lo es
               </button>
             </div>
           )}
