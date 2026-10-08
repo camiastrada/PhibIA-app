@@ -288,8 +288,8 @@ def init_routes(app):
                 public_id=result["public_id"],
                 usuario_id=usuario_id,
                 ubicacion_id=ubicacion_id,
-                latitud=float(lat) if lat else None,
-                longitud=float(lng) if lng else None,
+                #latitud=float(lat) if lat else None,
+                #longitud=float(lng) if lng else None,
             )
             db.session.add(imagen)
             db.session.commit()

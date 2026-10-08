@@ -29,8 +29,10 @@ def obtener_imagenes_publicas():
             "fecha_subida": fecha_iso_utc(imagen.fecha_subida),
             "usuario": imagen.usuario.name,
             "ubicacion": imagen.ubicacion.descripcion,
-            "latitud": imagen.latitud,        
-            "longitud": imagen.longitud,      
+            #"latitud": imagen.latitud,        
+            #"longitud": imagen.longitud,     
+            "latitud": imagen.ubicacion.latitud if imagen.ubicacion else None,
+            "longitud": imagen.ubicacion.longitud if imagen.ubicacion else None, 
         })
 
     return jsonify(resultado), 200
