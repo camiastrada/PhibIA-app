@@ -22,7 +22,31 @@ Aplicación para reconocer distintas especies de anfibios de la región(Río Cua
 
 ## PhibIA app
 
-Proyecto con Flask (backend), React (frontend) y MySQL, dockerizado para facilitar la instalación y despliegue.
+Proyecto con Flask (backend), React (frontend) y PostgreSQL, dockerizado para facilitar la instalación y despliegue.
+
+## 🛠️ Tecnologías
+
+**Backend**
+- Python + Flask / Flask-SQLAlchemy
+- PostgreSQL (vía psycopg2)
+- Flask-JWT-Extended (autenticación), Flask-Bcrypt (hash de contraseñas)
+- Flask-CORS, Flask-Limiter
+- TensorFlow, scikit-learn, librosa, soundfile, numpy, scipy (reconocimiento de especies por audio)
+- Cloudinary (almacenamiento de imágenes)
+- Brevo SMTP (envío de emails, ej. recuperación de contraseña)
+- pytest (testing)
+
+**Frontend**
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS 4
+- React Router
+- Mapbox GL / react-map-gl (mapa de capturas)
+- ESLint
+
+**Infraestructura**
+- Docker / Docker Compose
+- Nginx (reverse proxy)
 
 Para levantar la aplicación con Docker:
 
@@ -31,9 +55,10 @@ Para levantar la aplicación con Docker:
    ```docker compose up --build```
 
 
-   - **db**: levanta MySQL con la base de datos inicial `anfibios`.  
+   - **db**: levanta PostgreSQL con la base de datos inicial `anfibios`.  
    - **backend**: levanta Flask en [http://localhost:5000](http://localhost:5000).  
-   - **frontend**: levanta React (Nginx) en [http://localhost:3000](http://localhost:3000).
+   - **frontend**: build de React servido por Nginx.
+   - **nginx**: proxy en [http://localhost](http://localhost), expone la app y redirige `/api` al backend.
 
 
 -Una vez construido, solo para iniciar:

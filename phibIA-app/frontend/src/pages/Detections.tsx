@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TitleWithSubtitle from "../components/ui/TitleWithSubtitle";
+import CardGrid from "../components/CardGrid";
+import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../config/api";
 
 interface Detection {
@@ -20,18 +22,84 @@ interface Detection {
   };
 }
 
+interface Foto {
+  imagen_id: number;
+  url: string | null;
+  fecha_subida: string;
+  estado: string;
+  ubicacion: {
+    id: number;
+    descripcion: string;
+  } | null;
+}
+
 function Detections() {
+  const { user } = useAuth();
+  const isAdmin = user?.rol === "admin";
+  const [activeTab, setActiveTab] = useState<"audios" | "fotos">("audios");
   const [detections, setDetections] = useState<Detection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [playingAudio, setPlayingAudio] = useState<number | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [fotos, setFotos] = useState<Foto[]>([]);
+  const [isLoadingFotos, setIsLoadingFotos] = useState(false);
+  const [errorFotos, setErrorFotos] = useState<string | null>(null);
+  const [fotosLoaded, setFotosLoaded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchDetections();
   }, []);
+
+  const fetchPhotos = async () => {
+    try {
+      setIsLoadingFotos(true);
+      setErrorFotos(null);
+      const response = await fetch(`${API_URL}/user/photos`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.status === 401 || response.status === 422) {
+        navigate("/login");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Error al cargar las fotos");
+      }
+
+      const data = await response.json();
+      setFotos(data.photos);
+      setFotosLoaded(true);
+    } catch (err) {
+      setErrorFotos(
+        err instanceof Error ? err.message : "Error al cargar las fotos"
+      );
+    } finally {
+      setIsLoadingFotos(false);
+    }
+  };
+
+  const handleTabChange = (tab: "audios" | "fotos") => {
+    setActiveTab(tab);
+    if (tab === "fotos" && !fotosLoaded) {
+      fetchPhotos();
+    }
+  };
+
+  const estadoLabel = (estado: string) => {
+    switch (estado) {
+      case "confirmada":
+        return "Confirmada: rana toro";
+      case "rechazada":
+        return "Descartada";
+      default:
+        return "Pendiente de revisión";
+    }
+  };
 
   const fetchDetections = async () => {
     try {
@@ -165,7 +233,7 @@ function Detections() {
   if (isLoading) {
     return (
       <div className="h-screen flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+        <div className="w-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-8">
           <TitleWithSubtitle
             title="Mis Detecciones"
             subtitle="Cargando tus grabaciones..."
@@ -181,7 +249,7 @@ function Detections() {
   if (error) {
     return (
       <div className="h-screen flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+        <div className="w-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-8">
           <TitleWithSubtitle title="Mis Detecciones" subtitle="Error al cargar" />
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-6">
             {error}
@@ -193,16 +261,37 @@ function Detections() {
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-8 overflow-y-auto">
-      <div className="w-full max-w-6xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 my-auto">
-        <TitleWithSubtitle
-          title="Mis Detecciones"
-          subtitle={`${detections.length} ${
-            detections.length === 1 ? "grabación" : "grabaciones"
-          }`}
-        />
+      <div className="w-full max-w-6xl bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-6 md:p-8 my-auto">
+        <TitleWithSubtitle title="Mis Detecciones" subtitle="" />
 
-        <div 
-          className="mt-6 max-h-[60vh] overflow-y-auto detections-container"
+        {!isAdmin && (
+        <div className="flex gap-3 mt-4 justify-center">
+          <button
+            onClick={() => handleTabChange("audios")}
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
+              activeTab === "audios"
+                ? "bg-[#43A047] text-white"
+                : "bg-gray-100 text-[#004D40] hover:bg-gray-200"
+            }`}
+          >
+            Grabaciones
+          </button>
+          <button
+            onClick={() => handleTabChange("fotos")}
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
+              activeTab === "fotos"
+                ? "bg-[#43A047] text-white"
+                : "bg-gray-100 text-[#004D40] hover:bg-gray-200"
+            }`}
+          >
+            Fotos
+          </button>
+        </div>
+        )}
+
+        {activeTab === "audios" ? (
+        <div
+          className="mt-6 max-h-[60vh] overflow-y-auto scrollbar-hidden detections-container"
         >
           {detections.length === 0 ? (
             <div className="text-center py-12">
@@ -432,6 +521,69 @@ function Detections() {
             </div>
           )}
         </div>
+        ) : (
+        <div className="mt-6 max-h-[60vh] overflow-y-auto scrollbar-hidden detections-container">
+          {isLoadingFotos ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
+            </div>
+          ) : errorFotos ? (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+              {errorFotos}
+            </div>
+          ) : fotos.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-[#004D40] mb-4">
+                <svg
+                  className="mx-auto h-24 w-24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-[#004D40] mb-2">
+                No hay fotos todavía
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Subí una foto para ver tus fotos aquí
+              </p>
+              <button
+                onClick={() => navigate("/add-photo")}
+                className="bg-[#43A047] hover:bg-[#357a38] text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg"
+              >
+                Subir foto
+              </button>
+            </div>
+          ) : (
+            <CardGrid
+              fotos={fotos.map((foto) => ({
+                id: foto.imagen_id,
+                url: foto.url,
+                titulo: `${formatDate(foto.fecha_subida)} · ${formatTime(
+                  foto.fecha_subida
+                )}`,
+                ubicacion:
+                  foto.ubicacion?.descripcion || "Ubicación desconocida",
+                usuario: estadoLabel(foto.estado),
+                estado: foto.estado,
+              }))}
+            />
+          )}
+        </div>
+        )}
       </div>
     </div>
   );

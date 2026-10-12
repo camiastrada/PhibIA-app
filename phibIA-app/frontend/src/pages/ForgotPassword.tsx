@@ -42,8 +42,11 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-slate-100">
-      <div className="w-full max-w-sm bg-white/90 rounded-2xl shadow-2xl p-8">
+    <div className="flex justify-center items-center h-screen w-screen relative px-4 bg-[#152C28]">
+      <div className="w-full max-w-sm bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 relative z-10">
+        <h1 className="text-xl font-extrabold text-center text-(--color-text-main) mb-1">
+          PhibIA
+        </h1>
         <h2 className="text-2xl font-bold mb-4 text-center text-(--color-text-main)">
           Recuperar contraseña
         </h2>

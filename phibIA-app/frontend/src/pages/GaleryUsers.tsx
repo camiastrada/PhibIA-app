@@ -40,15 +40,15 @@ function GaleryUsers() {
 
   return (
     <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 bg-[url('/images/bgMainImage.webp')] bg-cover bg-center overflow-hidden">
-      <div className="w-full h-full flex flex-col bg-[#004D40]/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
+      <div className="w-full h-full max-w-6xl mx-auto flex flex-col bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-6 md:p-8">
         <div className="shrink-0 mb-6">
           <h1
-            className="text-3xl md:text-4xl text-[#F2E9DC]"
+            className="text-3xl md:text-4xl text-[#004D40]"
             style={{ fontFamily: "'Fraunces', Georgia, serif" }}
           >
             Reportes confirmados
           </h1>
-          <p className="text-[#B7CFC4] text-sm mt-1">
+          <p className="text-[#004D40]/70 text-sm mt-1">
             Ranas toro reportadas por la comunidad
           </p>
         </div>
@@ -56,14 +56,14 @@ function GaleryUsers() {
         <div className="flex-1 min-h-0 overflow-y-auto pr-1">
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-[#7CB342]" />
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-[#43A047]" />
             </div>
           ) : error ? (
-            <div className="bg-red-900/30 border border-red-400/40 text-red-100 px-4 py-3 rounded-xl">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
               {error}
             </div>
           ) : reportes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-[#B7CFC4]">
+            <div className="flex flex-col items-center justify-center h-full text-center text-[#004D40]/70">
               <p>Todavía no hay reportes confirmados.</p>
               <p className="text-sm mt-1">
                 Cuando alguien reporte uno, va a aparecer acá.
@@ -74,14 +74,14 @@ function GaleryUsers() {
               {reportes.map((r, i) => (
                 <li
                   key={r.imagen_id}
-                  className="relative border-l-2 border-[#7CB342]/40 pl-6 pb-7 last:pb-0 text-left"
+                  className="relative border-l-2 border-[#43A047]/40 pl-6 pb-7 last:pb-0 text-left"
                 >
-                  <span className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-[#7CB342]" />
+                  <span className="absolute -left-[7px] top-1 w-3 h-3 rounded-full bg-[#43A047]" />
 
                   <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
                     <div className="flex flex-col items-start">
                       <span
-                        className="text-[#F2E9DC] text-xl md:text-2xl leading-tight"
+                        className="text-[#004D40] text-xl md:text-2xl leading-tight"
                         style={{ fontFamily: "'Fraunces', Georgia, serif" }}
                       >
                         {r.ubicacion}
@@ -92,21 +92,21 @@ function GaleryUsers() {
                           href={`https://www.google.com/maps?q=${r.latitud},${r.longitud}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-[#7CB342] hover:underline mt-0.5"
+                          className="text-xs text-[#43A047] hover:underline mt-0.5"
                         >
-                          📍 Ver en el mapa
+                          Ver en el mapa
                         </a>
                       )}
                     </div>
 
-                    <span className="text-[#9FB8AD] text-sm pt-1.5">
+                    <span className="text-[#004D40]/60 text-sm pt-1.5">
                       {formatearFecha(r.fecha_subida)}
                     </span>
                   </div>
 
-                  <p className="text-[#B7CFC4] text-sm mt-1">
+                  <p className="text-[#004D40]/70 text-sm mt-1">
                     Reportado por {r.usuario}
-                    <span className="text-[#7CB342] ml-2">
+                    <span className="text-[#43A047] ml-2">
                       · Reporte N.º {reportes.length - i}
                     </span>
                   </p>

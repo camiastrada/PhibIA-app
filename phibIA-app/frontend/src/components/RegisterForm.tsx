@@ -147,7 +147,7 @@ export default function RegisterForm() {
           <div className="bg-gradient-to-b from-black to-transparent absolute inset-0 h-1/3 md:hidden"></div>
           
           <div className="fixed mt-5 md:mt-0 top-0 md:top-2/7 flex flex-col items-center z-10">
-            <h1 className="text-3xl md:text-5xl mb-4 text-center text-white font-extrabold">phibIA</h1>   
+            <h1 className="text-3xl md:text-5xl mb-4 text-center text-white font-extrabold">PhibIA</h1>   
             <h2 className="text-base md:text-lg mb-4 text-center text-white">Reconoce anfibios por su canto</h2>     
             <div className="relative hidden md:flex items-center mt-4 justify-center">
               <Link to="/login" className="absolute text-white font-semibold py-2 px-4 rounded-2xl border-1 border-white hover:border-2 transition-colors cursor-pointer whitespace-nowrap">

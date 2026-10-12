@@ -57,8 +57,8 @@ function Encyclopedia() {
 
   return (
     <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 overflow-hidden">
-      <div className="w-full h-full max-w-6xl mx-auto bg-[#004D40]/30 backdrop-blur-sm rounded-3xl shadow-2xl p-4 md:p-8 flex flex-col">
-        <div className="text-white">
+      <div className="w-full h-full max-w-6xl mx-auto bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-4 md:p-8 flex flex-col">
+        <div className="text-[#004D40]">
           <TitleWithSubtitle
             title="Enciclopedia de Especies"
             subtitle={`${species.length} especies registradas`}

@@ -141,50 +141,50 @@ function Galery() {
 
   return (
     <div className="flex-1 min-h-0 h-full px-3 md:px-4 py-4 md:py-8 overflow-hidden">
-      <div className="w-full h-full flex flex-col bg-[#004D40]/70 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8">
-        <div className="text-white shrink-0">
+      <div className="w-full h-full max-w-6xl mx-auto flex flex-col bg-white/85 border-2 border-white backdrop-blur-xs rounded-3xl shadow-2xl p-6 md:p-8">
+        <div className="text-[#004D40] shrink-0">
           <TitleWithSubtitle title="Galería de fotos" subtitle="" />
         </div>
 
         <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start shrink-0">
           <button
             onClick={() => setFiltro("todas")}
-            className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
               filtro === "todas"
                 ? "bg-[#43a047] text-white"
-                : "bg-white/20 text-white hover:bg-white/30"
+                : "bg-gray-100 text-[#004D40] hover:bg-gray-200"
             }`}
           >
             Ver todas las fotos
           </button>
           <button
             onClick={() => setFiltro("mias")}
-            className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
               filtro === "mias"
                 ? "bg-[#43a047] text-white"
-                : "bg-white/20 text-white hover:bg-white/30"
+                : "bg-gray-100 text-[#004D40] hover:bg-gray-200"
             }`}
           >
             Ver solo mis fotos
           </button>
           <button
             onClick={() => setFiltro("ranaToro")}
-            className={`px-4 py-2 rounded-lg font-semibold transition cursor-pointer ${
+            className={`px-3 py-1.5 text-sm rounded-lg font-semibold transition cursor-pointer ${
               filtro === "ranaToro"
                 ? "bg-[#43a047] text-white"
-                : "bg-white/20 text-white hover:bg-white/30"
+                : "bg-gray-100 text-[#004D40] hover:bg-gray-200"
             }`}
           >
-            🐸 Registro de ranas toro
+            Registro de ranas toro
           </button>
         </div>
 
-        <div className="border-t border-white/20 my-6 shrink-0" />
+        <div className="border-t border-gray-200 my-6 shrink-0" />
 
         <div className="flex-1 min-h-0 overflow-y-auto px-2 scrollbar-hidden">
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-white"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#004D40]"></div>
             </div>
           ) : error ? (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
@@ -192,7 +192,7 @@ function Galery() {
             </div>
           ) : filtro === "ranaToro" ? (
             registros.length === 0 ? (
-              <p className="text-white text-center py-12">
+              <p className="text-[#004D40] text-center py-12">
                 Todavía no hay avistamientos de rana toro confirmados.
               </p>
             ) : (
@@ -200,18 +200,17 @@ function Galery() {
                 {registros.map((r) => (
                   <div
                     key={r.id}
-                    className="bg-white/10 rounded-xl p-4 flex flex-wrap items-center justify-between gap-2 text-white"
+                    className="bg-gray-100 rounded-xl p-4 flex flex-wrap items-center justify-between gap-2 text-[#004D40]"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">🐸</span>
                       <div>
                         <p className="font-semibold">{r.ubicacion}</p>
-                        <p className="text-sm text-white/70">
+                        <p className="text-sm text-[#004D40]/70">
                           Reportado por {r.usuario}
                         </p>
                       </div>
                     </div>
-                    <span className="text-sm text-white/90">
+                    <span className="text-sm text-[#004D40]/90">
                       {formatFecha(r.fecha)}
                     </span>
                   </div>
@@ -219,7 +218,7 @@ function Galery() {
               </div>
             )
           ) : fotos.length === 0 ? (
-            <p className="text-white text-center py-12">
+            <p className="text-[#004D40] text-center py-12">
               No hay fotos pendientes de revisión.
             </p>
           ) : (
