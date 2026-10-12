@@ -14,6 +14,7 @@ import Galery from "./pages/Galery";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import GaleryUsers from "./pages/GaleryUsers";
+import ProjectInfo from "./pages/ProjectInfo";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/encyclopedia/:specieNumber" element={<InfoFrog />} />
           <Route path="/galery" element={<Galery />} />
           <Route path="/galeryUsers" element={<GaleryUsers />} />
+          <Route path="/project-info" element={<ProjectInfo />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
