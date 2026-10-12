@@ -5,16 +5,16 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_DB: anfibios
-      POSTGRES_USER: phibia_user
-      POSTGRES_PASSWORD: user123
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U phibia_user -d anfibios"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE}"]
       interval: 5s
       timeout: 10s
       retries: 10
@@ -27,6 +27,8 @@ services:
         # Vite la inyecta en tiempo de build; tiene que venir por acá.
         VITE_API_URL: /api
     container_name: frontend_app
+    environment:
+      - VITE_API_URL=/api
     depends_on:
       - backend 
 
@@ -39,16 +41,17 @@ services:
       - ./backend:/app
       - ./db:/db:ro
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=${FLASK_ENV}
       - POSTGRES_HOST=db
-      - POSTGRES_USER=phibia_user
-      - POSTGRES_PASSWORD=user123
-      - POSTGRES_DATABASE=anfibios
-      - POSTGRES_PORT=5432
-      - JWT_SECRET_KEY=cd0562e2a7cce7ce24d960874ac7bb01349507dffa165f1c9f58a5676cbe9cf1
-      - CLOUDINARY_CLOUD_NAME=py3ldpat
-      - CLOUDINARY_API_KEY=433833319952292
-      - CLOUDINARY_API_SECRET=C68FLb1ooWfTxQEo4KJ6sI7xmGU
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_COOKIE_SECURE=${JWT_COOKIE_SECURE}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
       - BREVO_SMTP_LOGIN=${BREVO_SMTP_LOGIN}
       - BREVO_SMTP_KEY=${BREVO_SMTP_KEY}
       - FRONTEND_URL=${FRONTEND_URL}
