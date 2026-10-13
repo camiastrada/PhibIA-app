@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
+      - db_data:/var/lib/postgresql/data
       - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
     healthcheck:
@@ -17,13 +18,13 @@ services:
       start_period: 60s
 
   frontend:
-    image: satrinidad/phibia-frontend:v1
+    image: satrinidad/phibia-frontend:v2
     restart: unless-stopped
     depends_on:
       - backend 
 
   backend:
-    image: satrinidad/phibia-backend:v1
+    image: satrinidad/phibia-backend:v2
     restart: unless-stopped
     volumes:
       - ./db:/db:ro
@@ -64,3 +65,7 @@ services:
         condition: service_started
       backend:
         condition: service_healthy
+
+volumes:
+  db_data:
+
