@@ -28,6 +28,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./db:/db:ro
+    command: gunicorn --bind 0.0.0.0:5000 --workers 1 --timeout 300 run:app
     environment:
       - FLASK_ENV=${FLASK_ENV}
       - POSTGRES_HOST=db
@@ -43,6 +44,7 @@ services:
       - BREVO_SMTP_LOGIN=${BREVO_SMTP_LOGIN}
       - BREVO_SMTP_KEY=${BREVO_SMTP_KEY}
       - FRONTEND_URL=${FRONTEND_URL}
+      - PYTHONUNBUFFERED=1
     depends_on:
       db:
         condition: service_healthy
@@ -51,7 +53,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 120s
+      start_period: 300s
         
   nginx:
     image: nginx:alpine
