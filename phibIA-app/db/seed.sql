@@ -159,7 +159,7 @@ INSERT INTO usuarios (name, email, password, register_date, rol)
 VALUES (
     'Admin',
     'admin@phibia.com',
-    '$2b$12$c7/Kv4HCg5a8bKrFuGDT4.qpZjFkg.9hZr/cPtZjMOptax7Y7e5Bu',
+    '$2b$12$dvrqmtnMiTRe3HtGIiSVheXj5WGPnOrnAL36pV3vM17XrRqBPI.7y',
     CURRENT_DATE,
     'admin'
 )
@@ -178,4 +178,4 @@ SELECT setval(pg_get_serial_sequence('ubicaciones', 'ubicacion_id'), COALESCE((S
 
 -- Un usuario común de prueba
 INSERT INTO usuarios (name, email, password, register_date, rol)
-VALUES ('Test User', 'test@test.com', '$2b$12$c7/Kv4HCg5a8bKrFuGDT4.qpZjFkg.9hZr/cPtZjMOptax7Y7e5Bu', CURRENT_DATE, 'usuario');
+VALUES ('Test User', 'test@test.com', '$2b$12$fFxNR9BgXqPLGUn.U13mcu/RFeRq3W.9u4pC7EglaDerZuTzu/BdW', CURRENT_DATE, 'usuario');

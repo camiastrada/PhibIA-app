@@ -1,8 +1,6 @@
-
 services:
   db:
     image: postgres:16
-    container_name: postgres_db
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE}
@@ -11,8 +9,6 @@ services:
     volumes:
       - ./db/anfibios.sql:/docker-entrypoint-initdb.d/1_init.sql
       - ./db/seed.sql:/docker-entrypoint-initdb.d/2_seed.sql
-    ports:
-      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE}"]
       interval: 5s
@@ -21,24 +17,15 @@ services:
       start_period: 60s
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        # Vite la inyecta en tiempo de build; tiene que venir por acá.
-        VITE_API_URL: /api
-    container_name: frontend_app
-    environment:
-      - VITE_API_URL=/api
+    image: satrinidad/phibia-frontend:v1
+    restart: unless-stopped
     depends_on:
       - backend 
 
   backend:
-    build: ./backend
-    container_name: flask_app
-    ports:
-      - "5000:5000"
+    image: satrinidad/phibia-backend:v1
+    restart: unless-stopped
     volumes:
-      - ./backend:/app
       - ./db:/db:ro
     environment:
       - FLASK_ENV=${FLASK_ENV}
@@ -55,7 +42,6 @@ services:
       - BREVO_SMTP_LOGIN=${BREVO_SMTP_LOGIN}
       - BREVO_SMTP_KEY=${BREVO_SMTP_KEY}
       - FRONTEND_URL=${FRONTEND_URL}
-    command: python run.py
     depends_on:
       db:
         condition: service_healthy
@@ -68,7 +54,7 @@ services:
         
   nginx:
     image: nginx:alpine
-    container_name: nginx_proxy
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
@@ -78,4 +64,3 @@ services:
         condition: service_started
       backend:
         condition: service_healthy
-    restart: unless-stopped

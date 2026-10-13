@@ -35,5 +35,9 @@ USER appuser
 # Exponer el puerto
 EXPOSE 5000
 
-# Comando por defecto: ejecutar el script de arranque
-CMD ["python", "run.py"]
+# Comando por defecto: gunicorn en vez del servidor de desarrollo de Flask.
+# --preload corre la espera de la DB y db.create_all() una sola vez (en el
+# proceso maestro) en lugar de una vez por worker.
+# --timeout 120 porque /predict corre inferencia de ML; el timeout default
+# de gunicorn (30s) mataría esas requests a mitad de camino.
+CMD ["gunicorn", "--preload", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "run:app"]

@@ -23,10 +23,14 @@ def wait_for_db():
     print("No se pudo conectar a la base de datos")
     return False
 
+# Se ejecuta al importar el módulo (no solo bajo __main__) para que gunicorn
+# -que importa "run:app" en vez de correr este archivo como script- también
+# espere la base y cree las tablas antes de servir requests.
+if wait_for_db():
+    with app.app_context():
+        db.create_all()
+else:
+    raise RuntimeError("No se pudo conectar a la base de datos")
+
 if __name__ == "__main__":
-    if wait_for_db():
-        with app.app_context():
-            db.create_all()
-        app.run(host="0.0.0.0", port=5000, debug=True)
-    else:
-        print("Error: No se pudo conectar a la base de datos")
+    app.run(host="0.0.0.0", port=5000, debug=os.getenv("FLASK_ENV") == "development")
