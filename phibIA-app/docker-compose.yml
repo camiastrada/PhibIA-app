@@ -23,7 +23,10 @@ services:
       - backend 
 
   backend:
-    image: satrinidad/phibia-backend:v1
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: satrinidad/phibia-backend:v2
     restart: unless-stopped
     volumes:
       - ./db:/db:ro
