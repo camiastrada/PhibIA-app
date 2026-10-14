@@ -4,11 +4,12 @@ import librosa
 import os
 import subprocess
 from scipy.ndimage import zoom
-import tensorflow as tf
-from tensorflow import keras
+from ai_edge_litert.interpreter import Interpreter
 
 # Variables globales para el modelo
-model = None
+interpreter = None
+input_details = None
+output_details = None
 label_encoder = None
 species_names = None
 
@@ -22,31 +23,34 @@ IMG_HEIGHT = None
 IMG_WIDTH = None
 
 # Rutas de archivos
-MODEL_PATH = "app/model/cnn_por_individuo.h5"
+MODEL_PATH = "app/model/cnn_por_individuo.tflite"
 METADATA_PATH = "app/model/cnn_por_individuo_metadata.pkl"
 
 
 def load_model():
     """
-    Carga el modelo CNN y sus metadatos.
+    Carga el modelo CNN (TFLite) y sus metadatos.
     Debe llamarse al iniciar la aplicación para evitar delays en la primera predicción.
     """
-    global model, label_encoder, species_names
+    global interpreter, input_details, output_details, label_encoder, species_names
     global SAMPLE_RATE, N_FFT, HOP_LENGTH, N_MELS, DURATION, IMG_HEIGHT, IMG_WIDTH
-    
+
     print(f"🔄 Cargando modelo CNN desde {MODEL_PATH}...")
-    
-    # Cargar modelo CNN
-    model = keras.models.load_model(MODEL_PATH)
+
+    # Cargar modelo CNN (TFLite)
+    interpreter = Interpreter(model_path=MODEL_PATH)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
     print("✅ Modelo CNN cargado exitosamente")
-    
+
     # Cargar metadata
     with open(METADATA_PATH, "rb") as f:
         metadata = pickle.load(f)
-    
+
     label_encoder = metadata["label_encoder"]
     species_names = metadata["species_names"]
-    
+
     # Parámetros de preprocesamiento
     SAMPLE_RATE = metadata["sample_rate"]
     N_FFT = metadata["n_fft"]
@@ -55,16 +59,18 @@ def load_model():
     DURATION = metadata["duration"]
     IMG_HEIGHT = metadata["img_height"]
     IMG_WIDTH = metadata["img_width"]
-    
+
     print(f"📊 Parámetros: SR={SAMPLE_RATE}, N_MELS={N_MELS}, IMG={IMG_HEIGHT}x{IMG_WIDTH}")
-    
+
     # Hacer warmup completo para eliminar delays en la primera predicción
     print("🔥 Precalentando modelo y librerías (warmup)...")
-    
-    # 1. Warmup de TensorFlow - predicción dummy
+
+    # 1. Warmup del intérprete TFLite - predicción dummy
     dummy_input = np.random.rand(1, IMG_HEIGHT, IMG_WIDTH, 1).astype(np.float32)
-    _ = model.predict(dummy_input, verbose=0)
-    
+    interpreter.set_tensor(input_details[0]['index'], dummy_input)
+    interpreter.invoke()
+    _ = interpreter.get_tensor(output_details[0]['index'])
+
     # 2. Warmup de librosa - generar espectrograma dummy
     # Esto precarga todas las funciones de librosa que se usan en audio_to_melspectrogram
     dummy_audio = np.random.randn(int(SAMPLE_RATE * DURATION)).astype(np.float32)
@@ -77,8 +83,8 @@ def load_model():
     )
     
     print("✅ Modelo y librerías precalentados - listo para predicciones rápidas")
-    
-    return model
+
+    return interpreter
 
 
 def audio_to_melspectrogram(audio, sr=SAMPLE_RATE):
@@ -132,10 +138,12 @@ def predict_species(file_path):
         mel_spec = audio_to_melspectrogram(audio, sr)
         
         # Preparar para el modelo (agregar dimensiones de batch y canal)
-        X = mel_spec[np.newaxis, ..., np.newaxis]  # Shape: (1, 128, 216, 1)
-        
+        X = mel_spec[np.newaxis, ..., np.newaxis].astype(np.float32)  # Shape: (1, 128, 216, 1)
+
         # Predicción
-        predictions = model.predict(X, verbose=0)
+        interpreter.set_tensor(input_details[0]['index'], X)
+        interpreter.invoke()
+        predictions = interpreter.get_tensor(output_details[0]['index'])
         
         # Obtener clase predicha y confianza
         pred_class = np.argmax(predictions[0])
