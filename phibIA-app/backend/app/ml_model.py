@@ -4,7 +4,7 @@ import librosa
 import os
 import subprocess
 from scipy.ndimage import zoom
-from ai_edge_litert.interpreter import Interpreter
+from ai_edge_litert.interpreter import Interpreter, OpResolverType
 
 # Variables globales para el modelo
 interpreter = None
@@ -38,7 +38,13 @@ def load_model():
     print(f"🔄 Cargando modelo CNN desde {MODEL_PATH}...")
 
     # Cargar modelo CNN (TFLite)
-    interpreter = Interpreter(model_path=MODEL_PATH)
+    # BUILTIN_REF fuerza kernels de referencia en C puro (sin SSE/AVX/XNNPACK),
+    # para evitar instrucciones ilegales en CPUs viejas o VMs donde la deteccion
+    # de features del delegate XNNPACK no es confiable.
+    interpreter = Interpreter(
+        model_path=MODEL_PATH,
+        experimental_op_resolver_type=OpResolverType.BUILTIN_REF,
+    )
     interpreter.allocate_tensors()
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
